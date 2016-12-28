@@ -1,3 +1,4 @@
+" copy of https://github.com/zenbro/dotfiles
 let g:python_host_prog='/usr/bin/python3'
 let g:mapleader = "\<SPACE>"
 
