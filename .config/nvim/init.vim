@@ -1,4 +1,3 @@
-" copy of https://github.com/zenbro/dotfiles
 let g:python_host_prog='/usr/bin/python3'
 let g:mapleader = "\<SPACE>"
 
@@ -9,6 +8,10 @@ if empty(glob('~/.nvim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall
 endif
 " }}}
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
 call plug#begin('~/.nvim/plugged') " Plugins initialization start {{{
 " }}
 " Appearance
@@ -173,11 +176,7 @@ Plug 'junegunn/limelight.vim'
 
 " Completion
 " ====================================================================
-""--system-libclang
-Plug 'Valloric/YouCompleteMe', {
-            \  'do': 'python3 install.py --clang-completer
-            \  --omnisharp-completer'
-            \ }
+Plug 'Valloric/YouCompleteMe', { 'do': 'python3 install.py --clang-completer' }
 " {{{
   let g:ycm_autoclose_preview_window_after_completion = 1
   let g:ycm_seed_identifiers_with_syntax = 1
@@ -185,6 +184,26 @@ Plug 'Valloric/YouCompleteMe', {
   let g:ycm_key_invoke_completion = '<c-j>'
   let g:ycm_complete_in_strings = 1
 " }}}
+"Plug 'Shougo/neocomplete.vim' "{{{
+"let g:neocomplete#enable_at_startup = 1
+"let g:neocomplete#enable_smart_case = 1
+"let g:neocomplete#enable_auto_select = 0
+"let g:neocomplete#enable_auto_delimiter = 1
+"" Recommended key-mappings.
+"" <CR>: close popup and save indent.
+"inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+"function! s:my_cr_function()
+"	return neocomplete#close_popup() . "\<CR>"
+"endfunction
+"" <TAB>: completion.
+"inoremap <expr><TAB>p umvisible() ? "\<C-n>" : "\<TAB>"
+"" <C-h>, <BS>: close popup and delete backword char.
+"inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+"inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+"inoremap <expr><C-y> neocomplete#close_popup()
+"inoremap <expr><C-e> neocomplete#cancel_popup()
+""}}}
+
 Plug 'SirVer/ultisnips'
 " {{{
   nnoremap <leader>se :UltiSnipsEdit<CR>
