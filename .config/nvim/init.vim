@@ -173,9 +173,10 @@ Plug 'junegunn/limelight.vim'
 
 " Completion
 " ====================================================================
+""--system-libclang
 Plug 'Valloric/YouCompleteMe', {
             \  'do': 'python3 install.py --clang-completer
-            \  --system-libclang --omnisharp-completer'
+            \  --omnisharp-completer'
             \ }
 " {{{
   let g:ycm_autoclose_preview_window_after_completion = 1
@@ -235,7 +236,7 @@ Plug 'junegunn/fzf.vim'
   nnoremap <silent> <leader>O :Tags<CR>
   nnoremap <silent> <leader>? :History<CR>
   nnoremap <silent> <leader>/ :execute 'Ag ' . input('Ag/')<CR>
-  nnoremap <silent> <leader>. :AgIn 
+  nnoremap <silent> <leader>. :AgIn
 
   nnoremap <silent> K :call SearchWordWithAg()<CR>
   vnoremap <silent> K :call SearchVisualSelectionWithAg()<CR>
@@ -315,7 +316,7 @@ Plug 'vim-scripts/gtags.vim'
     :nmap <leader>tp :cp<CR>
     :nmap <leader>tt :GtagsCursor<CR>
     :nmap <leader>t<SPACE> :Gtags <C-R>=expand("<cword>")<CR><CR>
-    :nmap <leader>tr :Gtags -r <C-R>=expand("<cword>")<CR><CR>	
+    :nmap <leader>tr :Gtags -r <C-R>=expand("<cword>")<CR><CR>
     :nmap <leader>ts :Gtags -s <C-R>=expand("<cword>")<CR><CR>
     :nmap <leader>tg :Gtags -g <C-R>=expand("<cword>")<CR><CR>
     :nmap <leader>tp :Gtags -P <C-R>=expand("<cword>")<CR><CR>
@@ -603,7 +604,7 @@ Plug 'tyru/open-browser.vim'
 " }}}
 Plug 'Shougo/junkfile.vim'
 " {{{
-  nnoremap <leader>jo :JunkfileOpen 
+  nnoremap <leader>jo :JunkfileOpen
   let g:junkfile#directory = $HOME . '/.nvim/cache/junkfile'
 " }}}
 Plug 'junegunn/vim-peekaboo'
