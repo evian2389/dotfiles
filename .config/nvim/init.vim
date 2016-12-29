@@ -1,9 +1,9 @@
-let g:python_host_prog='/usr/bin/python3'
+let g:python_host_prog='/usr/bin/python'
 let g:mapleader = "\<SPACE>"
 
 " Autoinstall vim-plug {{{
-if empty(glob('~/.config/nvim/autoload/plug.vim'))
-  silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+if empty(glob('~/.nvim/autoload/plug.vim'))
+  silent !curl -fLo ~/.nvim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall
 endif
@@ -176,7 +176,7 @@ Plug 'junegunn/limelight.vim'
 
 " Completion
 " ====================================================================
-Plug 'Valloric/YouCompleteMe', { 'do': 'python3 install.py --clang-completer' }
+Plug 'Valloric/YouCompleteMe', { 'do': 'python install.py --clang-completer' }
 " {{{
   let g:ycm_autoclose_preview_window_after_completion = 1
   let g:ycm_seed_identifiers_with_syntax = 1
@@ -329,7 +329,7 @@ Plug 'vim-scripts/gtags.vim'
 " {{{
   let Gtags_Auto_Map = 1
   if g:Gtags_Auto_Map == 1
-    :nmap <leader>ti :Gtags<SPACE>-gi
+    :nmap <leader>ti :Gtags<SPACE>-gi<SPACE><C-R>=expand("<cword>")<CR>
     :nmap <leader>tf :Gtags -f %<CR>
     :nmap <leader>tn :cn<CR>
     :nmap <leader>tp :cp<CR>
@@ -440,11 +440,11 @@ Plug 'tpope/vim-ragtag'
 " {{{
   let g:ragtag_global_maps = 0
 " }}}
-Plug 'vim-ruby/vim-ruby'
-Plug 'tpope/vim-rails'
-Plug 'tpope/vim-rake'
-Plug 'tpope/vim-bundler'
-Plug 'yaymukund/vim-rabl'
+"Plug 'vim-ruby/vim-ruby'
+"Plug 'tpope/vim-rails'
+"Plug 'tpope/vim-rake'
+"Plug 'tpope/vim-bundler'
+"Plug 'yaymukund/vim-rabl'
 Plug 'tpope/vim-liquid'
 Plug 'tpope/vim-jdaddy'
 Plug 'Shougo/context_filetype.vim'
@@ -652,6 +652,17 @@ Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 call plug#end() " Plugins initialization finished {{{
 " }}}
 
+Plug 'neomake/neomake'
+let g:neomake_cpp_enabled_makers = ['hkmc']
+let g:neomake_cpp_clang_maker = {
+    \ 'exe': ['make_hkmc5th.sh'],
+    \ 'args': [''],
+    \ 'errorformat': '%*[\|\ ]%f\:%l\:%c\:\ %m',
+    \ }
+
+set makeprg=make_hkmc5th.sh
+
+Plug 'skywind3000/asyncrun.vim'
 
 Plug 'vim-scripts/DoxygenToolkit.vim'
 " Doxytulkit
@@ -679,7 +690,7 @@ set scrolloff=999       " always keep cursor at the middle of screen
 set virtualedit=onemore " allow the cursor to move just past the end of the line
 set undolevels=5000     " set maximum undo levels
 
-set encoding=utf8
+"set encoding=utf8
 " ! save global variables that doesn't contains lowercase letters
 " h disable the effect of 'hlsearch' when loading the viminfo
 " f1 store marks
