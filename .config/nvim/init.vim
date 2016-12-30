@@ -249,14 +249,18 @@ Plug 'junegunn/fzf.vim'
 
   nnoremap <silent> <leader><space> :Files<CR>
   nnoremap <silent> <Leader>ff :exe 'Files ' . <SID>fzf_root()<CR>
-  nnoremap <silent> <leader>a :Buffers<CR>
-  nnoremap <silent> <leader>A :Windows<CR>
+  nnoremap <silent> <leader><Enter> :Buffers<CR>
+  nnoremap <silent> <leader>w :Windows<CR>
   nnoremap <silent> <leader>; :BLines<CR>
   nnoremap <silent> <leader>o :BTags<CR>
   nnoremap <silent> <leader>O :Tags<CR>
   nnoremap <silent> <leader>? :History<CR>
   nnoremap <silent> <leader>/ :execute 'Ag ' . input('Ag/')<CR>
   nnoremap <silent> <leader>. :AgIn
+  nnoremap <silent> <Leader>ag       :Ag <C-R><C-W><CR>
+  nnoremap <silent> <Leader>AG       :Ag <C-R><C-A><CR>
+  xnoremap <silent> <Leader>ag       y:Ag <C-R>"<CR>
+  nnoremap <silent> <Leader>`        :Marks<CR>
 
   nnoremap <silent> K :call SearchWordWithAg()<CR>
   vnoremap <silent> K :call SearchVisualSelectionWithAg()<CR>
@@ -264,8 +268,19 @@ Plug 'junegunn/fzf.vim'
   nnoremap <silent> <leader>ga :BCommits<CR>
   nnoremap <silent> <leader>ft :Filetypes<CR>
 
-  imap <C-x><C-f> <plug>(fzf-complete-file-ag)
-  imap <C-x><C-l> <plug>(fzf-complete-line)
+  inoremap <expr> <c-x><c-t> fzf#complete('tmuxwords.rb --all-but-current --scroll 500 --min 5')
+  imap <c-x><c-k> <plug>(fzf-complete-word)
+  imap <c-x><c-f> <plug>(fzf-complete-path)
+  imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+  imap <c-x><c-l> <plug>(fzf-complete-line)
+
+  nmap <leader><tab> <plug>(fzf-maps-n)
+  xmap <leader><tab> <plug>(fzf-maps-x)
+  omap <leader><tab> <plug>(fzf-maps-o)
+
+  nmap <leader>,t :call fzf#vim#tags({'options': '-q '.shellescape(expand('<cword>')), 'down': '~40%'})
+
+  command! Plugs call fzf#run({
 
   function! SearchWordWithAg()
     execute 'Ag' expand('<cword>')
@@ -780,9 +795,6 @@ nnoremap <leader>vi :tabedit $MYVIMRC<CR>
 map <silent> <F8> :copen<CR>
 "set efm=%*[\|\ ]%f\:%l\:%c\:\ %m
 "set efm+=%*[\|\ ]%f\:%l\:%m
-
-" Quick way to save file
-nnoremap <leader>w :w<CR>
 
 " Y behave like D or C
 nnoremap Y y$
