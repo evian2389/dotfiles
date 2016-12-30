@@ -16,6 +16,7 @@ call plug#begin('~/.nvim/plugged') " Plugins initialization start {{{
 " }}
 " Appearance
 " ====================================================================
+Plug 'junegunn/seoul256.vim'
 Plug 'nanotech/jellybeans.vim'
 " {{{
   let g:jellybeans_use_term_background_color = 0
@@ -363,6 +364,7 @@ Plug 'rhysd/clever-f.vim'
 " Text Manipulation
 " ====================================================================
 Plug 'tpope/vim-surround'
+Plug 'junegunn/vim-peekaboo'
 Plug 'junegunn/vim-easy-align'
 " {{{
   let g:easy_align_ignore_comment = 0 " align comments
@@ -514,6 +516,20 @@ Plug 'tpope/vim-fugitive'
     autocmd BufReadPost fugitive://* setlocal bufhidden=delete
   augroup END
 " }}}
+Plug 'junegunn/gv.vim'
+":GV to open commit browser
+"You can pass git log options to the command, e.g. :GV -S foobar.
+":GV! will only list commits that affected the current file
+":GV? fills the location list with the revisions of the current file
+":GV or :GV? can be used in visual mode to track the changes in the selected lines.
+"o or <cr> on a commit to display the content of it
+"o or <cr> on commits to display the diff in the range
+"O opens a new tab instead
+"gb for :Gbrowse
+"]] and [[ to move between commits
+". to start command-line with :Git [CURSOR] SHA à la fugitive
+"q to close
+
 Plug 'airblade/vim-gitgutter'
 " {{{
   let g:gitgutter_map_keys = 0
@@ -674,6 +690,8 @@ let g:DoxygenToolkit_blockHeader="----------------------------------------------
 let g:DoxygenToolkit_blockFooter="----------------------------------------------------------------------------"
 let g:DoxygenToolkit_authorName="jongho3.lee@lge.com"
 let g:DoxygenToolkit_licenseTag="LG\ Electroincs"
+Plug 'junegunn/vim-slash'
+
 
 " General settings {{{
 " ====================================================================
@@ -731,7 +749,9 @@ hi Search guibg=Yellow guifg=Black ctermbg=brown ctermfg=Black
 " }}}
 " Colors and highlightings {{{
 " ====================================================================
-colorscheme jellybeans
+"colorscheme jellybeans
+let g:seoul256_background = 234
+colorscheme seoul256
 let g:lightline#colorscheme#jellybeans_mod#palette = lightline#colorscheme#flatten(s:p)
 
 set cursorline     " highlight current line
@@ -814,10 +834,21 @@ nnoremap <C-j> :bn<CR>
 nnoremap <C-k> :np<CR>
 nnoremap <C-l> :tn<CR>
 
+tnoremap <A-h> <C-\><C-n><C-w>h
+tnoremap <A-j> <C-\><C-n><C-w>j
+tnoremap <A-k> <C-\><C-n><C-w>k
+tnoremap <A-l> <C-\><C-n><C-w>l
 nnoremap <A-h> <C-w>h
 nnoremap <A-j> <C-w>j
 nnoremap <A-k> <C-w>k
 nnoremap <A-l> <C-w>l
+
+" Movement in insert mode
+inoremap <C-h> <C-o>h
+inoremap <C-l> <C-o>a
+inoremap <C-j> <C-o>j
+inoremap <C-k> <C-o>k
+inoremap <C-^> <C-o><C-^>
 
 " Creating splits with empty buffers in all directions
 nnoremap <Leader>hn :leftabove  vnew<CR>
