@@ -1532,7 +1532,7 @@ nmap <leader>8 8gt
 nmap <leader>9 9gt
 nnoremap <C-h> :tp<CR>
 nnoremap <C-j> :bn<CR>
-nnoremap <C-k> :np<CR>
+nnoremap <C-k> :bp<CR>
 nnoremap <C-l> :tn<CR>
 
 tnoremap <A-h> <C-\><C-n><C-w>h
