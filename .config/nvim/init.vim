@@ -1,5 +1,17 @@
 let g:python_host_prog='/usr/bin/python'
-let g:mapleader = "\<SPACE>"
+let g:mapleader = " "
+
+let s:darwin = has('mac')
+
+if s:darwin
+  let g:plug_url_format = 'git@github.com:%s.git'
+else
+  let $GIT_SSL_NO_VERIFY = 'true'
+endif
+if s:darwin
+  Plug 'junegunn/vim-xmark'
+endif
+unlet! g:plug_url_format
 
 " Autoinstall vim-plug {{{
 if empty(glob('~/.nvim/autoload/plug.vim'))
@@ -8,13 +20,18 @@ if empty(glob('~/.nvim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall
 endif
 " }}}
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-call plug#begin('~/.nvim/plugged') " Plugins initialization start {{{
-" }}
-" Appearance
+"nnoremap <C-h> <C-w>h
+"nnoremap <C-j> <C-w>j
+"nnoremap <C-k> <C-w>k
+"nnoremap <C-l> <C-w>l
+" ============================================================================
+" VIM-PLUG BLOCK {{{
+" ============================================================================
+
+call plug#begin('~/.nvim/plugged')
+
+" ============================================================================
+" Appearance {{{
 " ====================================================================
 Plug 'junegunn/seoul256.vim'
 Plug 'nanotech/jellybeans.vim'
@@ -167,7 +184,42 @@ Plug 'kshenoy/vim-signature'
     \ }
 " }}}
 Plug 'tpope/vim-sleuth'
+Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
+" ----------------------------------------------------------------------------
+" goyo.vim + limelight.vim
+" ----------------------------------------------------------------------------
+let g:limelight_paragraph_span = 1
+let g:limelight_priority = -1
+
+function! s:goyo_enter()
+  if has('gui_running')
+    set fullscreen
+    set background=light
+    set linespace=7
+  elseif exists('$TMUX')
+    silent !tmux set status off
+  endif
+  " hi NonText ctermfg=101
+  Limelight
+endfunction
+
+function! s:goyo_leave()
+  if has('gui_running')
+    set nofullscreen
+    set background=dark
+    set linespace=0
+  elseif exists('$TMUX')
+    silent !tmux set status on
+  endif
+  Limelight!
+endfunction
+
+autocmd! User GoyoEnter nested call <SID>goyo_enter()
+autocmd! User GoyoLeave nested call <SID>goyo_leave()
+
+nnoremap <Leader>G :Goyo<CR>
+
 " {{{
   let g:limelight_default_coefficient = 0.7
   let g:limelight_conceal_ctermfg = 238
@@ -175,8 +227,15 @@ Plug 'junegunn/limelight.vim'
   xmap gl <Plug>(Limelight)
 " }}}
 
-" Completion
+" }}}
+
 " ====================================================================
+" Completion " {{{
+" ====================================================================
+" set complete=.,w,b,u,t
+set complete=i,t,b
+
+set completeopt=menuone,preview
 Plug 'Valloric/YouCompleteMe', { 'do': 'python install.py --clang-completer' }
 " {{{
   let g:ycm_autoclose_preview_window_after_completion = 1
@@ -217,9 +276,65 @@ Plug 'SirVer/ultisnips'
   let g:UltiSnipsJumpBackwardTrigger = '<c-b>'
   let g:ulti_expand_or_jump_res = 0
 " }}}
-Plug 'honza/vim-snippets'
+" ----------------------------------------------------------------------------
+" <tab> / <s-tab> / <c-v><tab> | super-duper-tab
+" ----------------------------------------------------------------------------
+function! s:can_complete(func, prefix)
+  if empty(a:func) || call(a:func, [1, '']) < 0
+    return 0
+  endif
+  let result = call(a:func, [0, matchstr(a:prefix, '\k\+$')])
+  return !empty(type(result) == type([]) ? result : result.words)
+endfunction
 
-" File Navigation
+function! s:super_duper_tab(k, o)
+  if pumvisible()
+    return a:k
+  endif
+
+  let line = getline('.')
+  let col = col('.') - 2
+  if line[col] !~ '\k\|[/~.]'
+    return a:o
+  endif
+
+  let prefix = expand(matchstr(line[0:col], '\S*$'))
+  if prefix =~ '^[~/.]'
+    return "\<c-x>\<c-f>"
+  endif
+  if s:can_complete(&omnifunc, prefix)
+    return "\<c-x>\<c-o>"
+  endif
+  if s:can_complete(&completefunc, prefix)
+    return "\<c-x>\<c-u>"
+  endif
+  return a:k
+endfunction
+
+if has_key(g:plugs, 'ultisnips')
+  " UltiSnips will be loaded only when tab is first pressed in insert mode
+  if !exists(':UltiSnipsEdit')
+    inoremap <silent> <Plug>(tab) <c-r>=plug#load('ultisnips')?UltiSnips#ExpandSnippet():''<cr>
+    imap <tab> <Plug>(tab)
+  endif
+
+  let g:SuperTabMappingForward  = "<tab>"
+  let g:SuperTabMappingBackward = "<s-tab>"
+  function! SuperTab(m)
+    return s:super_duper_tab(a:m == 'n' ? "\<c-n>" : "\<c-p>",
+                           \ a:m == 'n' ? "\<tab>" : "\<s-tab>")
+  endfunction
+else
+  inoremap <expr> <tab>   <SID>super_duper_tab("\<c-n>", "\<tab>")
+  inoremap <expr> <s-tab> <SID>super_duper_tab("\<c-p>", "\<s-tab>")
+endif
+
+" ----------------------------------------------------------------------------
+Plug 'honza/vim-snippets'
+" }}}
+
+" ====================================================================
+" File Navigation " {{{
 " ====================================================================
 Plug 'scrooloose/nerdtree'
 " {{{
@@ -247,18 +362,18 @@ Plug 'junegunn/fzf.vim'
 " {{{
   let g:fzf_nvim_statusline = 0 " disable statusline overwriting
 
-  nnoremap <silent> <leader><space> :Files<CR>
-  nnoremap <silent> <Leader>ff :exe 'Files ' . <SID>fzf_root()<CR>
-  nnoremap <silent> <leader><Enter> :Buffers<CR>
+  nnoremap <silent> <leader><Enter> :Files<CR>
+  nnoremap <silent> <leader><space> :exe 'Files ' . <SID>fzf_root()<CR>
+  nnoremap <silent> <leader>fb :Buffers<CR>
   nnoremap <silent> <leader>w :Windows<CR>
   nnoremap <silent> <leader>; :BLines<CR>
-  nnoremap <silent> <leader>o :BTags<CR>
-  nnoremap <silent> <leader>O :Tags<CR>
-  nnoremap <silent> <leader>? :History<CR>
+  nnoremap <silent> <leader>fT :BTags<CR>
+  nnoremap <silent> <leader>ft :Tags<CR>
+  nnoremap <silent> <leader>fh :History<CR>
   nnoremap <silent> <leader>/ :execute 'Ag ' . input('Ag/')<CR>
   nnoremap <silent> <leader>. :AgIn
   nnoremap <silent> <Leader>ag       :Ag <C-R><C-W><CR>
-  nnoremap <silent> <Leader>AG       :Ag <C-R><C-A><CR>
+  nnoremap <silent> <Leader>aG       :Ag <C-R><C-A><CR>
   xnoremap <silent> <Leader>ag       y:Ag <C-R>"<CR>
   nnoremap <silent> <Leader>`        :Marks<CR>
 
@@ -268,19 +383,23 @@ Plug 'junegunn/fzf.vim'
   nnoremap <silent> <leader>ga :BCommits<CR>
   nnoremap <silent> <leader>ft :Filetypes<CR>
 
-  inoremap <expr> <c-x><c-t> fzf#complete('tmuxwords.rb --all-but-current --scroll 500 --min 5')
-  imap <c-x><c-k> <plug>(fzf-complete-word)
-  imap <c-x><c-f> <plug>(fzf-complete-path)
-  imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-  imap <c-x><c-l> <plug>(fzf-complete-line)
+  inoremap <expr> <leader>fm fzf#complete('tmuxwords.rb --all-but-current --scroll 500 --min 5')
+  imap <leader>fw <plug>(fzf-complete-word)
+  imap <leader>fp <plug>(fzf-complete-path)
+  imap <leader>ff <plug>(fzf-complete-file-ag)
+  imap <leader>fl <plug>(fzf-complete-line)
 
   nmap <leader><tab> <plug>(fzf-maps-n)
   xmap <leader><tab> <plug>(fzf-maps-x)
   omap <leader><tab> <plug>(fzf-maps-o)
 
-  nmap <leader>,t :call fzf#vim#tags({'options': '-q '.shellescape(expand('<cword>')), 'down': '~40%'})
 
   command! Plugs call fzf#run({
+  \ 'source':  map(sort(keys(g:plugs)), 'g:plug_home."/".v:val'),
+  \ 'options': '--delimiter / --nth -1',
+  \ 'down':    '~40%',
+  \ 'sink':    'Explore'})
+
 
   function! SearchWordWithAg()
     execute 'Ag' expand('<cword>')
@@ -329,6 +448,76 @@ Plug 'zenbro/mirror.vim'
   nnoremap <leader>mc :MirrorConfig<CR>
 " }}}
 
+
+" ----------------------------------------------------------------------------
+" AutoSave
+" ----------------------------------------------------------------------------
+function! s:autosave(enable)
+  augroup autosave
+    autocmd!
+    if a:enable
+      autocmd TextChanged,InsertLeave <buffer>
+            \  if empty(&buftype) && !empty(bufname(''))
+            \|   silent! update
+            \| endif
+    endif
+  augroup END
+endfunction
+
+command! -bang AutoSave call s:autosave(<bang>1)
+
+" ----------------------------------------------------------------------------
+" Todo
+" ----------------------------------------------------------------------------
+function! s:todo() abort
+  let entries = []
+  for cmd in ['git grep -n -e TODO -e FIXME -e XXX 2> /dev/null',
+            \ 'grep -rn -e TODO -e FIXME -e XXX * 2> /dev/null']
+    let lines = split(system(cmd), '\n')
+    if v:shell_error != 0 | continue | endif
+    for line in lines
+      let [fname, lno, text] = matchlist(line, '^\([^:]*\):\([^:]*\):\(.*\)')[1:3]
+      call add(entries, { 'filename': fname, 'lnum': lno, 'text': text })
+    endfor
+    break
+  endfor
+
+  if !empty(entries)
+    call setqflist(entries)
+    copen
+  endif
+endfunction
+command! Todo call s:todo()
+
+" ----------------------------------------------------------------------------
+
+
+" ----------------------------------------------------------------------------
+" :A SwitchSourceHeader
+" ----------------------------------------------------------------------------
+function! s:a()
+  let name = expand('%:r')
+  let ext = tolower(expand('%:e'))
+  let sources = ['c', 'cc', 'cpp', 'cxx']
+  let headers = ['h', 'hh', 'hpp', 'hxx']
+  for pair in [[sources, headers], [headers, sources]]
+    let [set1, set2] = pair
+    if index(set1, ext) >= 0
+      for h in set2
+        let aname = name.'.'.h
+        for a in [aname, toupper(aname)]
+          if filereadable(a)
+            execute 'e' a
+            return
+          end
+        endfor
+      endfor
+    endif
+  endfor
+endfunction
+command! A call s:a()
+
+" ----------------------------------------------------------------------------
 function! SwitchSourceHeader()
     "update!
     if (expand ("%:e") == "cpp")
@@ -339,8 +528,21 @@ function! SwitchSourceHeader()
 endfunction
 nmap <leader>,s :call SwitchSourceHeader()<CR>
 
-" Tag Navigation
+if v:version >= 703
+  Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle'      }
+" <F11> | Tagbar
+  inoremap <F11> <esc>:TagbarToggle<cr>
+  nnoremap <F11> :TagbarToggle<cr>
+  let g:tagbar_sort = 0
+endif
+
+Plug 'justinmk/vim-gtfo'
+" }}}
 " ====================================================================
+" Tag Navigation {{{
+" ====================================================================
+" ctags
+set tags=./tags;/
 Plug 'vim-scripts/gtags.vim'
 " {{{
   let Gtags_Auto_Map = 1
@@ -356,14 +558,172 @@ Plug 'vim-scripts/gtags.vim'
     :nmap <leader>tg :Gtags -g <C-R>=expand("<cword>")<CR><CR>
     :nmap <leader>tp :Gtags -P <C-R>=expand("<cword>")<CR><CR>
   endif
+
+Plug 'ludovicchabant/vim-gutentags'
+" {{{
+  let g:gutentags_exclude = [
+      \ '*.min.js',
+      \ '*html*',
+      \ 'jquery*.js',
+      \ '*/vendor/*',
+      \ '*/node_modules/*',
+      \ '*/python2.7/*',
+      \ '*/migrate/*.rb'
+      \ ]
+  let g:gutentags_generate_on_missing = 0
+  let g:gutentags_generate_on_write = 0
+  let g:gutentags_generate_on_new = 0
+  nnoremap <leader>t! :GutentagsUpdate!<CR>
+" }}}
+" ----------------------------------------------------------------------------
+" Cscope mappings
+" ----------------------------------------------------------------------------
+function! s:add_cscope_db()
+  " add any database in current directory
+  let db = findfile('cscope.out', '.;')
+  if !empty(db)
+    silent cs reset
+    silent! execute 'cs add' db
+  " else add database pointed to by environment
+  elseif !empty($CSCOPE_DB)
+    silent cs reset
+    silent! execute 'cs add' $CSCOPE_DB
+  endif
+endfunction
+
+if has("cscope")
+  set csprg=/usr/local/bin/cscope
+  set csto=0
+  set cst
+  set nocsverb
+  set csverb
+  call s:add_cscope_db()
+
+  "   's'   symbol: find all references to the token under cursor
+  "   'g'   global: find global definition(s) of the token under cursor
+  "   'c'   calls:  find all calls to the function name under cursor
+  "   't'   text:   find all instances of the text under cursor
+  "   'e'   egrep:  egrep search for the word under cursor
+  "   'f'   file:   open the filename under cursor
+  "   'i'   includes: find files that include the filename under cursor
+  "   'd'   called: find functions that function under cursor calls
+  nnoremap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+  nnoremap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+  nnoremap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+  nnoremap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+  xnoremap <C-\>t y:cs find t <C-R>"<CR>
+  " nnoremap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+  nnoremap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+  " nnoremap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+  nnoremap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+
+  " extends
+  nnoremap <C-\>e :cs find t extends <C-R>=expand("<cword>")<CR><CR>
+  " implements
+  nnoremap <C-\>i :cs find t implements <C-R>=expand("<cword>")<CR><CR>
+  " new
+  nnoremap <C-\>n :cs find t new <C-R>=expand("<cword>")<CR><CR>
+endif
+
+" ----------------------------------------------------------------------------
+" :CSBuild
+" ----------------------------------------------------------------------------
+function! s:build_cscope_db(...)
+  let git_dir = system('git rev-parse --git-dir')
+  let chdired = 0
+  if !v:shell_error
+    let chdired = 1
+    execute 'cd' substitute(fnamemodify(git_dir, ':p:h'), ' ', '\\ ', 'g')
+  endif
+
+  let exts = empty(a:000) ?
+    \ ['java', 'c', 'h', 'cc', 'hh', 'cpp', 'hpp'] : a:000
+
+  let cmd = "find . " . join(map(exts, "\"-name '*.\" . v:val . \"'\""), ' -o ')
+  let tmp = tempname()
+  try
+    echon 'Building cscope.files'
+    call system(cmd.' | grep -v /test/ > '.tmp)
+    echon ' - cscoped db'
+    call system('cscope -b -q -i'.tmp)
+    echon ' - complete!'
+    call s:add_cscope_db()
+  finally
+    silent! call delete(tmp)
+    if chdired
+      cd -
+    endif
+  endtry
+endfunction
+command! CSBuild call s:build_cscope_db(<f-args>)
+
 " }}}
 
-" UI Navigation
+" ====================================================================
+" UI Navigation" {{{
 " ====================================================================
 Plug 'itspriddle/ZoomWin'
+" Zoom
+function! s:zoom()
+  if winnr('$') > 1
+    tab split
+  elseif len(filter(map(range(tabpagenr('$')), 'tabpagebuflist(v:val + 1)'),
+                  \ 'index(v:val, '.bufnr('').') >= 0')) > 1
+    tabclose
+  endif
+endfunction
+nnoremap <silent> <leader>z :call <sid>zoom()<cr>
 
-" Text Navigation
+" ----------------------------------------------------------------------------
+" }}}
+"
 " ====================================================================
+" Text Navigation" {{{
+" ====================================================================
+"Plug 'junegunn/vim-slash'
+" ----------------------------------------------------------------------------
+" vim-slash
+" ----------------------------------------------------------------------------
+function! s:blink(times, delay)
+  let s:blink = { 'ticks': 2 * a:times, 'delay': a:delay }
+
+  function! s:blink.tick(_)
+    let self.ticks -= 1
+    let active = self == s:blink && self.ticks > 0
+
+    if !self.clear() && active && &hlsearch
+      let [line, col] = [line('.'), col('.')]
+      let w:blink_id = matchadd('IncSearch',
+            \ printf('\%%%dl\%%>%dc\%%<%dc', line, max([0, col-2]), col+2))
+    endif
+    if active
+      call timer_start(self.delay, self.tick)
+    endif
+  endfunction
+
+  function! s:blink.clear()
+    if exists('w:blink_id')
+      call matchdelete(w:blink_id)
+      unlet w:blink_id
+      return 1
+    endif
+  endfunction
+
+  call s:blink.clear()
+  call s:blink.tick(0)
+  return ''
+endfunction
+
+if has('timers')
+  if has_key(g:plugs, 'vim-slash')
+    noremap <expr> <plug>(slash-after) <sid>blink(2, 50)
+  else
+    noremap <expr> n 'n'.<sid>blink(2, 50)
+    noremap <expr> N 'N'.<sid>blink(2, 50)
+    cnoremap <expr> <cr> (stridx('/?', getcmdtype()) < 0 ? '' : <sid>blink(2, 50))."\<cr>"
+  endif
+endif
+
 Plug 'Lokaltog/vim-easymotion'
 " {{{
   let g:EasyMotion_do_mapping = 0
@@ -376,11 +736,124 @@ Plug 'rhysd/clever-f.vim'
   let g:clever_f_across_no_line = 1
 " }}}
 
-" Text Manipulation
+"----------------------------------------------------------------------------
+" #gi / #gpi | go to next/previous indentation level
+" ----------------------------------------------------------------------------
+function! s:go_indent(times, dir)
+  for _ in range(a:times)
+    let l = line('.')
+    let x = line('$')
+    let i = s:indent_len(getline(l))
+    let e = empty(getline(l))
+
+    while l >= 1 && l <= x
+      let line = getline(l + a:dir)
+      let l += a:dir
+      if s:indent_len(line) != i || empty(line) != e
+        break
+      endif
+    endwhile
+    let l = min([max([1, l]), x])
+    execute 'normal! '. l .'G^'
+  endfor
+endfunction
+nnoremap <silent> gi :<c-u>call <SID>go_indent(v:count1, 1)<cr>
+nnoremap <silent> gpi :<c-u>call <SID>go_indent(v:count1, -1)<cr>
+
+" }}}
+"
 " ====================================================================
+" Text Manipulation" {{{
+" ====================================================================
+set nrformats=hex
+if v:version >= 703
+  Plug 'junegunn/vim-after-object'
+endif
+" ----------------------------------------------------------------------------
+" vim-after-object
+" ----------------------------------------------------------------------------
+silent! if has_key(g:plugs, 'vim-after-object')
+  autocmd VimEnter * silent! call after_object#enable('=', ':', '#', ' ', '|')
+endif
+
+"# va=  visual after =
+"# ca=  change after =
+"# da=  delete after =
+"# ya=  yank after =
+Plug 'junegunn/vim-journal'
+Plug 'junegunn/vim-pseudocl'
+Plug 'junegunn/vim-fnr'
+Plug 'junegunn/vim-emoji'
+" ----------------------------------------------------------------------------
+" vim-emoji :dog: :cat: :rabbit:!
+" ----------------------------------------------------------------------------
+function! s:replace_emojis() range
+  for lnum in range(a:firstline, a:lastline)
+    let line = getline(lnum)
+    let subs = substitute(line,
+          \ ':\([^:]\+\):', '\=emoji#for(submatch(1), submatch(0))', 'g')
+    if line != subs
+      call setline(lnum, subs)
+    endif
+  endfor
+endfunction
+command! -range EmojiReplace <line1>,<line2>call s:replace_emojis()
+
+" ----------------------------------------------------------------------------
+Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'junegunn/vim-peekaboo'
-Plug 'junegunn/vim-easy-align'
+" qq to record, Q to replay (recursive map due to peekaboo)
+" {{{
+  let g:peekaboo_delay = 400
+" }}}
+nmap Q @q
+
+Plug 'junegunn/rainbow_parentheses.vim'
+Plug 'junegunn/vim-easy-align',       { 'on': ['<Plug>(EasyAlign)', 'EasyAlign'] }
+" ----------------------------------------------------------------------------
+" <Enter> | vim-easy-align
+" ----------------------------------------------------------------------------
+let g:easy_align_delimiters = {
+\ '>': { 'pattern': '>>\|=>\|>' },
+\ '\': { 'pattern': '\\' },
+\ '/': { 'pattern': '//\+\|/\*\|\*/', 'delimiter_align': 'l', 'ignore_groups': ['!Comment'] },
+\ ']': {
+\     'pattern':       '\]\zs',
+\     'left_margin':   0,
+\     'right_margin':  1,
+\     'stick_to_left': 0
+\   },
+\ ')': {
+\     'pattern':       ')\zs',
+\     'left_margin':   0,
+\     'right_margin':  1,
+\     'stick_to_left': 0
+\   },
+\ 'f': {
+\     'pattern': ' \(\S\+(\)\@=',
+\     'left_margin': 0,
+\     'right_margin': 0
+\   },
+\ 'd': {
+\     'pattern': ' \ze\S\+\s*[;=]',
+\     'left_margin': 0,
+\     'right_margin': 0
+\   }
+\ }
+
+" Start interactive EasyAlign in visual mode
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign with a Vim movement
+nmap ga <Plug>(EasyAlign)
+nmap gaa ga_
+
+" xmap <Leader><Enter>   <Plug>(LiveEasyAlign)
+" nmap <Leader><Leader>a <Plug>(LiveEasyAlign)
+
+" inoremap <silent> => =><Esc>mzvip:EasyAlign/=>/<CR>`z$a<Space>
+
 " {{{
   let g:easy_align_ignore_comment = 0 " align comments
   vnoremap <silent> <Enter> :EasyAlign<cr>
@@ -394,8 +867,11 @@ Plug 'Raimondi/delimitMate'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'AndrewRadev/switch.vim'
 " {{{
-  let g:switch_mapping = '\'
-" }}}
+  let g:splitjoin_split_mapping = ''
+  let g:splitjoin_join_mapping = ''
+  nnoremap gss :SplitjoinSplit<cr>
+  nnoremap gsj :SplitjoinJoin<cr>
+  " }}}
 Plug 'AndrewRadev/sideways.vim'
 " {{{
   nnoremap <Leader>< :SidewaysLeft<CR>
@@ -404,17 +880,89 @@ Plug 'AndrewRadev/sideways.vim'
 Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-abolish'
-
-" Text Objects
-" ====================================================================
+Plug 'tpope/vim-commentary',        { 'on': '<Plug>Commentary' }
+Plug 'vim-scripts/ReplaceWithRegister'
+"Plug 'rhysd/vim-grammarous'
+Plug 'chrisbra/unicode.vim', { 'for': 'journal' }
+" }}}
+" ============================================================================
+" TEXT OBJECTS {{{
+" ============================================================================
 Plug 'kana/vim-textobj-user'
 Plug 'kana/vim-textobj-indent'
 Plug 'nelstrom/vim-textobj-rubyblock'
 
-" Languages
+" ----------------------------------------------------------------------------
+" Common
+" ----------------------------------------------------------------------------
+function! s:textobj_cancel()
+  if v:operator == 'c'
+    augroup textobj_undo_empty_change
+      autocmd InsertLeave <buffer> execute 'normal! u'
+            \| execute 'autocmd! textobj_undo_empty_change'
+            \| execute 'augroup! textobj_undo_empty_change'
+    augroup END
+  endif
+endfunction
+
+noremap         <Plug>(TOC) <nop>
+inoremap <expr> <Plug>(TOC) exists('#textobj_undo_empty_change')?"\<esc>":''
+
+" ----------------------------------------------------------------------------
+" ?ii / ?ai | indent-object
+" ?io       | strictly-indent-object
+" ----------------------------------------------------------------------------
+function! s:indent_len(str)
+  return type(a:str) == 1 ? len(matchstr(a:str, '^\s*')) : 0
+endfunction
+
+function! s:indent_object(op, skip_blank, b, e, bd, ed)
+  let i = min([s:indent_len(getline(a:b)), s:indent_len(getline(a:e))])
+  let x = line('$')
+  let d = [a:b, a:e]
+
+  if i == 0 && empty(getline(a:b)) && empty(getline(a:e))
+    let [b, e] = [a:b, a:e]
+    while b > 0 && e <= line('$')
+      let b -= 1
+      let e += 1
+      let i = min(filter(map([b, e], 's:indent_len(getline(v:val))'), 'v:val != 0'))
+      if i > 0
+        break
+      endif
+    endwhile
+  endif
+
+  for triple in [[0, 'd[o] > 1', -1], [1, 'd[o] < x', +1]]
+    let [o, ev, df] = triple
+
+    while eval(ev)
+      let line = getline(d[o] + df)
+      let idt = s:indent_len(line)
+
+      if eval('idt '.a:op.' i') && (a:skip_blank || !empty(line)) || (a:skip_blank && empty(line))
+        let d[o] += df
+      else | break | end
+    endwhile
+  endfor
+  execute printf('normal! %dGV%dG', max([1, d[0] + a:bd]), min([x, d[1] + a:ed]))
+endfunction
+xnoremap <silent> ii :<c-u>call <SID>indent_object('>=', 1, line("'<"), line("'>"), 0, 0)<cr>
+onoremap <silent> ii :<c-u>call <SID>indent_object('>=', 1, line('.'), line('.'), 0, 0)<cr>
+xnoremap <silent> ai :<c-u>call <SID>indent_object('>=', 1, line("'<"), line("'>"), -1, 1)<cr>
+onoremap <silent> ai :<c-u>call <SID>indent_object('>=', 1, line('.'), line('.'), -1, 1)<cr>
+xnoremap <silent> io :<c-u>call <SID>indent_object('==', 0, line("'<"), line("'>"), 0, 0)<cr>
+onoremap <silent> io :<c-u>call <SID>indent_object('==', 0, line('.'), line('.'), 0, 0)<cr>
+
+" }}}
+
+" ====================================================================
+" Languages" {{{
 " ====================================================================
 Plug 'scrooloose/syntastic'
 " {{{
+  let g:syntastic_always_populate_loc_list = 1
+  let g:syntastic_auto_loc_list = 1
   let g:syntastic_enable_signs          = 1
   let g:syntastic_enable_highlighting   = 1
   let g:syntastic_cpp_check_header      = 1
@@ -451,11 +999,6 @@ Plug 'scrooloose/syntastic'
 Plug 'mattn/emmet-vim'
 " {{{
   let g:user_emmet_expandabbr_key = '<c-e>'
-" }}}
-Plug 'Valloric/MatchTagAlways'
-Plug 'tpope/vim-ragtag'
-" {{{
-  let g:ragtag_global_maps = 0
 " }}}
 "Plug 'vim-ruby/vim-ruby'
 "Plug 'tpope/vim-rails'
@@ -494,8 +1037,24 @@ Plug 'qbbr/vim-twig'
 Plug 'mxw/vim-jsx'
 Plug 'ekalinin/Dockerfile.vim'
 
-" Git
+"html
+Plug 'Valloric/MatchTagAlways'
+Plug 'tpope/vim-ragtag'
+" {{{
+  let g:ragtag_global_maps = 0
+" }}}
+" }}}
+
+" }}}
 " ====================================================================
+" Git" {{{
+" ====================================================================
+Plug 'junegunn/vim-github-dashboard', { 'on': ['GHDashboard', 'GHActivity']      }
+" ----------------------------------------------------------------------------
+" vim-github-dashboard
+" ----------------------------------------------------------------------------
+let g:github_dashboard = { 'username': 'evian2389' }
+
 Plug 'tpope/vim-fugitive'
 " {{{
   " Fix broken syntax highlight in gitcommit files
@@ -532,6 +1091,42 @@ Plug 'tpope/vim-fugitive'
   augroup END
 " }}}
 Plug 'junegunn/gv.vim'
+" ----------------------------------------------------------------------------
+" gv.vim / gl.vim
+" ----------------------------------------------------------------------------
+function! s:gv_expand()
+  let line = getline('.')
+  GV --name-status
+  call search('\V'.line, 'c')
+  normal! zz
+endfunction
+
+autocmd! FileType GV nnoremap <buffer> <silent> + :call <sid>gv_expand()<cr>
+
+if v:version >= 703
+  Plug 'mhinz/vim-signify'
+  " ----------------------------------------------------------------------------
+  " vim-signify
+  " ----------------------------------------------------------------------------
+  let g:signify_vcs_list = ['git']
+  let g:signify_skip_filetype = { 'journal': 1 }
+
+  " ----------------------------------------------------------------------------
+endif
+
+" ----------------------------------------------------------------------------
+" gv.vim / gl.vim
+" ----------------------------------------------------------------------------
+function! s:gv_expand()
+  let line = getline('.')
+  GV --name-status
+  call search('\V'.line, 'c')
+  normal! zz
+endfunction
+
+autocmd! FileType GV nnoremap <buffer> <silent> + :call <sid>gv_expand()<cr>
+
+" ----------------------------------------------------------------------------
 ":GV to open commit browser
 "You can pass git log options to the command, e.g. :GV -S foobar.
 ":GV! will only list commits that affected the current file
@@ -548,7 +1143,7 @@ Plug 'junegunn/gv.vim'
 Plug 'airblade/vim-gitgutter'
 " {{{
   let g:gitgutter_map_keys = 0
-  let g:gitgutter_max_signs = 200
+  let g:gitgutter_max_signs = 1200
   let g:gitgutter_realtime = 1
   let g:gitgutter_eager = 1
   let g:gitgutter_sign_removed = '–'
@@ -562,8 +1157,99 @@ Plug 'airblade/vim-gitgutter'
 " }}}
 Plug 'esneider/YUNOcommit.vim'
 
-" Utility
+" }}}
 " ====================================================================
+" Utility" {{{
+" ====================================================================
+
+" ----------------------------------------------------------------------------
+" <F5> / <F6> | Run script
+" ----------------------------------------------------------------------------
+function! s:run_this_script(output)
+  let head   = getline(1)
+  let pos    = stridx(head, '#!')
+  let file   = expand('%:p')
+  let ofile  = tempname()
+  let rdr    = " 2>&1 | tee ".ofile
+  let win    = winnr()
+  let prefix = a:output ? 'silent !' : '!'
+  " Shebang found
+  if pos != -1
+    execute prefix.strpart(head, pos + 2).' '.file.rdr
+  " Shebang not found but executable
+  elseif executable(file)
+    execute prefix.file.rdr
+  elseif &filetype == 'ruby'
+    execute prefix.'/usr/bin/env ruby '.file.rdr
+  elseif &filetype == 'tex'
+    execute prefix.'latex '.file. '; [ $? -eq 0 ] && xdvi '. expand('%:r').rdr
+  elseif &filetype == 'dot'
+    let svg = expand('%:r') . '.svg'
+    let png = expand('%:r') . '.png'
+    " librsvg >> imagemagick + ghostscript
+    execute 'silent !dot -Tsvg '.file.' -o '.svg.' && '
+          \ 'rsvg-convert -z 2 '.svg.' > '.png.' && open '.png.rdr
+  else
+    return
+  end
+  redraw!
+  if !a:output | return | endif
+
+  " Scratch buffer
+  if exists('s:vim_exec_buf') && bufexists(s:vim_exec_buf)
+    execute bufwinnr(s:vim_exec_buf).'wincmd w'
+    %d
+  else
+    silent!  bdelete [vim-exec-output]
+    silent!  vertical botright split new
+    silent!  file [vim-exec-output]
+    setlocal buftype=nofile bufhidden=wipe noswapfile
+    let      s:vim_exec_buf = winnr()
+  endif
+  execute 'silent! read' ofile
+  normal! gg"_dd
+  execute win.'wincmd w'
+endfunction
+nnoremap <silent> <F5> :call <SID>run_this_script(0)<cr>
+nnoremap <silent> <F6> :call <SID>run_this_script(1)<cr>
+
+
+" ----------------------------------------------------------------------------
+" SaveMacro / LoadMacro
+" ----------------------------------------------------------------------------
+function! s:save_macro(name, file)
+  let content = eval('@'.a:name)
+  if !empty(content)
+    call writefile(split(content, "\n"), a:file)
+    echom len(content) . " bytes save to ". a:file
+  endif
+endfunction
+command! -nargs=* SaveMacro call <SID>save_macro(<f-args>)
+
+function! s:load_macro(file, name)
+  let data = join(readfile(a:file), "\n")
+  call setreg(a:name, data, 'c')
+  echom "Macro loaded to @". a:name
+endfunction
+command! -nargs=* LoadMacro call <SID>load_macro(<f-args>)
+
+" ----------------------------------------------------------------------------
+
+
+" ----------------------------------------------------------------------------
+" ----------------------------------------------------------------------------
+" :Count
+" ----------------------------------------------------------------------------
+command! -nargs=1 Count execute printf('%%s/%s//gn', escape(<q-args>, '/')) | normal! ``
+
+" ----------------------------------------------------------------------------
+Plug 'justinmk/vim-gtfo'
+" {{{
+" gof: Go to the current file's directory in the File manager
+" goF (uppercase F) opens the current working directory (:pwd)
+" got: Go to the current file's directory in the Terminal
+" goT (uppercase T) opens the current working directory (:pwd)
+" }}}
 Plug 'lyokha/vim-xkbswitch'
 " {{{
   let g:XkbSwitchEnabled = 1
@@ -581,22 +1267,8 @@ Plug 'lyokha/vim-xkbswitch'
   nnoremap <silent> л :call RestoreKeyboardLayout('k')<CR>
   nnoremap <silent> д :call RestoreKeyboardLayout('l')<CR>
 " }}}
-Plug 'ludovicchabant/vim-gutentags'
-" {{{
-  let g:gutentags_exclude = [
-      \ '*.min.js',
-      \ '*html*',
-      \ 'jquery*.js',
-      \ '*/vendor/*',
-      \ '*/node_modules/*',
-      \ '*/python2.7/*',
-      \ '*/migrate/*.rb'
-      \ ]
-  let g:gutentags_generate_on_missing = 0
-  let g:gutentags_generate_on_write = 0
-  let g:gutentags_generate_on_new = 0
-  nnoremap <leader>t! :GutentagsUpdate!<CR>
-" }}}
+
+" show ascii value
 Plug 'tpope/vim-characterize'
 Plug 'tpope/vim-unimpaired'
 " {{{
@@ -657,10 +1329,6 @@ Plug 'Shougo/junkfile.vim'
   nnoremap <leader>jo :JunkfileOpen
   let g:junkfile#directory = $HOME . '/.nvim/cache/junkfile'
 " }}}
-Plug 'junegunn/vim-peekaboo'
-" {{{
-  let g:peekaboo_delay = 400
-" }}}
 Plug 'mbbill/undotree'
 " {{{
   set undofile
@@ -671,27 +1339,27 @@ Plug 'mbbill/undotree'
   endif
   let &undodir = undodir
 
+  let g:undotree_WindowLayout = 2
   nnoremap <leader>U :UndotreeToggle<CR>
 " }}}
 
 " Misc
 " ====================================================================
+set pastetoggle=<F9>
+silent! set cryptmethod=blowfish2
 Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 " {{{
   let g:calendar_date_month_name = 1
 " }}}
-call plug#end() " Plugins initialization finished {{{
-" }}}
 
 Plug 'neomake/neomake'
-let g:neomake_cpp_enabled_makers = ['hkmc']
-let g:neomake_cpp_clang_maker = {
+"let g:neomake_cpp_enabled_makers = ['hkmc']
+let g:neomake_hkmc_maker = {
     \ 'exe': ['make_hkmc5th.sh'],
     \ 'args': [''],
-    \ 'errorformat': '%*[\|\ ]%f\:%l\:%c\:\ %m',
+    \ 'errorformat': ['%*[\|\ ]%f\:%l\:%c\:\ %m'],
     \ }
 
-set makeprg=make_hkmc5th.sh
 
 Plug 'skywind3000/asyncrun.vim'
 
@@ -705,11 +1373,15 @@ let g:DoxygenToolkit_blockHeader="----------------------------------------------
 let g:DoxygenToolkit_blockFooter="----------------------------------------------------------------------------"
 let g:DoxygenToolkit_authorName="jongho3.lee@lge.com"
 let g:DoxygenToolkit_licenseTag="LG\ Electroincs"
-Plug 'junegunn/vim-slash'
 
+" Tmux
+Plug 'tpope/vim-tbone'
 
+call plug#end()
+" }}}
 " General settings {{{
 " ====================================================================
+set makeprg=make_hkmc5th.sh
 set path=$PWD/**
 set clipboard=unnamed,unnamedplus
 set number         " show line numbers
@@ -718,6 +1390,9 @@ set noswapfile     " disable creating of *.swp files
 set hidden         " hide buffers instead of closing
 set lazyredraw     " speed up on large files
 set mouse=a         " disable mouse
+
+" FOOBAR=~/<CTRL-><CTRL-F>
+"set isfname-==
 
 set scrolloff=999       " always keep cursor at the middle of screen
 set virtualedit=onemore " allow the cursor to move just past the end of the line
@@ -753,6 +1428,7 @@ set tabstop=4     " number of spaces that a <Tab> in the file counts for
 set softtabstop=4 " remove <Tab> symbols as it was spaces
 set shiftwidth=4  " indent size for << and >>
 set shiftround    " round indent to multiple of 'shiftwidth' (for << and >>)
+set nojoinspaces
 " }}}
 " Search {{{
 " ====================================================================
@@ -761,9 +1437,17 @@ set smartcase  " override the 'ignorecase' when there is uppercase letters
 set gdefault   " when on, the :substitute flag 'g' is default on
 set hlsearch
 hi Search guibg=Yellow guifg=Black ctermbg=brown ctermfg=Black
+set grepformat=%f:%l:%c:%m,%f:%l:%m
 " }}}
 " Colors and highlightings {{{
 " ====================================================================
+if has('termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
+
+" %< Where to truncate
 "colorscheme jellybeans
 let g:seoul256_background = 234
 colorscheme seoul256
@@ -793,6 +1477,11 @@ nnoremap <leader>vi :tabedit $MYVIMRC<CR>
 
 " Toggle quickfix
 map <silent> <F8> :copen<CR>
+" ----------------------------------------------------------------------------
+" <Leader>c Close quickfix/location window
+" ----------------------------------------------------------------------------
+nnoremap <leader>c :cclose<bar>lclose<cr>
+
 "set efm=%*[\|\ ]%f\:%l\:%c\:\ %m
 "set efm+=%*[\|\ ]%f\:%l\:%m
 
@@ -800,7 +1489,7 @@ map <silent> <F8> :copen<CR>
 nnoremap Y y$
 
 " Disable search highlighting
-nnoremap <silent> <Esc><Esc> :nohlsearch<CR><Esc>
+nnoremap <silent> <leader><Esc> :nohlsearch<CR><Esc>
 
 " Copy current file path to clipboard
 nnoremap <leader>% :call CopyCurrentFilePath()<CR>
@@ -896,6 +1585,12 @@ nnoremap <silent> <Leader>j<Space> :call JumpOrOpenNewSplit('j', ':rightbelow sp
 
 " Remove trailing whitespaces in current buffer
 nnoremap <Leader><BS>s :1,$s/[ ]*$//<CR>:nohlsearch<CR>1G
+" ----------------------------------------------------------------------------
+" :Chomp
+" ----------------------------------------------------------------------------
+command! Chomp %s/\s\+$// | normal! ``
+
+" ----------------------------------------------------------------------------
 
 " Universal closing behavior
 nnoremap <silent> Q :call CloseSplitOrDeleteBuffer()<CR>
@@ -999,3 +1694,13 @@ augroup END
   let &t_EI = "\<Esc>[2 q"
 " }}}
 " vim: set sw=2 ts=2 et foldlevel=0 foldmethod=marker:
+" ----------------------------------------------------------------------------
+" Help in new tabs
+" ----------------------------------------------------------------------------
+function! s:helptab()
+  if &buftype == 'help'
+    wincmd T
+    nnoremap <buffer> q :q<cr>
+  endif
+endfunction
+
