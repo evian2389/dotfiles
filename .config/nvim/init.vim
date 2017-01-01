@@ -662,7 +662,6 @@ command! CSBuild call s:build_cscope_db(<f-args>)
 " ====================================================================
 " UI Navigation" {{{
 " ====================================================================
-Plug 'itspriddle/ZoomWin'
 " Zoom
 function! s:zoom()
   if winnr('$') > 1
@@ -684,6 +683,7 @@ nnoremap <silent> <leader>z :call <sid>zoom()<cr>
 " ----------------------------------------------------------------------------
 " vim-slash
 " ----------------------------------------------------------------------------
+set incsearch
 function! s:blink(times, delay)
   let s:blink = { 'ticks': 2 * a:times, 'delay': a:delay }
 
@@ -1353,15 +1353,33 @@ Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 " }}}
 
 Plug 'neomake/neomake'
-"let g:neomake_cpp_enabled_makers = ['hkmc']
+" {{{
+  let g:neomake_open_list = 2
+" 
+"let g:neomake_warning_sign = {
+"  \ 'text': 'W',
+"  \ 'texthl': 'WarningMsg',
+"  \ }
+"let g:neomake_error_sign = {
+"  \ 'text': 'E',
+"  \ 'texthl': 'ErrorMsg',
+"  \ }
+" }}}
+let g:neomake_makeclean_maker = { 'exe': 'make', 'args': ['clean'] }
+
 let g:neomake_hkmc_maker = {
-    \ 'exe': ['make_hkmc5th.sh'],
+    \ 'exe': 'make_hkmc5th.sh',
     \ 'args': [''],
-    \ 'errorformat': ['%*[\|\ ]%f\:%l\:%c\:\ %m'],
+    \ 'errorformat': '%*[\|\ ]%f\:%l\:%c\:\ %m',
     \ }
+let g:neomake_c_test_maker = {
+    \ 'exe': 'make',
+    \ }
+let g:neomake_c_enabled_makers = ['hkmc','test']
+let g:neomake_enabled_makers = ['hkmc',]
 
 
-Plug 'skywind3000/asyncrun.vim'
+"Plug 'skywind3000/asyncrun.vim'
 
 Plug 'vim-scripts/DoxygenToolkit.vim'
 " Doxytulkit
@@ -1502,8 +1520,8 @@ endfunction
 " Keep search results at the center of screen
 nmap n nzz
 nmap N Nzz
-nmap * *zz
-nmap # #zz
+nmap * /\<<C-R>=expand('<cword>')<CR>\><CR>
+nmap # ?\<<C-R>=expand('<cword>')<CR>\><CR>
 nmap g* g*zz
 nmap g# g#zz
 
@@ -1530,10 +1548,10 @@ nmap <leader>6 6gt
 nmap <leader>7 7gt
 nmap <leader>8 8gt
 nmap <leader>9 9gt
-nnoremap <C-h> :tp<CR>
+nnoremap <C-h> :tp
 nnoremap <C-j> :bn<CR>
 nnoremap <C-k> :bp<CR>
-nnoremap <C-l> :tn<CR>
+nnoremap <C-l> :tn
 
 tnoremap <A-h> <C-\><C-n><C-w>h
 tnoremap <A-j> <C-\><C-n><C-w>j
