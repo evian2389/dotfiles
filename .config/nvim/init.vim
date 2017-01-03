@@ -537,6 +537,12 @@ if v:version >= 703
 endif
 
 Plug 'justinmk/vim-gtfo'
+" {{{
+" gof: Go to the current file's directory in the File manager
+" goF (uppercase F) opens the current working directory (:pwd)
+" got: Go to the current file's directory in the Terminal
+" goT (uppercase T) opens the current working directory (:pwd)
+" }}}
 " }}}
 " ====================================================================
 " Tag Navigation {{{
@@ -1243,13 +1249,6 @@ command! -nargs=* LoadMacro call <SID>load_macro(<f-args>)
 command! -nargs=1 Count execute printf('%%s/%s//gn', escape(<q-args>, '/')) | normal! ``
 
 " ----------------------------------------------------------------------------
-Plug 'justinmk/vim-gtfo'
-" {{{
-" gof: Go to the current file's directory in the File manager
-" goF (uppercase F) opens the current working directory (:pwd)
-" got: Go to the current file's directory in the Terminal
-" goT (uppercase T) opens the current working directory (:pwd)
-" }}}
 Plug 'lyokha/vim-xkbswitch'
 " {{{
   let g:XkbSwitchEnabled = 1
@@ -1459,16 +1458,16 @@ set grepformat=%f:%l:%c:%m,%f:%l:%m
 " }}}
 " Colors and highlightings {{{
 " ====================================================================
-if has('termguicolors')
-  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-  set termguicolors
-endif
+"if has('termguicolors')
+"  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+"  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+"  set termguicolors
+"endif
 
 " %< Where to truncate
-"colorscheme jellybeans
+colorscheme jellybeans
 let g:seoul256_background = 234
-colorscheme seoul256
+"colorscheme seoul256
 let g:lightline#colorscheme#jellybeans_mod#palette = lightline#colorscheme#flatten(s:p)
 
 set cursorline     " highlight current line

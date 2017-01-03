@@ -75,6 +75,8 @@ alias which='type -p'
 alias k5='kill -9 %%'
 alias gs='git status'
 alias gv='vim +GV +"autocmd BufWipeout <buffer> qall"'
+alias cdd='cd ~/workspace/hkmc_5thGen_01/build-mango/BUILD/work/corei7-64-oe-linux'
+
 ext() {
   local name=$(basename $(pwd))
   cd ..
