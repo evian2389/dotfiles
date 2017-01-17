@@ -38,16 +38,20 @@ Plug 'nanotech/jellybeans.vim'
 " {{{
   let g:jellybeans_use_term_background_color = 0
 " }}}
+
 Plug 'itchyny/lightline.vim'
 " {{{
   let g:lightline = {
         \ 'colorscheme': 'jellybeans_mod',
         \ 'active': {
         \   'left': [ [ 'mode', 'paste' ],
-        \             [ 'fugitive', 'gitgutter', 'filename' ] ],
+        \             [ 'fugitive', 'gitgutter', 'filename', 'funcname'], ],
         \   'right': [ [ 'percent', 'lineinfo' ],
         \              [ 'syntastic' ],
         \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
+        \ },
+        \ 'component': {
+        \   'tagbar': '%{tagbar#currenttag("[%s]", "")}',
         \ },
         \ 'component_function': {
         \   'fugitive': 'LightLineFugitive',
@@ -55,7 +59,8 @@ Plug 'itchyny/lightline.vim'
         \   'readonly': 'LightLineReadonly',
         \   'modified': 'LightLineModified',
         \   'syntastic': 'SyntasticStatuslineFlag',
-        \   'filename': 'LightLineFilename'
+        \   'filename': 'LightLineFilename',
+        \   'funcname': 'LightLineCrreuntFunction',
         \ },
         \ 'separator': { 'left': '▓▒░', 'right': '░▒▓' },
         \ 'subseparator': { 'left': '>', 'right': '' }
@@ -107,6 +112,14 @@ Plug 'itchyny/lightline.vim'
     return join(ret, ' ')
   endfunction
 
+function! LightLineCrreuntFunction()
+endfunction
+
+function! Fname()
+   return '%{tagbar#currenttag("%s", "", "f")}'
+   "return Tagbar#currenttag('%s', '')
+  endfunction
+
   function! LightLineFilename()
     return ('' != LightLineReadonly() ? LightLineReadonly() . ' ' : '') .
         \ ('' != expand('%:t') ? expand('%:t') : '[No Name]') .
@@ -149,13 +162,13 @@ Plug 'itchyny/lightline.vim'
   let s:p.normal.warning  = [ [ s:yellow, s:base01 ] ]
   " }}}
 " }}}
-Plug 'nathanaelkane/vim-indent-guides'
-" {{{
-  let g:indent_guides_default_mapping = 0
-  let g:indent_guides_enable_on_vim_startup = 1
-  let g:indent_guides_start_level = 2
-  let g:indent_guides_exclude_filetypes = ['help', 'startify', 'man', 'rogue']
-" }}}
+"Plug 'nathanaelkane/vim-indent-guides'
+"" {{{
+"  let g:indent_guides_default_mapping = 0
+"  let g:indent_guides_enable_on_vim_startup = 1
+"  let g:indent_guides_start_level = 2
+"  let g:indent_guides_exclude_filetypes = ['help', 'startify', 'man', 'rogue']
+"" }}}
 Plug 'kshenoy/vim-signature'
 " {{{
   let g:SignatureMarkerTextHL = 'Typedef'
@@ -367,6 +380,7 @@ Plug 'junegunn/fzf.vim'
   nnoremap <silent> <leader>fb :Buffers<CR>
   nnoremap <silent> <leader>w :Windows<CR>
   nnoremap <silent> <leader>; :BLines<CR>
+  nnoremap <silent> <leader>: :Lines<CR>
   nnoremap <silent> <leader>fT :BTags<CR>
   nnoremap <silent> <leader>ft :Tags<CR>
   nnoremap <silent> <leader>fh :History<CR>
@@ -528,13 +542,13 @@ function! SwitchSourceHeader()
 endfunction
 nmap <leader>,s :call SwitchSourceHeader()<CR>
 
-if v:version >= 703
+"if v:version >= 703
   Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle'      }
 " <F11> | Tagbar
   inoremap <F11> <esc>:TagbarToggle<cr>
   nnoremap <F11> :TagbarToggle<cr>
   let g:tagbar_sort = 0
-endif
+"endif
 
 Plug 'justinmk/vim-gtfo'
 " {{{
@@ -549,6 +563,9 @@ Plug 'justinmk/vim-gtfo'
 " ====================================================================
 " ctags
 set tags=./tags;/
+
+nmap <leader>th tp<CR>
+nmap <leader>tl tn<CR>
 Plug 'vim-scripts/gtags.vim'
 " {{{
   let Gtags_Auto_Map = 1
@@ -678,6 +695,8 @@ function! s:zoom()
   endif
 endfunction
 nnoremap <silent> <leader>z :call <sid>zoom()<cr>
+" tab
+nnoremap <leader>as :tab split<CR>
 
 " ----------------------------------------------------------------------------
 " }}}
@@ -1364,11 +1383,18 @@ Plug 'neomake/neomake'
 "  \ 'texthl': 'ErrorMsg',
 "  \ }
 " }}}
+
+let g:neomake_open_list = 1
+"let g:neomake_hook_context.file_mode = 1
+autocmd User NeomakeFinished if g:neomake_hook_context.file_mode | lwindow | endif
+autocmd User NeomakeFinished if !g:neomake_hook_context.file_mode | cwindow | endif
+
 let g:neomake_makeclean_maker = { 'exe': 'make', 'args': ['clean'] }
 
+let g:neomake_hkmcclean_maker = { 'exe': 'make_hkmc5th.sh', 'args': ['clean'] }
 let g:neomake_hkmc_maker = {
     \ 'exe': 'make_hkmc5th.sh',
-    \ 'args': [''],
+    \ 'args': ['compile'],
     \ 'errorformat': '%*[\|\ ]%f\:%l\:%c\:\ %m',
     \ }
 let g:neomake_c_test_maker = {
@@ -1376,7 +1402,10 @@ let g:neomake_c_test_maker = {
     \ }
 let g:neomake_c_enabled_makers = ['hkmc','test']
 let g:neomake_enabled_makers = ['hkmc',]
-
+nnoremap <leader>bb :Neomake! hkmc
+nnoremap <leader>bi :!rpm_install_to_target.sh
+nnoremap <leader>bu :!copy_app_to_usb.sh
+nnoremap <leader>bl :!dltlog.sh
 
 "Plug 'skywind3000/asyncrun.vim'
 
@@ -1392,7 +1421,7 @@ let g:DoxygenToolkit_authorName="jongho3.lee@lge.com"
 let g:DoxygenToolkit_licenseTag="LG\ Electroincs"
 
 " Tmux
-Plug 'tpope/vim-tbone'
+"Plug 'tpope/vim-tbone'
 
 call plug#end()
 " }}}
@@ -1400,6 +1429,7 @@ call plug#end()
 " ====================================================================
 set makeprg=make_hkmc5th.sh
 set path=$PWD/**
+set ff=unix
 set clipboard=unnamed,unnamedplus
 set number         " show line numbers
 set relativenumber " use relative lines numbering by default
@@ -1407,6 +1437,9 @@ set noswapfile     " disable creating of *.swp files
 set hidden         " hide buffers instead of closing
 set lazyredraw     " speed up on large files
 set mouse=a         " disable mouse
+set autoread
+
+let g:terminal_scrollback_buffer_size=50000
 
 " FOOBAR=~/<CTRL-><CTRL-F>
 "set isfname-==
@@ -1435,8 +1468,11 @@ set listchars=tab:•·,trail:·,extends:❯,precedes:❮,nbsp:×
 set laststatus=2 " always show status line
 set showcmd      " always show current command
 
-set nowrap        " disable wrap for long lines
-set textwidth=0   " disable auto break long lines
+"set fo?
+set fo+=t
+set fo-=l
+set textwidth=100  " disable auto break long lines
+"set wrap linebreak nolist " enable wrap for long lines
 " }}}
 " Indentation {{{
 " ====================================================================
@@ -1447,22 +1483,6 @@ set shiftwidth=4  " indent size for << and >>
 set shiftround    " round indent to multiple of 'shiftwidth' (for << and >>)
 set nojoinspaces
 " }}}
-" Search {{{
-" ====================================================================
-set ignorecase " ignore case of letters
-set smartcase  " override the 'ignorecase' when there is uppercase letters
-set gdefault   " when on, the :substitute flag 'g' is default on
-set hlsearch
-hi Search guibg=Yellow guifg=Black ctermbg=brown ctermfg=Black
-set grepformat=%f:%l:%c:%m,%f:%l:%m
-" }}}
-" Colors and highlightings {{{
-" ====================================================================
-"if has('termguicolors')
-"  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-"  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-"  set termguicolors
-"endif
 
 " %< Where to truncate
 colorscheme jellybeans
@@ -1494,6 +1514,24 @@ nnoremap <leader>vi :tabedit $MYVIMRC<CR>
 
 " Toggle quickfix
 map <silent> <F8> :copen<CR>
+
+" Search {{{
+" ====================================================================
+set ignorecase " ignore case of letters
+set smartcase  " override the 'ignorecase' when there is uppercase letters
+set gdefault   " when on, the :substitute flag 'g' is default on
+set hlsearch
+hi Search guibg=Yellow guifg=Black ctermbg=brown ctermfg=Black
+set grepformat=%f:%l:%c:%m,%f:%l:%m
+" }}}
+" Colors and highlightings {{{
+" ====================================================================
+"if has('termguicolors')
+"  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+"  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+"  set termguicolors
+"endif
+
 " ----------------------------------------------------------------------------
 " <Leader>c Close quickfix/location window
 " ----------------------------------------------------------------------------
@@ -1547,10 +1585,10 @@ nmap <leader>6 6gt
 nmap <leader>7 7gt
 nmap <leader>8 8gt
 nmap <leader>9 9gt
-nnoremap <C-h> :tp
-nnoremap <C-j> :bn<CR>
-nnoremap <C-k> :bp<CR>
-nnoremap <C-l> :tn
+nnoremap <C-h> :bp<CR>
+nnoremap <C-j> :tabn<CR>
+nnoremap <C-k> :tabp<CR>
+nnoremap <C-l> :bn<CR>
 
 tnoremap <A-h> <C-\><C-n><C-w>h
 tnoremap <A-j> <C-\><C-n><C-w>j

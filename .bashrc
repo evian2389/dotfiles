@@ -68,7 +68,9 @@ alias cd.='cd ..'
 alias cd..='cd ..'
 alias l='ls -alF'
 alias ll='ls -l'
-alias vi='vim'
+#alias v='nvim'
+#alias vi='nvim'
+#alias vim='nvim'
 alias vi2='vi -O2 '
 alias hc="history -c"
 alias which='type -p'
@@ -506,6 +508,12 @@ c() {
 
 # GIT heart FZF
 # -------------
+
+export FZF_DEFAULT_OPTS='--extended'
+
+export FZF_COMPLETION_TRIGGER='//'
+bindkey    '^I' fzf-completion
+bindkey -a '//'  fzf-directly-complete
 
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
