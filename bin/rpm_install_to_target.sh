@@ -29,6 +29,7 @@ then
  exit
 fi
 
+ssh root@$TARGET_IP "mount -o rw,remount /"
 
 ORI=$(ssh root@$TARGET_IP "ls /home/root/$APP_NAME.ori")
 if [ "$ORI" == "/app/bin/$APP_NAME.ori" ]

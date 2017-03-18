@@ -53,8 +53,7 @@ echo " "
 echo "[$ADD_DIR]"
 echo "################################### "
 echo "indexing $ADD_DIR cscope.files "
-find $ADD_DIR -type f \(  -iname '*.c' -o -iname '*.cpp' -o -iname '*.py' -o -iname '*.cc' -o -iname '*.h' -o -iname '*.asm' -o -iname '*.java' -o -iname '*.jni' -o -iname '*.mk' -o -iname '*.xml' -o -iname '*.aidl' -o -iname '*.s' -o -iname '*.S' -o -iname '*.rc' -o -iname '*defconfig' -o -iname '*.dts' -o -iname '*.dtsi' -o -iname '*.config' -o -iname 'Makefile' -o -iname 'Kconfig' -o -iname '*.sh' \) \
-	-print > ${CSCOPE_FILES}
+find $ADD_DIR -type f \(  -iname '*.c' -o -iname '*.cpp' -o -iname '*.py' -o -iname '*.cc' -o -iname '*.h' -o -iname '*.asm' -o -iname '*.java' -o -iname '*.jni' -o -iname '*.mk' -o -iname '*.xml' -o -iname '*.aidl' -o -iname '*.s' -o -iname '*.S' -o -iname '*.rc' -o -iname '*defconfig' -o -iname '*.dts' -o -iname '*.dtsi' -o -iname '*.config' -o -iname 'Makefile' -o -iname 'Kconfig' -o -iname '*.sh' \) -print > ${CSCOPE_FILES}
 
 echo " "
 echo "################################### "
@@ -66,6 +65,11 @@ cscope -b -q -k -i ${CSCOPE_FILES} -f ${CSCOPE_OUT}
 echo "################################### "
 echo "building ctags ...."
 ctags -L ${CSCOPE_FILES} -f ${TAGS_OUT}
+
+#echo " "
+echo "################################### "
+echo "building gtags ...."
+gtags -f ${CSCOPE_FILES} -w
 
 
 

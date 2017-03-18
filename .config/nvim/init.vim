@@ -248,11 +248,14 @@ nnoremap <Leader>G :Goyo<CR>
 " set complete=.,w,b,u,t
 set complete=i,t,b
 
-set completeopt=menuone,preview
+set completeopt=menuone,preview,longest
+"Plug 'rdnetto/YCM-Generator'
+
+if 1
 Plug 'Valloric/YouCompleteMe', { 'do': 'python install.py --clang-completer' }
 " {{{
   let g:ycm_autoclose_preview_window_after_completion = 1
-  let g:ycm_seed_identifiers_with_syntax = 1
+  let g:ycm_seed_identifiers_with_syntax = 0
   let g:ycm_collect_identifiers_from_tags_files = 1
   let g:ycm_key_invoke_completion = '<c-j>'
   let g:ycm_complete_in_strings = 1
@@ -276,6 +279,7 @@ Plug 'Valloric/YouCompleteMe', { 'do': 'python install.py --clang-completer' }
 "inoremap <expr><C-y> neocomplete#close_popup()
 "inoremap <expr><C-e> neocomplete#cancel_popup()
 ""}}}
+endif
 
 Plug 'SirVer/ultisnips'
 " {{{
@@ -462,6 +466,12 @@ Plug 'zenbro/mirror.vim'
   nnoremap <leader>mc :MirrorConfig<CR>
 " }}}
 
+"Plug 'mhinz/vim-grepper'
+" {{{
+""  let g:grepper.quickfix = 0
+""  nnoremap <leader>' :Grepper -buffer -query<space>
+"  nnoremap <leader>" :Grepper -buffers<CR>
+" }}}
 
 " ----------------------------------------------------------------------------
 " AutoSave
@@ -582,9 +592,10 @@ Plug 'vim-scripts/gtags.vim'
     :nmap <leader>tp :Gtags -P <C-R>=expand("<cword>")<CR><CR>
   endif
 
+
 Plug 'ludovicchabant/vim-gutentags'
 " {{{
-  let g:gutentags_exclude = [
+  let g:gutentags_ctags_exclude = [
       \ '*.min.js',
       \ '*html*',
       \ 'jquery*.js',
@@ -1009,7 +1020,7 @@ Plug 'scrooloose/syntastic'
 
   function! RubocopAutoCorrection()
     echo 'Starting rubocop autocorrection...'
-    cexpr system('rubocop -D -R -f emacs -a ' . expand(@%))
+    lgetexpr system('rubocop -D -R -f emacs -a ' . expand(@%))
     edit
     SyntasticCheck rubocop
     copen
@@ -1384,10 +1395,10 @@ Plug 'neomake/neomake'
 "  \ }
 " }}}
 
-let g:neomake_open_list = 1
-"let g:neomake_hook_context.file_mode = 1
-autocmd User NeomakeFinished if g:neomake_hook_context.file_mode | lwindow | endif
-autocmd User NeomakeFinished if !g:neomake_hook_context.file_mode | cwindow | endif
+"let g:neomake_open_list = 1
+"autocmd User NeomakeFinished if g:neomake_hook_context.file_mode | lwindow | endif
+"autocmd User NeomakeFinished if !g:neomake_hook_context.file_mode | cwindow | endif
+autocmd User NeomakeFinished if 1 | lwindow | endif
 
 let g:neomake_makeclean_maker = { 'exe': 'make', 'args': ['clean'] }
 
@@ -1403,12 +1414,16 @@ let g:neomake_c_test_maker = {
 let g:neomake_c_enabled_makers = ['hkmc','test']
 let g:neomake_enabled_makers = ['hkmc',]
 nnoremap <leader>bb :Neomake! hkmc
+
+""###########
 nnoremap <leader>bi :!rpm_install_to_target.sh
 nnoremap <leader>bu :!copy_app_to_usb.sh
 nnoremap <leader>bl :!dltlog.sh
 
 "Plug 'skywind3000/asyncrun.vim'
-
+" {{{
+""    nnoremap <silent> <leader>' :AsyncRun! grep -R<space>
+" }}}
 Plug 'vim-scripts/DoxygenToolkit.vim'
 " Doxytulkit
 let g:DoxygenToolkit_commentType = "C++"
