@@ -1,0 +1,1 @@
+/home/orka/dotfiles/.config/kak/kakrc 107.1,107.1
