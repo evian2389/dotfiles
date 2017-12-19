@@ -77,7 +77,7 @@ alias which='type -p'
 alias k5='kill -9 %%'
 alias gs='git status'
 alias gv='vim +GV +"autocmd BufWipeout <buffer> qall"'
-alias cdd='cd ~/workspace/hkmc_5thGen_01/build-mango/BUILD/work/corei7-64-oe-linux/ApplicationManager/0.0.1-master.hmc.140-r4/git'
+alias cdd='cd ~/workspace/*/build-mango/BUILD/work/corei7-64-oe-linux/ApplicationManager/*/git'
 
 ext() {
   local name=$(basename $(pwd))
@@ -129,7 +129,7 @@ fi
 # --------------------------------------------------------------------
 
 if [ "$PLATFORM" = Linux ]; then
-  PS1="\[\e[5;82m\]\u\[\e[1;34m\]@\[\e[1;38m\]\h\[\e[1;30m\]:"
+  PS1="\[\e[5;82m\]\u\[\e[1;34m\]@\[\e[1;38m\]\h\[\e[1;35m\]:"
   PS1="$PS1\[\e[0;38m\]\w\[\e[1;35m\]> \[\e[0m\]"
 else
   ### git-prompt

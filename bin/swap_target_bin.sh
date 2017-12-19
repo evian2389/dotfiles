@@ -64,3 +64,5 @@ else
 	echo "SWAP to ORI file"
 	echo "SWAP to $ORI->$BIN"
 fi
+	ssh root@10.186.128.49 "sync"
+

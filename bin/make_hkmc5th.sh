@@ -23,3 +23,4 @@ bitbake -fC $BUILD_OPT1 ${TARGET}
 cd ${PWD}
 
 
+~/bin/git_hooks.sh
