@@ -1,6 +1,27 @@
-hook global WinCreate .* %{addhl window/ number_lines}
-hook global WinCreate .* %{addhl window/ show_whitespaces}
+def plug -params 1 %{
+  %sh{
+    if [[ ! -d $HOME/build/$1 ]]; then
+      (cd $HOME/build; git clone https://github.com/$1 2> /dev/null)
+    fi
+    for file in $(echo $HOME/build/$(basename $1)/*.kak); do
+      echo source "$file"
+    done
+  }
+}
 
+plug occivink/kakoune-vertical-selection
+plug occivink/kakoune-interactive-itersel
+plug occivink/kakoune-expand
+plug occivink/kakoune-find
+plug occivink/kakoune-sudo-write
+plug danr/kakoune-easymotion
+plug fsub/kakoune-mark
+
+
+
+
+#hook global WinCreate .* %{addhl window/ number_lines}
+hook global WinCreate .* %{addhl window/ show_whitespaces}  
 
 hook global WinCreate .* %{set global indentwidth 2}
 hook global WinCreate .* %{set global tabstop 2}
@@ -13,19 +34,19 @@ hook global WinCreate .* %{hook window InsertChar \t %{ exec -draft h@}}
 #hook global InsertChar ' "exec '<left>"
 
 
-hook global WinCreate .* %{ addhl show_matching }
+hook global WinCreate .* %{ addhl window/ show_matching }
 
 hook global NormalKey y|d|c %{ nop %sh{
   printf %s "$kak_reg_dquote" | pbcopy
   }}
 
-hook global BufCreate .* %{editorconfig-load}
+#hook global BufCreate .* %{editorconfig-load}
 hook global BufCreate .vue %{ set buffer filetype xml }
 hook global BufCreate .*.elm %{ set buffer filetype haskell }
 hook global BufCreate .*.purs %{ set buffer filetype haskell }
 hook global BufCreate .*.(es6|tsx?) %{ set buffer filetype javascript }
 
-hook global WinSetOption filetype=(c|cpp) %{
+hook global WinSetOption filetype=(c|cpp|cc|h|hpp) %{
     clang-enable-autocomplete 
     clang-enable-diagnostics
     alias window lint clang-parse
@@ -55,11 +76,11 @@ decl -hidden regex curword
 face CurWord default,rgb:4a4a4a
 
 hook global WinCreate .* %{
-    addhl show_matching
-    addhl dynregex '%reg{/}' 0:+u
+    addhl global/ show_matching
+    addhl global/ dynregex '%reg{/}' 0:+u 
 
     # Highlight the word under the cursor
-    addhl dynregex '%opt{curword}' 0:CurWord
+    addhl global/ dynregex '%opt{curword}' 0:CurWord
 }
 
 hook global NormalIdle .* %{
@@ -73,7 +94,7 @@ hook global NormalIdle .* %{
 hook global BufOpenFifo '\*grep\*' %{ map -- global normal - ':grep-next<ret>' }
 hook global BufOpenFifo '\*make\*' %{ map -- global normal - ':make-next<ret>' }
 
-hook global WinCreate ^[^*]+$ %{ addhl number_lines }
+hook global WinCreate ^[^*]+$ %{ addhl global/ number_lines }
 
 #set global ycmd_path /home/mawww/prj/ycmd/ycmd/
 
@@ -91,7 +112,12 @@ def ide %{
 hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <backtab> <c-p> }
 hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <backtab> <c-p> }
 
-def find -params 1 -shell-candidates %{ find . -type f } %{ edit %arg{1} }
+hook global InsertChar k %{ try %{
+    exec -draft hH <a-k>jk<ret> d
+    exec <esc>
+}}
+
+#def find -params 1 -shell-candidates %{ find . -type f } %{ edit %arg{1} }
 
 
 # set global autoinfo 2
@@ -100,11 +126,11 @@ set global ui_options ncurses_status_on_top=true
 set global tabstop     4
 set global indentwidth 4
 set global scrolloff 1,5
-set global makecmd 'make --jobs=8'
+#set global makecmd 'make --jobs=8'
 #set global grepcmd 'ag --filename --column'
 
 #set global makecmd 'make -j8'
-set global grepcmd 'ag --column'
+#set global grepcmd 'ag --column'
 map global normal <c-p> :lint<ret>
 
 
@@ -117,7 +143,12 @@ map global user y '<a-|>xclip -i<ret>; :echo -color Information "copied selectio
 map global user R '|xclip -o<ret>'
 
 
-#colorscheme base16
+map -docstring 'case insensitive search' global user '/' /(?i)
+map -docstring 'case insensitive backward search' global user '<a-/>' <a-/>(?i)
+map -docstring 'case insensitive extend search' global user '?' ?(?i)
+map -docstring 'case insensitive backward extend-search' global user '<a-?>' <a-?>(?i)
+
+colorscheme default
 
 ## User keys
 
@@ -129,13 +160,16 @@ map global normal '<a-#>' :comment-block<ret> -docstring 'comment block'
 map global goto m '<esc>m;' -docstring 'matching char'
 
 # alias
-alias global tv tmux-repl-vertical
-alias global th tmux-repl-vertical
+#alias global tv tmux-repl-vertical
+#alias global th tmux-repl-vertical
 # Option
 map global normal <space> ,
 map global normal  , <space>
 
-map global user <space> 'wb:fzf-file<ret>'
-map global user f 'fzf-buffer<ret>'
+
+map global user <space> ':fzf-file<ret>'
+map global user f ':fzf-buffer<ret>'
+#map global user t ':fzf <ret>'
+map global user / 'wb*'
 
 map global user d 'wb:ctags-search<ret>'

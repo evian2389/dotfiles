@@ -1,1 +1,3 @@
-/home/orka/dotfiles/.config/kak/kakrc 107.1,107.1
+/home/orka/dotfiles/.config/kak/autoload/kakoune-extra/fzy.kak 27.29,27.29
+/home/orka/dotfiles/.config/kak/kakrc 49.50,49.50
+/home/orka/workspace/kakoune/kakoune/src/main.cc 142.1,142.1
