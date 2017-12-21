@@ -1,6 +1,6 @@
 def plug -params 1 %{
   %sh{
-    if [[ ! -d $HOME/build/$1 ]]; then
+    if [ ! -d $HOME/build/$1 ]; then
       (cd $HOME/build; git clone https://github.com/$1 2> /dev/null)
     fi
     for file in $(echo $HOME/build/$(basename $1)/*.kak); do
@@ -16,7 +16,6 @@ plug occivink/kakoune-find
 plug occivink/kakoune-sudo-write
 plug danr/kakoune-easymotion
 plug fsub/kakoune-mark
-
 
 
 
@@ -38,7 +37,7 @@ hook global WinCreate .* %{ addhl window/ show_matching }
 
 hook global NormalKey y|d|c %{ nop %sh{
   printf %s "$kak_reg_dquote" | pbcopy
-  }}
+}}
 
 #hook global BufCreate .* %{editorconfig-load}
 hook global BufCreate .vue %{ set buffer filetype xml }
