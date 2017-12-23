@@ -39,6 +39,15 @@ values."
      ;;ivy
      helm
      gtags
+     ranger
+     c-c++
+     heskell
+     semantic
+     erc
+     scala
+     github
+     shell-scripts
+     python
      ;;counsel-gtags
      auto-completion
      better-defaults
