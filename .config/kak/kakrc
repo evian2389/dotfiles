@@ -129,7 +129,8 @@ set global scrolloff 1,5
 #set global grepcmd 'ag --filename --column'
 
 #set global makecmd 'make -j8'
-#set global grepcmd 'ag --column'
+#set global grepcmd 'rg --vimgrep --colors \'match:fg:magenta\' --colors \'line:bg:yellow\' '
+set global grepcmd 'rg --vimgrep -s -p'
 map global normal <c-p> :lint<ret>
 
 
@@ -147,7 +148,7 @@ map -docstring 'case insensitive backward search' global user '<a-/>' <a-/>(?i)
 map -docstring 'case insensitive extend search' global user '?' ?(?i)
 map -docstring 'case insensitive backward extend-search' global user '<a-?>' <a-?>(?i)
 
-colorscheme default
+#colorscheme desertex
 
 ## User keys
 
