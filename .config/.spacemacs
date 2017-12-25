@@ -31,6 +31,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     haskell
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -322,6 +323,21 @@ before packages are loaded. If you are unsure, you should try in setting them in
   
   )
 
+(defun my-setup-indent (n)
+  ;; java/c/c++
+  (setq c-basic-offset 4)
+  ;; web development
+  (setq coffee-tab-width n) ; coffeescript
+  (setq javascript-indent-level n) ; javascript-mode
+  (setq js-indent-level n) ; js-mode
+  (setq js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+  (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
+  (setq web-mode-css-indent-offset n) ; web-mode, css in html file
+  (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
+  (setq css-indent-offset n) ; css-mode
+  )
+
+
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
 This function is called at the very end of Spacemacs initialization after
@@ -342,6 +358,11 @@ you should place your code here."
     (define-key counsel-gtags-mode-map (kbd "m,") 'counsel-gtags-go-backward)
     (define-key counsel-gtags-mode-map (kbd "mc") 'counsel-gtags-create-tags)
     (define-key counsel-gtags-mode-map (kbd "mu") 'counsel-gtags-update-tags))
+
+  (setq-default indent-tabs-mode nil)
+  (setq tab-width 4) ; or any other preferred value
+  (my-setup-indent 2) ; indent 2 spaces width
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
