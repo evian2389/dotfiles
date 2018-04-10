@@ -1,4 +1,4 @@
-ommand rofi-buffers \
+define-command rofi-buffers \
 -docstring 'Select an open buffer using Rofi' %{ %sh{
     BUFFER=$(printf %s\\n "${kak_buflist}" | tr : '\n' | rofi -dmenu)
     if [ -n "$BUFFER" ]; then

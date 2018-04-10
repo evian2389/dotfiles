@@ -35,10 +35,6 @@ hook global WinCreate .* %{hook window InsertChar \t %{ exec -draft h@}}
 
 hook global WinCreate .* %{ addhl window/ show_matching }
 
-hook global NormalKey y|d|c %{ nop %sh{
-  printf %s "$kak_reg_dquote" | pbcopy
-}}
-
 #hook global BufCreate .* %{editorconfig-load}
 hook global BufCreate .vue %{ set buffer filetype xml }
 hook global BufCreate .*.elm %{ set buffer filetype haskell }
@@ -141,6 +137,17 @@ map global user n ':lint-next<ret>'
 map global user p '!xclip -o<ret>'
 map global user y '<a-|>xclip -i<ret>; :echo -color Information "copied selection to X11 clipboard"<ret>'
 map global user R '|xclip -o<ret>'
+
+
+
+# copy to clipboar
+#hook global NormalKey y|d|c %{ nop %sh{
+#  printf %s "$kak_reg_dquote" | xsel --input --clipboard
+#}}
+
+# paste from clipboard
+#map global user P '!xsel --output --clipboard<ret>'
+#map global user p '<a-!>xsel --output --clipboard<ret>'
 
 
 map -docstring 'case insensitive search' global user '/' /(?i)
