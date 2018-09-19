@@ -339,49 +339,37 @@ projects =
 
     , Project   { projectName       = wsSYS
                 , projectDirectory  = "~/"
-                , projectStartHook  = Just $ do spawnOn wsSYS myTerminal
-                                                spawnOn wsSYS myTerminal
-                                                spawnOn wsSYS myTerminal
+                , projectStartHook  = Nothing
                 }
 
     , Project   { projectName       = wsDMO
                 , projectDirectory  = "~/"
-                -- , projectStartHook  = Just $ do spawn "/usr/lib/xscreensaver/binaryring"
-                , projectStartHook  = Just $ do spawn "/usr/lib/xscreensaver/spheremonics"
-                                                runInTerm "-name top" "top"
-                                                runInTerm "-name top" "htop"
-                                                runInTerm "-name glances" "glances"
-                                                spawn "/usr/lib/xscreensaver/cubicgrid"
-                                                spawn "/usr/lib/xscreensaver/surfaces"
+                , projectStartHook  = Nothing
                 }
 
     , Project   { projectName       = wsVIX
                 , projectDirectory  = "~/.xmonad"
-                , projectStartHook  = Just $ do runInTerm "-name vix" "vim ~/.xmonad/xmonad.hs"
-                                                spawnOn wsVIX myTerminal
-                                                spawnOn wsVIX myTerminal
+                , projectStartHook  = Nothing
                 }
 
     , Project   { projectName       = wsMON
                 , projectDirectory  = "~/"
-                , projectStartHook  = Just $ do runInTerm "-name glances" "glances"
+                , projectStartHook  = Nothing
                 }
 
     , Project   { projectName       = wsWRK
                 , projectDirectory  = "~/wrk"
-                , projectStartHook  = Just $ do spawnOn wsWRK myTerminal
-                                                spawnOn wsWRK myBrowser
+                , projectStartHook  = Nothing
                 }
 
     , Project   { projectName       = wsRAD
                 , projectDirectory  = "~/"
-                , projectStartHook  = Just $ do spawn myBrowser
+                , projectStartHook  = Nothing
                 }
 
     , Project   { projectName       = wsTMP
                 , projectDirectory  = "~/"
-                -- , projectStartHook  = Just $ do spawn $ myBrowser ++ " https://mail.google.com/mail/u/0/#inbox/1599e6883149eeac"
-                , projectStartHook  = Just $ do return ()
+                , projectStartHook  = Nothing
                 }
     ]
 
@@ -393,9 +381,10 @@ projects =
 
 --myTerminal          = "terminator"
 --myTerminalClass     = "Terminator"
-myTerminal          = "urxvt"
+--myTerminal          = "urxvt"
+myTerminal          = "gnome-terminal"
 myAltTerminal       = "cool-retro-term"
-myBrowser           = "google-chrome" -- chrome with WS profile dirs
+myBrowser           = "google-chrome-stable" -- chrome with WS profile dirs
 myBrowserClass      = "Google-chrome-stable"
 myStatusBar         = "xmobar -x0 ~/.xmonad/xmobar.conf"
 --myLauncher          = "dmenu_run"
@@ -1499,6 +1488,7 @@ myStartupHook = do
     -- spawnOnce "$HOME/bin/wm/init-tilingwm"
     -- spawn "~/bin/wm/init-tilingwm"
     spawn "~/bin/wm/init-wallpaper"
+    spawn "nautilus --no-desktop -n &"
 
     -- init-tray kills and restarts stalone tray, hence just "spawn" so it
     -- runs on restart and will suffice to reposition tray on display changes
