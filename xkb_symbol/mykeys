@@ -30,6 +30,7 @@ xkb_symbols "pc105" {
     key <RCTL> {	[ Control_R		]	};
     key <RWIN> {	[ Super_R		]	};
     key <MENU> {	[ Menu			]	};
+    key <HJCV> {	[ Hangul_Hanja          ]	};
 
     // Beginning of modifier mappings.
     modifier_map Shift  { Shift_L, Shift_R };
@@ -37,6 +38,7 @@ xkb_symbols "pc105" {
     modifier_map Control{ Control_L, Control_R };
     modifier_map Mod2   { Num_Lock };
     modifier_map Mod4   { Super_L, Super_R };
+    modifier_map Mod3   { Hangul_Hanja };  //<HJCV>
 
     // Fake keys for virtual<->real modifiers mapping:
     key <LVL3> {	[ ISO_Level3_Shift	]	};

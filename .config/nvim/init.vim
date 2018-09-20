@@ -251,7 +251,7 @@ set complete=i,t,b
 set completeopt=menuone,preview,longest
 "Plug 'rdnetto/YCM-Generator'
 
-if 1
+if 0
 Plug 'Valloric/YouCompleteMe', { 'do': 'python install.py --clang-completer' }
 " {{{
   let g:ycm_autoclose_preview_window_after_completion = 1

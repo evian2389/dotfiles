@@ -1186,6 +1186,7 @@ myKeys conf = let
     subKeys "System"
     [ ("M-q"                    , addName "Restart XMonad"                  $ spawn "xmonad --restart")
     , ("M-C-q"                  , addName "Rebuild & restart XMonad"        $ spawn "xmonad --recompile && xmonad --restart")
+    , ("S-C-q"                  , addName "Rebuild & restart XMonad"        $ confirmPrompt hotPromptTheme "Quit XMonad" $ io (exitWith ExitSuccess))
     , ("M-S-q"                  , addName "Quit XMonad"                     $ confirmPrompt hotPromptTheme "Quit XMonad" $ io (exitWith ExitSuccess))
     , ("M-x"                    , addName "Lock screen"                     $ spawn "xset s activate")
     , ("M-<F4>"                    , addName "Print Screen"                    $ return ())
