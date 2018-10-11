@@ -95,7 +95,8 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-alias cdd='cd ~/workspace/*/build-mango/BUILD/work/corei7-64-oe-linux/ApplicationManager/*/git'
+alias cdd='cd ~/workspace/hkmc5th/build-mango/BUILD/work/corei7-64-oe-linux/'
+alias cdb='cd ~/mnt/avn_build_server/workspace/hkmc5th/build-mango/BUILD/work/corei7-64-oe-linux'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

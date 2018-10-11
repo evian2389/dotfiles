@@ -1,2 +1,2 @@
-ibus-daemon -drx
+ibus-daemon --xim -d
 synergy &

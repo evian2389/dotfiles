@@ -8,6 +8,10 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
+export XMODIFIERS=@im=ibus
+export GTK_IM_MODULE=ibus
+export QT_IM_MODULE=ibus
+
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
@@ -21,3 +25,4 @@ PATH="$HOME/.local/bin/:$HOME/bin:$HOME/.local/bin:$PATH"
 
 XDG_CONFIG_HOME=$HOME/.config
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+export GTAGSLABEL=pygments
