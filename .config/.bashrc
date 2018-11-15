@@ -80,6 +80,7 @@ esac
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
+    alias lp='ls --color=auto -lrt -d -1 $PWD/{*,.*}'
     #alias dir='dir --color=auto'
     #alias vdir='vdir --color=auto'
 
@@ -95,8 +96,8 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-alias cdd='cd ~/workspace/hkmc5th/build-mango/BUILD/work/corei7-64-oe-linux/'
-alias cdb='cd ~/mnt/avn_build_server/workspace/hkmc5th/build-mango/BUILD/work/corei7-64-oe-linux'
+alias cdd='cd ~/workspace/l_hkmc5th/build-mango/BUILD/work/corei7-64-oe-linux/'
+alias cdb='cd ~/mnt/avn_build_server/workspace/l_hkmc5th/build-mango/BUILD/work/corei7-64-oe-linux'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

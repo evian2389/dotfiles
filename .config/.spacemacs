@@ -31,6 +31,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     haskell
      typescript
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
@@ -51,6 +52,7 @@ values."
      github
      shell-scripts
      python
+     kotlin
      ;;counsel-gtags
      auto-completion
      better-defaults

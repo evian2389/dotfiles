@@ -381,15 +381,17 @@ projects =
 
 --myTerminal          = "terminator"
 --myTerminalClass     = "Terminator"
---myTerminal          = "urxvt"
-myTerminal          = "gnome-terminal"
-myAltTerminal       = "cool-retro-term"
+myTerminal          = "urxvt"
+--myTerminal          = "gnome-terminal"
+--myAltTerminal       = "cool-retro-term"
+myAltTerminal       = "gnome-terminal"
 myBrowser           = "google-chrome-stable" -- chrome with WS profile dirs
 myBrowserClass      = "Google-chrome-stable"
 myStatusBar         = "xmobar -x0 ~/.xmonad/xmobar.conf"
 --myLauncher          = "dmenu_run"
 --myLauncher          = "rofi -matching fuzzy -show run"
 myLauncher          = "rofi -matching fuzzy -modi combi -show combi -combi-modi run,drun"
+myFileManager       = "ranger"
 
 
 -- I'm using a custom browser launching script (see myBrowser above) that
@@ -1095,7 +1097,7 @@ myLayoutHook = showWorkspaceName
 -- Bindings                                                             {{{
 ---------------------------------------------------------------------------
 
-myModMask = mod4Mask -- super (and on my system, hyper) keys
+myModMask = mod3Mask -- super (and on my system, hyper) keys
 
 -- Display keyboard mappings using zenity
 -- from https://github.com/thomasf/dotfiles-thomasf-xmonad/
@@ -1218,6 +1220,7 @@ myKeys conf = let
     subKeys "Launchers"
     [ ("M-<Space>"              , addName "Launcher"                        $ spawn myLauncher)
     , ("M-<Return>"             , addName "Terminal"                        $ spawn myTerminal)
+    , ("M-S-<Return>"           , addName "File Manager"                    $ spawn myFileManager)
     , ("M-\\"                   , addName "Browser"                         $ spawn myBrowser)
     , ("M-c"                    , addName "NSP Chat"                        $ bindOn WS [(wsWRK, namedScratchpadAction scratchpads "hangoutsWork"),
                                                                               ("", namedScratchpadAction scratchpads "hangoutsPersonal")])
@@ -1489,7 +1492,7 @@ myStartupHook = do
     -- spawnOnce "$HOME/bin/wm/init-tilingwm"
     -- spawn "~/bin/wm/init-tilingwm"
     spawn "~/bin/wm/init-wallpaper"
-    spawn "nautilus --no-desktop -n &"
+    spawn "udiskie &"
 
     -- init-tray kills and restarts stalone tray, hence just "spawn" so it
     -- runs on restart and will suffice to reposition tray on display changes
