@@ -1,0 +1,9 @@
+#!/bin/sh
+
+udiskie &
+
+# Set background image with feh
+feh --bg-scale /home/orka/Pictures/Wallpapers/milky-way-clipart-1080p-3.jpg &
+~/bin/wm/init-wallpaper &
+
+# urxvt -e ranger

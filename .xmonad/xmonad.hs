@@ -502,10 +502,14 @@ inactive    = base02
 focusColor  = blue
 unfocusColor = base02
 
-myFont      = "-*-terminus-medium-*-*-*-*-160-*-*-*-*-*-*"
-myBigFont   = "-*-terminus-medium-*-*-*-*-240-*-*-*-*-*-*"
-myWideFont  = "xft:Eurostar Black Extended:"
-            ++ "style=Regular:pixelsize=180:hinting=true"
+--myFont      = "-*-terminus-medium-*-*-*-*-160-*-*-*-*-*-*"
+--myBigFont   = "-*-terminus-medium-*-*-*-*-240-*-*-*-*-*-*"
+--myWideFont  = "xft:Eurostar Black Extended:"
+--            ++ "style=Regular:pixelsize=180:hinting=true"
+myFont      = "xft:D2Conding:pixelsize=10:style=Regular:hinting=true"
+myBigFont   = "xft:D2Conding:pixelsize=20:style=Bold:hinting=true"
+myWideFont  = "xft:D2Conding:pixelsize=160:style=Bold:hinting=true"
+            
 
 -- this is a "fake title" used as a highlight bar in lieu of full borders
 -- (I find this a cleaner and less visually intrusive solution)
@@ -1097,7 +1101,7 @@ myLayoutHook = showWorkspaceName
 -- Bindings                                                             {{{
 ---------------------------------------------------------------------------
 
-myModMask = mod3Mask -- super (and on my system, hyper) keys
+myModMask = mod4Mask -- super (and on my system, hyper) keys
 
 -- Display keyboard mappings using zenity
 -- from https://github.com/thomasf/dotfiles-thomasf-xmonad/
@@ -1447,7 +1451,7 @@ myKeys conf = let
 --    [
 --    ("<XF86AudioMicMute>"      , addName "Mic Mute"                    $ spawn "notify-send mic mute")
 --    ]
-    
+
 
 -- Mouse bindings: default actions bound to mouse events
 -- Includes window snapping on move/resize using X.A.FloatSnap
@@ -1491,8 +1495,8 @@ myStartupHook = do
     -- init-tilingwm sets up all major "desktop environment" like components
     -- spawnOnce "$HOME/bin/wm/init-tilingwm"
     -- spawn "~/bin/wm/init-tilingwm"
-    spawn "~/bin/wm/init-wallpaper"
-    spawn "udiskie &"
+    spawnOnce "$HOME/.xmonad/autostart &"
+    raiseMaybe (runInTerm "-title ranger" "ranger") (title =? "ranger")
 
     -- init-tray kills and restarts stalone tray, hence just "spawn" so it
     -- runs on restart and will suffice to reposition tray on display changes
