@@ -1224,7 +1224,7 @@ myKeys conf = let
     subKeys "Launchers"
     [ ("M-<Space>"              , addName "Launcher"                        $ spawn myLauncher)
     , ("M-<Return>"             , addName "Terminal"                        $ spawn myTerminal)
-    , ("M-S-<Return>"           , addName "File Manager"                    $ spawn myFileManager)
+    , ("M-S-<Return>"           , addName "File Manager"                    $ safeSpawn myTerminal ["ranger ~"])  --runInTerm myFileManager "~")
     , ("M-\\"                   , addName "Browser"                         $ spawn myBrowser)
     , ("M-c"                    , addName "NSP Chat"                        $ bindOn WS [(wsWRK, namedScratchpadAction scratchpads "hangoutsWork"),
                                                                               ("", namedScratchpadAction scratchpads "hangoutsPersonal")])
