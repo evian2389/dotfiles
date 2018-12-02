@@ -381,8 +381,8 @@ projects =
 
 --myTerminal          = "terminator"
 --myTerminalClass     = "Terminator"
-myTerminal          = "urxvt"
---myTerminal          = "gnome-terminal"
+--myTerminal          = "urxvt"
+myTerminal          = "gnome-terminal"
 --myAltTerminal       = "cool-retro-term"
 myAltTerminal       = "gnome-terminal"
 myBrowser           = "google-chrome-stable" -- chrome with WS profile dirs
@@ -1238,6 +1238,20 @@ myKeys conf = let
     , ("M-s M-s"                , addName "Cancel submap"                   $ return ())
     ] ^++^
 
+    -----------------------------------------------------------------------
+    -- Audios
+    -----------------------------------------------------------------------
+    subKeys "Audio"
+--    [ ("M-="              , addName "Volume Up"                          $ runInTerm "-name volumeUp"   "amixer -D pulse sset Master 5%+")
+--    , ("M--"              , addName "Volume Down"                        $ runInTerm "-name volumeDown" "amixer -D pulse sset Master 5%-")
+--    , ("M-S--"            , addName "Volume Mute"                        $ runInTerm "-name volumeMute" "amixer -D pulse sset Master 0%")
+--    , ("M-S-="            , addName "Pulse Volume Ctl"                   $ runInTerm "-name volumeCtl"  "amixer -D pulse sset Master 0%")
+--    ] ^++^
+    [ ("M-="              , addName "Volume Up"                          $  spawn "amixer -D pulse sset Master 5%+")
+    , ("M--"              , addName "Volume Down"                        $  spawn "amixer -D pulse sset Master 5%-")
+    , ("M-S--"            , addName "Volume Mute"                        $  spawn "amixer -D pulse sset Master toggle")
+    , ("M-S-="            , addName "Pulse Volume Ctl"                   $  spawn "amixer -D pulse sset Master toggle")
+    ] ^++^
     -----------------------------------------------------------------------
     -- Windows
     -----------------------------------------------------------------------

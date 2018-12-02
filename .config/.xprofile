@@ -1,2 +1,3 @@
 ibus-daemon --xim -d
+gnome-terminal &
 synergy &
