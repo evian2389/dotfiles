@@ -15,8 +15,7 @@ unlet! g:plug_url_format
 
 " Autoinstall vim-plug {{{
 if empty(glob('~/.nvim/autoload/plug.vim'))
-  silent !curl -fLo ~/.nvim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall
 endif
 " }}}
@@ -280,6 +279,11 @@ Plug 'Valloric/YouCompleteMe', { 'do': 'python install.py --clang-completer' }
 "inoremap <expr><C-e> neocomplete#cancel_popup()
 ""}}}
 endif
+Plug 'ervandew/supertab'
+" {{{
+  let g:SuperTabDefaultCompletionType = '<c-x><c-o>'
+" }}}
+
 
 Plug 'SirVer/ultisnips'
 " {{{
@@ -921,6 +925,13 @@ Plug 'vim-scripts/ReplaceWithRegister'
 "Plug 'rhysd/vim-grammarous'
 Plug 'chrisbra/unicode.vim', { 'for': 'journal' }
 " }}}
+Plug 'godlygeek/tabular'
+" {{{
+  nnoremap <leader>= :Tabularize /=<CR>
+  nnoremap <leader>- :Tabularize /-><CR>
+  nnoremap <leader>, :Tabularize /,<CR>
+  nnoremap <leader># :Tabularize /#-}<CR>
+" }}}
 " ============================================================================
 " TEXT OBJECTS {{{
 " ============================================================================
@@ -995,6 +1006,90 @@ onoremap <silent> io :<c-u>call <SID>indent_object('==', 0, line('.'), line('.')
 " ====================================================================
 " Languages" {{{
 " ====================================================================
+" haskell : https://mendo.zone/fun/neovim-setup-haskell/
+Plug 'dan-t/vim-hsimport'
+" {{{ 
+" }}}
+
+Plug 'alx741/vim-hindent'
+" {{{ 
+  let g:hindent_on_save = 0
+  au FileType haskell nnoremap <silent> <leader>ph :Hindent<CR>
+" }}}
+Plug 'alx741/vim-stylishask'
+" {{{ 
+  let g:stylishask_on_save = 0
+  au FileType haskell nnoremap <silent> <leader>ps :Stylishask<CR>
+" }}}
+Plug 'Shougo/vimproc.vim'
+" {{{ 
+" }}}
+Plug 'eagletmt/ghcmod-vim'
+" {{{ 
+  au FileType haskell nmap <leader>mc :GhcModSplitFunCase<CR>
+  au FileType haskell nmap <leader>ms :GhcModSigCodegen<CR>
+" }}}
+Plug 'Shougo/vimproc.vim'
+" {{{ 
+" }}}
+" {{{ haskell
+  let g:neomake_haskell_enabled_makers = []
+" }}}
+Plug 'neovimhaskell/haskell-vim'
+" {{{
+  let g:haskell_classic_highlighting = 1
+  let g:haskell_indent_if = 3
+  let g:haskell_indent_case = 2
+  let g:haskell_indent_let = 4
+  let g:haskell_indent_where = 6
+  let g:haskell_indent_before_where = 2
+  let g:haskell_indent_after_bare_where = 2
+  let g:haskell_indent_do = 3
+  let g:haskell_indent_in = 1
+  let g:haskell_indent_guard = 2
+  let g:haskell_indent_case_alternative = 1
+  let g:cabal_indent_section = 2
+" }}}
+Plug 'neovimhaskell/haskell-vim'
+" {{{
+" }}}
+Plug 'parsonsmatt/intero-neovim'
+" {{{  https://mendo.zone/fun/neovim-setup-haskell/
+  " Automatically reload on save
+  au BufWritePost *.hs InteroReload
+
+  " Lookup the type of expression under the cursor
+  au FileType haskell nmap <silent> <leader>t <Plug>InteroGenericType
+  au FileType haskell nmap <silent> <leader>T <Plug>InteroType
+  " Insert type declaration
+  au FileType haskell nnoremap <silent> <leader>ni :InteroTypeInsert<CR>
+  " Show info about expression or type under the cursor
+  au FileType haskell nnoremap <silent> <leader>i :InteroInfo<CR>
+
+  " Open/Close the Intero terminal window
+  au FileType haskell nnoremap <silent> <leader>nn :InteroOpen<CR>
+  au FileType haskell nnoremap <silent> <leader>nh :InteroHide<CR>
+
+  " Reload the current file into REPL
+  au FileType haskell nnoremap <silent> <leader>nf :InteroLoadCurrentFile<CR>
+  " Jump to the definition of an identifier
+  au FileType haskell nnoremap <silent> <leader>ng :InteroGoToDef<CR>
+  " Evaluate an expression in REPL
+  au FileType haskell nnoremap <silent> <leader>ne :InteroEval<CR>
+
+  " Start/Stop Intero
+  au FileType haskell nnoremap <silent> <leader>ns :InteroStart<CR>
+  au FileType haskell nnoremap <silent> <leader>nk :InteroKill<CR>
+
+  " Reboot Intero, for when dependencies are added
+  au FileType haskell nnoremap <silent> <leader>nr :InteroKill<CR> :InteroOpen<CR>
+
+  " Managing targets
+  " Prompts you to enter targets (no silent):
+  au FileType haskell nnoremap <leader>nt :InteroSetTargets<CR>
+  " Run the spec in the current file
+  au FileType haskell nnoremap <silent> <leader>nb :InteroSend hspec spec<CR>
+" }}}
 Plug 'scrooloose/syntastic'
 " {{{
   let g:syntastic_always_populate_loc_list = 1
@@ -1384,6 +1479,7 @@ Plug 'itchyny/calendar.vim', { 'on': 'Calendar' }
 Plug 'neomake/neomake'
 " {{{
   let g:neomake_open_list = 2
+  "call neomake#configure#automake('w')
 " 
 "let g:neomake_warning_sign = {
 "  \ 'text': 'W',
@@ -1504,6 +1600,7 @@ colorscheme jellybeans
 let g:seoul256_background = 234
 "colorscheme seoul256
 let g:lightline#colorscheme#jellybeans_mod#palette = lightline#colorscheme#flatten(s:p)
+
 
 set cursorline     " highlight current line
 set colorcolumn=80 " highlight column
