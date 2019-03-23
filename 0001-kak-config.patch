@@ -1,0 +1,322 @@
+From 75be175a465801868a9ed098ef92d667a3d17b8f Mon Sep 17 00:00:00 2001
+From: orka <evian2389@gmail.com>
+Date: Sun, 24 Mar 2019 10:03:53 +0900
+Subject: [PATCH] kak config
+
+---
+ .config/kak/autoload/plug.kak          |   1 +
+ .config/kak/colors/default.kak         |  82 ++++++++---------
+ .config/kak/kakoune-vertical-selection |   2 +-
+ .config/kak/kakrc                      | 122 ++++++++++++++++++++-----
+ .xmonad/stack.yaml                     |  14 +++
+ 5 files changed, 156 insertions(+), 65 deletions(-)
+ create mode 120000 .config/kak/autoload/plug.kak
+ create mode 100644 .xmonad/stack.yaml
+
+diff --git a/.config/kak/autoload/plug.kak b/.config/kak/autoload/plug.kak
+new file mode 120000
+index 0000000..046838b
+--- /dev/null
++++ b/.config/kak/autoload/plug.kak
+@@ -0,0 +1 @@
++../plugins/plug.kak/rc/plug.kak
+\ No newline at end of file
+diff --git a/.config/kak/colors/default.kak b/.config/kak/colors/default.kak
+index 4c2307d..3e456d7 100644
+--- a/.config/kak/colors/default.kak
++++ b/.config/kak/colors/default.kak
+@@ -1,48 +1,48 @@
+ # Kakoune default color scheme
+ 
+ # For Code
+-face value red
+-face type yellow
+-face variable green
+-face module green
+-face function cyan
+-face string magenta
+-face keyword blue
+-face operator yellow
+-face attribute green
+-face comment cyan
+-face meta magenta
+-face builtin default+b
++face global value red
++face global type yellow
++face global variable green
++face global module green
++face global function cyan
++face global string magenta
++face global keyword blue
++face global operator yellow
++face global attribute green
++face global comment cyan
++face global meta magenta
++face global builtin default+b
+ 
+ # For markup
+-face title blue
+-face header cyan
+-face bold red
+-face italic yellow
+-face mono green
+-face block magenta
+-face link cyan
+-face bullet cyan
+-face list yellow
++face global title blue
++face global header cyan
++face global bold red
++face global italic yellow
++face global mono green
++face global block magenta
++face global link cyan
++face global bullet cyan
++face global list yellow
+ 
+ # builtin faces
+-face Default default,default
+-face PrimarySelection white,blue
+-face SecondarySelection black,blue
+-face PrimaryCursor black,white
+-face SecondaryCursor black,white
+-face LineNumbers default,default
+-face LineNumberCursor default,default+r
+-face MenuForeground white,blue
+-face MenuBackground blue,white
+-face MenuInfo cyan
+-face Information black,yellow
+-face Error black,red
+-face StatusLine cyan,default
+-face StatusLineMode yellow,default
+-face StatusLineInfo blue,default
+-face StatusLineValue green,default
+-face StatusCursor black,cyan
+-face Prompt yellow,default
+-face MatchingChar default,default+b
+-face BufferPadding blue,default
++face global Default default,default
++face global PrimarySelection white,blue
++face global SecondarySelection black,blue
++face global PrimaryCursor black,white
++face global SecondaryCursor black,white
++face global LineNumbers default,default
++face global LineNumberCursor default,default+r
++face global MenuForeground white,blue
++face global MenuBackground blue,white
++face global MenuInfo cyan
++face global Information black,yellow
++face global Error black,red
++face global StatusLine cyan,default
++face global StatusLineMode yellow,default
++face global StatusLineInfo blue,default
++face global StatusLineValue green,default
++face global StatusCursor black,cyan
++face global Prompt yellow,default
++face global MatchingChar default,default+b
++face global BufferPadding blue,default
+diff --git a/.config/kak/kakoune-vertical-selection b/.config/kak/kakoune-vertical-selection
+index e177891..9c35211 160000
+--- a/.config/kak/kakoune-vertical-selection
++++ b/.config/kak/kakoune-vertical-selection
+@@ -1 +1 @@
+-Subproject commit e1778911bf55af0cd8d36bd61055149ef09a72cc
++Subproject commit 9c35211de74227f55282323d3b8b4f8905213274
+diff --git a/.config/kak/kakrc b/.config/kak/kakrc
+index d686868..e330227 100644
+--- a/.config/kak/kakrc
++++ b/.config/kak/kakrc
+@@ -1,13 +1,18 @@
+-def plug -params 1 %{
+-  %sh{
+-    if [ ! -d $HOME/build/$1 ]; then
+-      (cd $HOME/build; git clone https://github.com/$1 2> /dev/null)
+-    fi
+-    for file in $(echo $HOME/build/$(basename $1)/*.kak); do
+-      echo source "$file"
+-    done
+-  }
+-}
++#def plug -params 1 %{
++#  %sh{
++#    if [ ! -d $HOME/build/$1 ]; then
++#      (cd $HOME/build; git clone https://github.com/$1 2> /dev/null)
++#    fi
++#    for file in $(echo $HOME/build/$(basename $1)/*.kak); do
++#      echo source "$file"
++#    done
++#  }
++#}
++
++# Plugins
++
++source "%val{config}/plugins/plug.kak/rc/plug.kak"
++plug "andreyorst/plug.kak" noload
+ 
+ plug occivink/kakoune-vertical-selection
+ plug occivink/kakoune-interactive-itersel
+@@ -18,12 +23,81 @@ plug danr/kakoune-easymotion
+ plug fsub/kakoune-mark
+ 
+ 
++plug "andreyorst/fzf.kak" config %{
++    map global user f -docstring 'Open fzf mode' %{: fzf-mode<ret>}
++    map global fzf g -docstring 'Open vcs mode' %{: fzf-vcs-mode<ret>}
++    map global user <space> -docstring 'fzf file mode' ':fzf-file<ret>'
++    #map global user f -docstring 'Open vcs mode' ':fzf-buffer<ret>'
++    #map global user t -docstring 'Open vcs mode' ':fzf <ret>'
++}
+ 
+-#hook global WinCreate .* %{addhl window/ number_lines}
+-hook global WinCreate .* %{addhl window/ show_whitespaces}  
++map global user f -docstring 'Open fzf mode' %{: fzf-mode<ret>}
++map global user <space> -docstring 'fzf file mode' ':fzf-file<ret>'
++map global fzf g -docstring 'Open vcs mode' %{: fzf-vcs-mode<ret>}
++map global fzf f -docstring 'Open fzf-buffer mode' ':fzf-buffer<ret>'
++map global fzf t -docstring 'Open fzf' ':fzf <ret>'
++
++plug "occivink/kakoune-phantom-selection" %{
++    declare-user-mode phantom-selection
++    map global user h -docstring "Phantom selections" ": enter-user-mode phantom-selection<ret>"
++    map global phantom-selection n -docstring "Next" ": phantom-sel-iterate-next<ret>"
++    map global phantom-selection p -docstring "Previous" ": phantom-sel-iterate-prev<ret>"
++    map global phantom-selection c -docstring "Clear" ": phantom-sel-select-all; phantom-sel-clear<ret>"
++    map global phantom-selection a -docstring "Add" ": phantom-sel-add-selection<ret>"
++}
++plug "occivink/kakoune-snippets" %{
++    set-option global snippets_auto_expand true
++    declare-user-mode snippets
++    map global user s -docstring "Snippets" ": enter-user-mode snippets<ret>"
++    map global snippets n -docstring "Select next placeholder" ": snippets-select-next-placeholders<ret>"
++    map global snippets s -docstring "Snippet" ": snippets "
++    map global snippets i -docstring "Info" ": snippets-info<ret>"
++    map global insert <a-e> "<esc>: try snippets-select-next-placeholders catch phantom-sel-iterate-next<ret>i"
++    add-highlighter global/ ranges snippets_placeholders
++    source "%val{config}/snippets.kak"
++}
+ 
+-hook global WinCreate .* %{set global indentwidth 2}
+-hook global WinCreate .* %{set global tabstop 2}
++plug "occivink/kakoune-sudo-write"
++plug "jjk96/kakoune-fireplace"
++plug "lenormf/kakoune-extra" load %{
++    syntastic.kak
++}
++plug "alexherbo2/yank-ring.kak" %{
++    map global normal <c-p> ':<space>yank-ring<ret><c-p>'
++    map global normal <c-n> ':<space>yank-ring<ret><c-n>'
++}
++plug "Delapouite/kakoune-buffers" %{
++    map global user b ': enter-user-mode -lock buffers<ret>'   -docstring 'buffers (lock)…'
++}
++plug "ul/kak-tree" %{
++    declare-user-mode tree
++    map global tree u ': tree-select-parent-node<ret>' -docstring 'parent'
++    map global tree n ': tree-select-next-node<ret>' -docstring 'next'
++    map global tree p ': tree-select-previous-node<ret>' -docstring 'previous'
++    map global tree c ': tree-select-children<ret>' -docstring 'children'
++    map global tree f ': tree-select-first-child<ret>' -docstring 'first child'
++    map global tree t ': tree-node-sexp<ret>' -docstring 'show syntax tree'
++    map global tree . ': enter-user-mode -lock tree<ret>' -docstring 'lock'
++    map global user t ': enter-user-mode tree<ret>' -docstring 'tree-sitter'
++}
++plug 'delapouite/kakoune-cd' %{
++    # Suggested aliases
++    alias global cdb change-directory-current-buffer
++    alias global cdr change-directory-project-root
++    alias global ecd edit-current-buffer-directory
++    alias global pwd print-working-directory
++}
++plug 'Delapouite/kakoune-mirror' %{
++    map global user o -docstring 'mirror' ': enter-user-mode mirror<ret>'
++    map global mirror * -docstring 'stars (markdown bold)' 'i**<esc>a**<esc>'
++    map global mirror . ': enter-user-mode -lock mirror<ret>'
++}
++
++
++hook global WinCreate .* %{addhl window/ show_whitespaces}
++
++hook global WinCreate .* %{set global indentwidth 4}
++hook global WinCreate .* %{set global tabstop 4}
+ hook global WinCreate .* %{hook window InsertChar \t %{ exec -draft h@}}
+ 
+ #hook global InsertChar \( 'exec )<left>'
+@@ -42,7 +116,7 @@ hook global BufCreate .*.purs %{ set buffer filetype haskell }
+ hook global BufCreate .*.(es6|tsx?) %{ set buffer filetype javascript }
+ 
+ hook global WinSetOption filetype=(c|cpp|cc|h|hpp) %{
+-    clang-enable-autocomplete 
++    clang-enable-autocomplete
+     clang-enable-diagnostics
+     alias window lint clang-parse
+     alias window lint-next clang-diagnostics-next
+@@ -68,11 +142,11 @@ hook global WinSetOption filetype=python %{
+ }
+ 
+ decl -hidden regex curword
+-face CurWord default,rgb:4a4a4a
++face global CurWord default,rgb:4a4a4a
+ 
+ hook global WinCreate .* %{
+     addhl global/ show_matching
+-    addhl global/ dynregex '%reg{/}' 0:+u 
++    addhl global/ dynregex '%reg{/}' 0:+u
+ 
+     # Highlight the word under the cursor
+     addhl global/ dynregex '%opt{curword}' 0:CurWord
+@@ -126,14 +200,14 @@ set global scrolloff 1,5
+ 
+ #set global makecmd 'make -j8'
+ #set global grepcmd 'rg --vimgrep --colors \'match:fg:magenta\' --colors \'line:bg:yellow\' '
+-set global grepcmd 'rg --vimgrep -s -p'
+-map global normal <c-p> :lint<ret>
++#set global grepcmd 'rg --vimgrep -s -p'
++#map global normal <c-p> :lint<ret>
+ 
+ 
+ map global normal '#' :comment-line<ret>
+ map global normal = ':prompt math: %{exec "a%val{text}<lt>esc>|bc<lt>ret>"}<ret>'
+ 
+-map global user n ':lint-next<ret>'
++#map global user n ':lint-next<ret>'
+ map global user p '!xclip -o<ret>'
+ map global user y '<a-|>xclip -i<ret>; :echo -color Information "copied selection to X11 clipboard"<ret>'
+ map global user R '|xclip -o<ret>'
+@@ -174,9 +248,11 @@ map global normal <space> ,
+ map global normal  , <space>
+ 
+ 
+-map global user <space> ':fzf-file<ret>'
+-map global user f ':fzf-buffer<ret>'
+-#map global user t ':fzf <ret>'
++
+ map global user / 'wb*'
++hook global BufWritePre .* %{exec -draft '%s\h+$<ret>d'}
+ 
+ map global user d 'wb:ctags-search<ret>'
++
++# Overwrites colors defined in kak-lsp
++#colorscheme gruvbox
+diff --git a/.xmonad/stack.yaml b/.xmonad/stack.yaml
+new file mode 100644
+index 0000000..cd3b92d
+--- /dev/null
++++ b/.xmonad/stack.yaml
+@@ -0,0 +1,14 @@
++# ~/.xmonad/stack.yaml
++resolver: lts-9.6
++packages:
++- xmobar-git
++- xmonad-git
++- xmonad-contrib-git
++extra_deps:
++    - iwlib-0.1.0
++#extra-deps: []
++flags:
++  xmobar:
++    all_extensions: true
++#flags: {}
++extra-package-dbs: []
+-- 
+2.21.0
+
