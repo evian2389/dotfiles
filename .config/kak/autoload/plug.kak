@@ -1,0 +1,1 @@
+../plugins/plug.kak/rc/plug.kak
