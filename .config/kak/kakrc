@@ -1,13 +1,18 @@
-def plug -params 1 %{
-  %sh{
-    if [ ! -d $HOME/build/$1 ]; then
-      (cd $HOME/build; git clone https://github.com/$1 2> /dev/null)
-    fi
-    for file in $(echo $HOME/build/$(basename $1)/*.kak); do
-      echo source "$file"
-    done
-  }
-}
+#def plug -params 1 %{
+#  %sh{
+#    if [ ! -d $HOME/build/$1 ]; then
+#      (cd $HOME/build; git clone https://github.com/$1 2> /dev/null)
+#    fi
+#    for file in $(echo $HOME/build/$(basename $1)/*.kak); do
+#      echo source "$file"
+#    done
+#  }
+#}
+
+# Plugins
+
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/plug.kak" noload
 
 plug occivink/kakoune-vertical-selection
 plug occivink/kakoune-interactive-itersel
@@ -18,12 +23,81 @@ plug danr/kakoune-easymotion
 plug fsub/kakoune-mark
 
 
+plug "andreyorst/fzf.kak" config %{
+    map global user f -docstring 'Open fzf mode' %{: fzf-mode<ret>}
+    map global fzf g -docstring 'Open vcs mode' %{: fzf-vcs-mode<ret>}
+    map global user <space> -docstring 'fzf file mode' ':fzf-file<ret>'
+    #map global user f -docstring 'Open vcs mode' ':fzf-buffer<ret>'
+    #map global user t -docstring 'Open vcs mode' ':fzf <ret>'
+}
 
-#hook global WinCreate .* %{addhl window/ number_lines}
-hook global WinCreate .* %{addhl window/ show_whitespaces}  
+map global user f -docstring 'Open fzf mode' %{: fzf-mode<ret>}
+map global user <space> -docstring 'fzf file mode' ':fzf-file<ret>'
+map global fzf g -docstring 'Open vcs mode' %{: fzf-vcs-mode<ret>}
+map global fzf f -docstring 'Open fzf-buffer mode' ':fzf-buffer<ret>'
+map global fzf t -docstring 'Open fzf' ':fzf <ret>'
 
-hook global WinCreate .* %{set global indentwidth 2}
-hook global WinCreate .* %{set global tabstop 2}
+plug "occivink/kakoune-phantom-selection" %{
+    declare-user-mode phantom-selection
+    map global user h -docstring "Phantom selections" ": enter-user-mode phantom-selection<ret>"
+    map global phantom-selection n -docstring "Next" ": phantom-sel-iterate-next<ret>"
+    map global phantom-selection p -docstring "Previous" ": phantom-sel-iterate-prev<ret>"
+    map global phantom-selection c -docstring "Clear" ": phantom-sel-select-all; phantom-sel-clear<ret>"
+    map global phantom-selection a -docstring "Add" ": phantom-sel-add-selection<ret>"
+}
+plug "occivink/kakoune-snippets" %{
+    set-option global snippets_auto_expand true
+    declare-user-mode snippets
+    map global user s -docstring "Snippets" ": enter-user-mode snippets<ret>"
+    map global snippets n -docstring "Select next placeholder" ": snippets-select-next-placeholders<ret>"
+    map global snippets s -docstring "Snippet" ": snippets "
+    map global snippets i -docstring "Info" ": snippets-info<ret>"
+    map global insert <a-e> "<esc>: try snippets-select-next-placeholders catch phantom-sel-iterate-next<ret>i"
+    add-highlighter global/ ranges snippets_placeholders
+    source "%val{config}/snippets.kak"
+}
+
+plug "occivink/kakoune-sudo-write"
+plug "jjk96/kakoune-fireplace"
+plug "lenormf/kakoune-extra" load %{
+    syntastic.kak
+}
+plug "alexherbo2/yank-ring.kak" %{
+    map global normal <c-p> ':<space>yank-ring<ret><c-p>'
+    map global normal <c-n> ':<space>yank-ring<ret><c-n>'
+}
+plug "Delapouite/kakoune-buffers" %{
+    map global user b ': enter-user-mode -lock buffers<ret>'   -docstring 'buffers (lock)…'
+}
+plug "ul/kak-tree" %{
+    declare-user-mode tree
+    map global tree u ': tree-select-parent-node<ret>' -docstring 'parent'
+    map global tree n ': tree-select-next-node<ret>' -docstring 'next'
+    map global tree p ': tree-select-previous-node<ret>' -docstring 'previous'
+    map global tree c ': tree-select-children<ret>' -docstring 'children'
+    map global tree f ': tree-select-first-child<ret>' -docstring 'first child'
+    map global tree t ': tree-node-sexp<ret>' -docstring 'show syntax tree'
+    map global tree . ': enter-user-mode -lock tree<ret>' -docstring 'lock'
+    map global user t ': enter-user-mode tree<ret>' -docstring 'tree-sitter'
+}
+plug 'delapouite/kakoune-cd' %{
+    # Suggested aliases
+    alias global cdb change-directory-current-buffer
+    alias global cdr change-directory-project-root
+    alias global ecd edit-current-buffer-directory
+    alias global pwd print-working-directory
+}
+plug 'Delapouite/kakoune-mirror' %{
+    map global user o -docstring 'mirror' ': enter-user-mode mirror<ret>'
+    map global mirror * -docstring 'stars (markdown bold)' 'i**<esc>a**<esc>'
+    map global mirror . ': enter-user-mode -lock mirror<ret>'
+}
+
+
+hook global WinCreate .* %{addhl window/ show_whitespaces}
+
+hook global WinCreate .* %{set global indentwidth 4}
+hook global WinCreate .* %{set global tabstop 4}
 hook global WinCreate .* %{hook window InsertChar \t %{ exec -draft h@}}
 
 #hook global InsertChar \( 'exec )<left>'
@@ -42,7 +116,7 @@ hook global BufCreate .*.purs %{ set buffer filetype haskell }
 hook global BufCreate .*.(es6|tsx?) %{ set buffer filetype javascript }
 
 hook global WinSetOption filetype=(c|cpp|cc|h|hpp) %{
-    clang-enable-autocomplete 
+    clang-enable-autocomplete
     clang-enable-diagnostics
     alias window lint clang-parse
     alias window lint-next clang-diagnostics-next
@@ -68,11 +142,11 @@ hook global WinSetOption filetype=python %{
 }
 
 decl -hidden regex curword
-face CurWord default,rgb:4a4a4a
+face global CurWord default,rgb:4a4a4a
 
 hook global WinCreate .* %{
     addhl global/ show_matching
-    addhl global/ dynregex '%reg{/}' 0:+u 
+    addhl global/ dynregex '%reg{/}' 0:+u
 
     # Highlight the word under the cursor
     addhl global/ dynregex '%opt{curword}' 0:CurWord
@@ -126,14 +200,14 @@ set global scrolloff 1,5
 
 #set global makecmd 'make -j8'
 #set global grepcmd 'rg --vimgrep --colors \'match:fg:magenta\' --colors \'line:bg:yellow\' '
-set global grepcmd 'rg --vimgrep -s -p'
-map global normal <c-p> :lint<ret>
+#set global grepcmd 'rg --vimgrep -s -p'
+#map global normal <c-p> :lint<ret>
 
 
 map global normal '#' :comment-line<ret>
 map global normal = ':prompt math: %{exec "a%val{text}<lt>esc>|bc<lt>ret>"}<ret>'
 
-map global user n ':lint-next<ret>'
+#map global user n ':lint-next<ret>'
 map global user p '!xclip -o<ret>'
 map global user y '<a-|>xclip -i<ret>; :echo -color Information "copied selection to X11 clipboard"<ret>'
 map global user R '|xclip -o<ret>'
@@ -174,9 +248,11 @@ map global normal <space> ,
 map global normal  , <space>
 
 
-map global user <space> ':fzf-file<ret>'
-map global user f ':fzf-buffer<ret>'
-#map global user t ':fzf <ret>'
+
 map global user / 'wb*'
+hook global BufWritePre .* %{exec -draft '%s\h+$<ret>d'}
 
 map global user d 'wb:ctags-search<ret>'
+
+# Overwrites colors defined in kak-lsp
+#colorscheme gruvbox
