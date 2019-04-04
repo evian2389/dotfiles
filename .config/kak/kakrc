@@ -12,8 +12,8 @@
 # Plugins
 
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
-plug "andreyorst/plug.kak" noload
 
+plug "andreyorst/plug.kak" noload
 plug occivink/kakoune-vertical-selection
 plug occivink/kakoune-interactive-itersel
 plug occivink/kakoune-expand
@@ -21,21 +21,64 @@ plug occivink/kakoune-find
 plug occivink/kakoune-sudo-write
 plug danr/kakoune-easymotion
 plug fsub/kakoune-mark
+plug Delapouite/kakoune-buffers
+plug "andreyorst/powerline.kak"
+plug "lenormf/kakoune-extra" %{
 
+    ##VCS
+    declare-option str-list ctagsfiles
 
-plug "andreyorst/fzf.kak" config %{
-    map global user f -docstring 'Open fzf mode' %{: fzf-mode<ret>}
-    map global fzf g -docstring 'Open vcs mode' %{: fzf-vcs-mode<ret>}
-    map global user <space> -docstring 'fzf file mode' ':fzf-file<ret>'
-    #map global user f -docstring 'Open vcs mode' ':fzf-buffer<ret>'
-    #map global user t -docstring 'Open vcs mode' ':fzf <ret>'
+    hook global BufCreate .* %{
+        %sh{
+            if [ -e "${kak_opt_vcs_root_path}/tags" ]; then
+                printf 'set-option -add buffer ctagsfiles %%{%s}\n' "${kak_opt_vcs_root_path}/tags"
+                #printf 'declare-option -add buffer ctagsfiles %%{%s}\n' "${kak_opt_vcs_root_path}/tags"
+            fi
+        }
+        #declare-option -add buffer ctagsfiles %%{%s}\n' "${kak_opt_vcs_root_path}/tags
+    }
+
+    hook global WinCreate .* %{ evaluate-commands %sh{
+        if [ -n "${kak_opt_vcs_root_path}" ]; then
+            case "${kak_opt_vcs_name}" in
+                git)
+                    echo "
+                        git show-diff
+                        hook global BufWritePost %val{buffile} %{git update-diff}
+                        hook global BufReload %val{buffile} %{git update-diff}
+                        hook global WinDisplay %val{buffile} %{git update-diff}
+                    ";;
+            esac
+        fi
+    } }
 }
 
+
+plug "andreyorst/fzf.kak" %{
+
 map global user f -docstring 'Open fzf mode' %{: fzf-mode<ret>}
-map global user <space> -docstring 'fzf file mode' ':fzf-file<ret>'
-map global fzf g -docstring 'Open vcs mode' %{: fzf-vcs-mode<ret>}
-map global fzf f -docstring 'Open fzf-buffer mode' ':fzf-buffer<ret>'
-map global fzf t -docstring 'Open fzf' ':fzf <ret>'
+#map global fzf g -docstring 'Open vcs mode' %{: fzf-vcs-mode<ret>}
+#map global fzf b -docstring 'Open fzf-buffer mode' ':fzf-buffer<ret>'
+map global fzf f -docstring 'fzf file mode' ':fzf-file<ret>'
+#map global fzf t -docstring 'Open fzf' ':fzf <ret>'
+
+#source "%val{config}/plugins/fzf.kak/rc/fzf-modules/fzf-file.kak"   # fzf file chooser
+#source "%val{config}/plugins/fzf.kak/rc/fzf-modules/fzf-buffer.kak" # switching buffers with fzf
+#source "%val{config}/plugins/fzf.kak/rc/fzf-modules/fzf-search.kak" # search within file contents
+#source "%val{config}/plugins/fzf.kak/rc/fzf-modules/fzf-cd.kak"     # change server's working directory
+#source "%val{config}/plugins/fzf.kak/rc/fzf-modules/fzf-ctags.kak"  # search for tag in your project ctags file
+#source "%val{config}/plugins/fzf.kak/rc/fzf-modules/fzf-git.kak"    # git support modulemap global user f -docstring 'Open fzf mode' %{: fzf-mode<ret>}
+}
+
+plug "andreyorst/tagbar.kak" config %{
+    # if you have wrap highlighter enamled in you configuration
+    # files it's better to turn it off for tagbar, using this hook:
+    hook global WinSetOption filetype=tagbar %{
+        remove-highlighter window/wrap
+        # you can also disable rendering whitespaces here, and
+    }
+}
+
 
 plug "occivink/kakoune-phantom-selection" %{
     declare-user-mode phantom-selection
@@ -178,8 +221,8 @@ def ide %{
     set global docsclient docs
 }
 
-hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <backtab> <c-p> }
-hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <backtab> <c-p> }
+#hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <backtab> <c-p> }
+#hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <backtab> <c-p> }
 
 hook global InsertChar k %{ try %{
     exec -draft hH <a-k>jk<ret> d
@@ -256,3 +299,93 @@ map global user d 'wb:ctags-search<ret>'
 
 # Overwrites colors defined in kak-lsp
 #colorscheme gruvbox
+
+# CLI utils
+##
+def suspend-and-resume \
+    -params 1..2 \
+    -docstring 'suspend-and-resume <cli command> [<kak command after resume>]: backgrounds current kakoune client and runs specified cli command.  Upon exit of command the optional kak command is executed.' \
+    %{ evaluate-commands %sh{
+
+    # Note we are adding '&& fg' which resumes the kakoune client process after the cli command exits
+    cli_cmd="$1 && fg"
+    post_resume_cmd="$2"
+
+    # automation is different platform to platform
+    platform=$(uname -s)
+    case $platform in
+        Darwin)
+            automate_cmd="sleep 0.01; osascript -e 'tell application \"System Events\" to keystroke \"$cli_cmd\\n\" '"
+            kill_cmd="/bin/kill"
+            break
+            ;;
+        Linux)
+            automate_cmd="sleep 0.2; xdotool type '$cli_cmd'; xdotool key Return"
+            kill_cmd="/usr/bin/kill"
+            break
+            ;;
+    esac
+
+    # Uses platforms automation to schedule the typing of our cli command
+    nohup sh -c "$automate_cmd"  > /dev/null 2>&1 &
+    # Send kakoune client to the background
+    $kill_cmd -SIGTSTP $kak_client_pid
+
+    # ...At this point the kakoune client is paused until the " && fg " gets run in the $automate_cmd
+
+    # Upon resume, run the kak command is specified
+    if [ ! -z "$post_resume_cmd" ]; then
+        echo "$post_resume_cmd"
+    fi
+}}
+
+##
+def tig-blame -override -docstring 'Open blame in tig for current file and line' %{
+    # Note here we aren't passing any command on resume of kakoune
+    suspend-and-resume "tig blame +%val{cursor_line} %val{buffile}"
+}
+
+declare-user-mode tig
+map global tig b ': tig-blame<ret>' -docstring 'show blame (with tig)'
+map global tig s ': suspend-and-resume "tig status"<ret>' -docstring 'show git status (with tig)'
+map global tig m ': suspend-and-resume "tig"<ret>' -docstring 'show main view (with tig)'
+
+map global user t ': enter-user-mode tig<ret>' -docstring 'tig commands'
+
+## ranger
+def for-each-line \
+    -docstring "for-each-line <command> <path to file>: run command with the value of each line in the file" \
+    -params 2 \
+    %{ evaluate-commands %sh{
+
+    while read f; do
+        printf "$1 $f\n"
+    done < "$2"
+}}
+
+def toggle-ranger %{
+    suspend-and-resume \
+        "ranger --choosefiles=/tmp/ranger-files-%val{client_pid}" \
+        "for-each-line edit /tmp/ranger-files-%val{client_pid}"
+}
+
+map global user r ': toggle-ranger<ret>' -docstring 'select files in ranger'
+
+define-command symbol -params 1 -shell-script-candidates %{
+    tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    ctags -f $tags $kak_buffile
+    readtags -t $tags -l | cut -f 1 | awk '!x[$0]++' | grep -v -e "__anon.*"
+    } %{ evaluate-commands %sh{
+    tags="${TMPDIR:-/tmp}/tags-${kak_buffile##*/}"; tags="${tags%.*}"
+    readtags -t $tags $1 | awk -F '\t|\n' '
+        /^!TAGROOT\t/ { tagroot=$2 }
+        /[^\t]+\t[^\t]+\t\/\^.*\$?\// {
+            re=$0;
+            sub(".*\t/\\^", "", re); sub("\\$?/$", "", re); gsub("(\\{|\\}|\\\\E).*$", "", re);
+            keys=re; gsub(/</, "<lt>", keys); gsub(/\t/, "<c-v><c-i>", keys);
+            out = out " %{" $2 " {MenuInfo}" re "} %{evaluate-commands %{ try %{ edit %{" tagroot $2 "}; execute-keys %{/\\Q" keys "<ret>vc} } catch %{ echo %{unable to find tag} } } }"
+        }
+        /[^\t]+\t[^\t]+\t[0-9]+/ { out = out " %{" $2 ":" $3 "} %{evaluate-commands %{ edit %{" tagroot $2 "} %{" $3 "}}}" }
+        END { print ( length(out) == 0 ? "echo -markup %{{Error}no such tag " ENVIRON["tagname"] "}" : "menu -markup -auto-single " out ) }'
+    rm $tags
+}}

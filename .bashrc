@@ -1,368 +1,190 @@
-# .bashrc for OS X and Ubuntu
-# ====================================================================
-# - https://github.com/junegunn/dotfiles
-# - junegunn.c@gmail.com
+#
+# ~/.bashrc
+#
 
-# System default
-# --------------------------------------------------------------------
+[[ $- != *i* ]] && return
 
-export PLATFORM=$(uname -s)
-[ -f /etc/bashrc ] && . /etc/bashrc
+colors() {
+	local fgc bgc vals seq0
 
-BASE=$(dirname $(readlink $BASH_SOURCE))
+	printf "Color escapes are %s\n" '\e[${value};...;${value}m'
+	printf "Values 30..37 are \e[33mforeground colors\e[m\n"
+	printf "Values 40..47 are \e[43mbackground colors\e[m\n"
+	printf "Value  1 gives a  \e[1mbold-faced look\e[m\n\n"
 
-# Options
-# --------------------------------------------------------------------
+	# foreground colors
+	for fgc in {30..37}; do
+		# background colors
+		for bgc in {40..47}; do
+			fgc=${fgc#37} # white
+			bgc=${bgc#40} # black
 
-### Append to the history file
-shopt -s histappend
+			vals="${fgc:+$fgc;}${bgc}"
+			vals=${vals%%;}
 
-### Check the window size after each command ($LINES, $COLUMNS)
+			seq0="${vals:+\e[${vals}m}"
+			printf "  %-9s" "${seq0:-(default)}"
+			printf " ${seq0}TEXT\e[m"
+			printf " \e[${vals:+${vals+$vals;}}1mBOLD\e[m"
+		done
+		echo; echo
+	done
+}
+
+[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
+
+# Change the window title of X terminals
+case ${TERM} in
+	xterm*|rxvt*|Eterm*|aterm|kterm|gnome*|interix|konsole*)
+		PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/\~}\007"'
+		;;
+	screen*)
+		PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/\~}\033\\"'
+		;;
+esac
+
+use_color=true
+
+# Set colorful PS1 only on colorful terminals.
+# dircolors --print-database uses its own built-in database
+# instead of using /etc/DIR_COLORS.  Try to use the external file
+# first to take advantage of user additions.  Use internal bash
+# globbing instead of external grep binary.
+safe_term=${TERM//[^[:alnum:]]/?}   # sanitize TERM
+match_lhs=""
+[[ -f ~/.dir_colors   ]] && match_lhs="${match_lhs}$(<~/.dir_colors)"
+[[ -f /etc/DIR_COLORS ]] && match_lhs="${match_lhs}$(</etc/DIR_COLORS)"
+[[ -z ${match_lhs}    ]] \
+	&& type -P dircolors >/dev/null \
+	&& match_lhs=$(dircolors --print-database)
+[[ $'\n'${match_lhs} == *$'\n'"TERM "${safe_term}* ]] && use_color=true
+
+if ${use_color} ; then
+	# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
+	if type -P dircolors >/dev/null ; then
+		if [[ -f ~/.dir_colors ]] ; then
+			eval $(dircolors -b ~/.dir_colors)
+		elif [[ -f /etc/DIR_COLORS ]] ; then
+			eval $(dircolors -b /etc/DIR_COLORS)
+		fi
+	fi
+
+	if [[ ${EUID} == 0 ]] ; then
+		PS1='\[\033[01;31m\][\h\[\033[01;36m\] \W\[\033[01;31m\]]\$\[\033[00m\] '
+	else
+		PS1='\[\033[01;32m\][\u@\h\[\033[01;37m\] \W\[\033[01;32m\]]\$\[\033[00m\] '
+	fi
+
+	alias ls='ls --color=auto'
+	alias grep='grep --colour=auto'
+	alias egrep='egrep --colour=auto'
+	alias fgrep='fgrep --colour=auto'
+else
+	if [[ ${EUID} == 0 ]] ; then
+		# show root@ when we don't have colors
+		PS1='\u@\h \W \$ '
+	else
+		PS1='\u@\h \w \$ '
+	fi
+fi
+
+unset use_color safe_term match_lhs sh
+
+alias cp="cp -i"                          # confirm before overwriting something
+alias df='df -h'                          # human-readable sizes
+alias free='free -m'                      # show sizes in MB
+alias np='nano -w PKGBUILD'
+alias more=less
+alias vi=kak
+
+xhost +local:root > /dev/null 2>&1
+
+complete -cf sudo
+
+# Bash won't get SIGWINCH if another process is in the foreground.
+# Enable checkwinsize so that bash will check the terminal size when
+# it regains control.  #65623
+# http://cnswww.cns.cwru.edu/~chet/bash/FAQ (E11)
 shopt -s checkwinsize
 
-### Better-looking less for binary files
-[ -x /usr/bin/lesspipe    ] && eval "$(SHELL=/bin/sh lesspipe)"
+shopt -s expand_aliases
 
-### Bash completion
-[ -f /etc/bash_completion ] && . /etc/bash_completion
+# export QT_SELECT=4
 
-### Disable CTRL-S and CTRL-Q
-[[ $- =~ i ]] && stty -ixoff -ixon
+# Enable history appending instead of overwriting.  #139609
+shopt -s histappend
 
-
-# Environment variables
-# --------------------------------------------------------------------
-
-### man bash
-export HISTCONTROL=ignoreboth:erasedups
-export HISTSIZE=
-export HISTFILESIZE=
-export HISTTIMEFORMAT="%Y/%m/%d %H:%M:%S:   "
-[ -z "$TMPDIR" ] && TMPDIR=/tmp
-
-### Global
-export GOPATH=~/gosrc
-mkdir -p $GOPATH
-if [ -z "$PATH_EXPANDED" ]; then
-  export PATH=~/bin:~/ruby:/opt/bin:/usr/local/bin:/usr/local/share/python:$GOPATH/bin:/usr/local/opt/go/libexec/bin:$PATH
-  export PATH_EXPANDED=1
-fi
-export EDITOR=nvim
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-[ "$PLATFORM" = 'Darwin' ] ||
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.:/usr/local/lib
-
-### OS X
-export COPYFILE_DISABLE=true
-
-# Aliases
-# --------------------------------------------------------------------
-
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias .....='cd ../../../..'
-alias ......='cd ../../../../..'
-alias cd.='cd ..'
-alias cd..='cd ..'
-alias l='ls -alF'
-alias ll='ls -l'
-#alias v='nvim'
-#alias vi='nvim'
-#alias vim='nvim'
-alias vi2='vi -O2 '
-alias hc="history -c"
-alias which='type -p'
-alias k5='kill -9 %%'
-alias gs='git status'
-alias gv='vim +GV +"autocmd BufWipeout <buffer> qall"'
-alias cdd='cd ~/workspace/*/build-mango/BUILD/work/corei7-64-oe-linux/ApplicationManager/*/git'
-
-ext() {
-  local name=$(basename $(pwd))
-  cd ..
-  tar -cvzf "$name.tgz" --exclude .git --exclude target --exclude "*.log" "$name"
-  cd -
-  mv ../"$name".tgz .
-}
-temp() {
-  vim +"set buftype=nofile bufhidden=wipe nobuflisted noswapfile tw=${1:-0}"
-}
-
-if [ "$PLATFORM" = 'Darwin' ]; then
-  alias tac='tail -r'
-  o() {
-    open --reveal "${1:-.}"
-  }
-fi
-
-### Tmux
-alias tmux="tmux -2"
-alias tmuxls="ls $TMPDIR/tmux*/"
-tping() {
-  for p in $(tmux list-windows -F "#{pane_id}"); do
-    tmux send-keys -t $p Enter
-  done
-}
-tpingping() {
-  [ $# -ne 1 ] && return
-  while true; do
-    echo -n '.'
-    tmux send-keys -t $1 ' '
-    sleep 10
-  done
-}
-
-
-### Colored ls
-if [ -x /usr/bin/dircolors ]; then
-  eval "`dircolors -b`"
-  alias ls='ls --color=auto'
-  alias grep='grep --color=auto'
-elif [ "$PLATFORM" = Darwin ]; then
-  alias ls='ls -G'
-fi
-
-
-# Prompt
-# --------------------------------------------------------------------
-
-if [ "$PLATFORM" = Linux ]; then
-  PS1="\[\e[5;82m\]\u\[\e[1;34m\]@\[\e[1;38m\]\h\[\e[1;35m\]:"
-  PS1="$PS1\[\e[0;38m\]\w\[\e[1;35m\]> \[\e[0m\]"
-else
-  ### git-prompt
-  __git_ps1() { :;}
-  if [ -e ~/.git-prompt.sh ]; then
-    source ~/.git-prompt.sh
-  fi
-  # PROMPT_COMMAND='history -a; history -c; history -r; printf "\[\e[38;5;59m\]%$(($COLUMNS - 4))s\r" "$(__git_ps1) ($(date +%m/%d\ %H:%M:%S))"'
-  PROMPT_COMMAND='history -a; printf "\[\e[38;5;59m\]%$(($COLUMNS - 4))s\r" "$(__git_ps1) ($(date +%m/%d\ %H:%M:%S))"'
-  PS1="\[\e[34m\]\u\[\e[1;32m\]@\[\e[0;33m\]\h\[\e[35m\]:"
-  PS1="$PS1\[\e[m\]\w\[\e[1;31m\]> \[\e[0m\]"
-fi
-
-# Tmux tile
-# --------------------------------------------------------------------
-
-tt() {
-  if [ $# -lt 1 ]; then
-    echo 'usage: tt <commands...>'
-    return 1
-  fi
-
-  local head="$1"
-  local tail='echo -n Press enter to finish.; read'
-
-  while [ $# -gt 1 ]; do
-    shift
-    tmux split-window "$SHELL -ci \"$1; $tail\""
-    tmux select-layout tiled > /dev/null
-  done
-
-  tmux set-window-option synchronize-panes on > /dev/null
-  $SHELL -ci "$head; $tail"
-}
-
-
-# Shortcut functions
-# --------------------------------------------------------------------
-
-viw() {
-  vim `which "$1"`
-}
-
-gd() {
-  [ "$1" ] && cd *$1*
-}
-
-csbuild() {
-  [ $# -eq 0 ] && return
-
-  cmd="find `pwd`"
-  for ext in $@; do
-    cmd=" $cmd -name '*.$ext' -o"
-  done
-  echo ${cmd: 0: ${#cmd} - 3}
-  eval "${cmd: 0: ${#cmd} - 3}" > cscope.files &&
-  cscope -b -q && rm cscope.files
-}
-
-gems() {
-  for v in 2.0.0 1.8.7 jruby 1.9.3; do
-    rvm use $v
-    gem $@
-  done
-}
-
-rakes() {
-  for v in 2.0.0 1.8.7 jruby 1.9.3; do
-    rvm use $v
-    rake $@
-  done
-}
-
-tx() {
-  tmux splitw "$*; echo -n Press enter to finish.; read"
-  tmux select-layout tiled
-  tmux last-pane
-}
-
-rvm() {
-  # Load RVM into a shell session *as a function*
-  if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
-    unset -f rvm
-
-    source "$HOME/.rvm/scripts/rvm"
-    # Add RVM to PATH for scripting
-    PATH=$PATH:$HOME/.rvm/bin
-    rvm $@
+#
+# # ex - archive extractor
+# # usage: ex <file>
+ex ()
+{
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1   ;;
+      *.tar.gz)    tar xzf $1   ;;
+      *.bz2)       bunzip2 $1   ;;
+      *.rar)       unrar x $1     ;;
+      *.gz)        gunzip $1    ;;
+      *.tar)       tar xf $1    ;;
+      *.tbz2)      tar xjf $1   ;;
+      *.tgz)       tar xzf $1   ;;
+      *.zip)       unzip $1     ;;
+      *.Z)         uncompress $1;;
+      *.7z)        7z x $1      ;;
+      *)           echo "'$1' cannot be extracted via ex()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
   fi
 }
-
-gitzip() {
-  git archive -o $(basename $PWD).zip HEAD
-}
-
-gittgz() {
-  git archive -o $(basename $PWD).tgz HEAD
-}
-
-gitdiffb() {
-  if [ $# -ne 2 ]; then
-    echo two branch names required
-    return
-  fi
-  git log --graph \
-  --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' \
-  --abbrev-commit --date=relative $1..$2
-}
-
-alias gitv='git log --graph --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
-
-miniprompt() {
-  unset PROMPT_COMMAND
-  PS1="\[\e[38;5;168m\]> \[\e[0m\]"
-}
-
-repeat() {
-  local _
-  for _ in $(seq $1); do
-    eval "$2"
-  done
-}
-
-acdul() {
-  acdcli ul -x 8 -r 4 -o "$@"
-}
-
-acddu() {
-  acdcli ls -lbr "$1" | awk '{sum += $3} END { print sum / 1024 / 1024 / 1024 " GB" }'
-}
-
-make-patch() {
-  local name="$(git log --oneline HEAD^.. | awk '{print $2}')"
-  git format-patch HEAD^.. --stdout > "$name.patch"
-}
-
-pbc() {
-  perl -pe 'chomp if eof' | pbcopy
-}
-
-EXTRA=$BASE/bashrc-extra
-[ -f "$EXTRA" ] && source "$EXTRA"
-
-
-# boot2docker
-# --------------------------------------------------------------------
-if [ "$PLATFORM" = 'Darwin' ]; then
-  dockerinit() {
-    [ $(docker-machine status default) = 'Running' ] || docker-machine start default
-    eval "$(docker-machine env default)"
-  }
-
-  dockerstop() {
-    docker-machine stop default
-  }
-
-  resizes() {
-    mkdir -p out &&
-    for jpg in *.JPG; do
-      echo $jpg
-      [ -e out/$jpg ] || sips -Z 2048 --setProperty formatOptions 80 $jpg --out out/$jpg
-    done
-  }
-
-  j() { export JAVA_HOME=$(/usr/libexec/java_home -v1.$1); }
-
-  # https://gist.github.com/Andrewpk/7558715
-  alias startvpn="sudo launchctl load -w /Library/LaunchDaemons/net.juniper.AccessService.plist; open -a '/Applications/Junos Pulse.app/Contents/Plugins/JamUI/PulseTray.app/Contents/MacOS/PulseTray'"
-  alias quitvpn="osascript -e 'tell application \"PulseTray.app\" to quit';sudo launchctl unload -w /Library/LaunchDaemons/net.juniper.AccessService.plist"
-fi
 
 
 # fzf (https://github.com/junegunn/fzf)
 # --------------------------------------------------------------------
-# export FZF_DEFAULT_COMMAND='if [ -f cscope.files ]; then cat cscope.files; else find ./ -type f ; fi'
-export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
-# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND | with-dir"
-export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
-export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden --bind '?:toggle-preview' --bind 'ctrl-y:execute(echo -n {2..} | pbcopy)' --header 'Press CTRL-Y to copy command into clipboard'"
-command -v blsd > /dev/null && export FZF_ALT_C_COMMAND='blsd'
+
+csi() {
+  echo -en "\x1b[$*"
+}
+
+fzf-down() {
+  fzf --height 50% "$@" --border
+}
+
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND='fd --type f --type d --hidden --follow --exclude .git'
+[ -n "$NVIM_LISTEN_ADDRESS" ] && export FZF_DEFAULT_OPTS='--no-height'
+
+if [ -x ~/.vim/plugged/fzf.vim/bin/preview.rb ]; then
+  export FZF_CTRL_T_OPTS="--preview '~/.vim/plugged/fzf.vim/bin/preview.rb {} | head -200'"
+fi
+
+export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview' --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' --header 'Press CTRL-Y to copy command into clipboard' --border"
+
+command -v blsd > /dev/null && export FZF_ALT_C_COMMAND='blsd $dir'
 command -v tree > /dev/null && export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
 
-# fd - cd to selected directory
-fd() {
-  DIR=`find ${1:-*} -path '*/\.*' -prune -o -type d -print 2> /dev/null | fzf-tmux` \
-    && cd "$DIR"
-}
-
-# fda - including hidden directories
-fda() {
-  DIR=`find ${1:-.} -type d 2> /dev/null | fzf-tmux` && cd "$DIR"
-}
-
-# Figlet font selector
+# Figlet font selector => copy to clipboard
 fgl() (
+  [ $# -eq 0 ] && return
   cd /usr/local/Cellar/figlet/*/share/figlet/fonts
-  ls *.flf | sort | fzf --no-multi --reverse --preview "figlet -f {} Hello World!"
+  local font=$(ls *.flf | sort | fzf --no-multi --reverse --preview "figlet -f {} $@") &&
+  figlet -f "$font" "$@" | pbcopy
 )
-
-# fbr - checkout git branch
-fbr() {
-  local branches branch
-  branches=$(git branch --all | grep -v HEAD) &&
-  branch=$(echo "$branches" |
-           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
-  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
-}
 
 # fco - checkout git branch/tag
 fco() {
   local tags branches target
-  tags=$(
-    git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
+  tags=$(git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
   branches=$(
     git branch --all | grep -v HEAD             |
     sed "s/.* //"    | sed "s#remotes/[^/]*/##" |
     sort -u          | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
   target=$(
-    (echo "$tags"; echo "$branches") |
-    fzf-tmux -l40 -- --no-hscroll --ansi +m -d "\t" -n 2 -1 -q "$*") || return
+    (echo "$tags"; echo "$branches") | sed '/^$/d' |
+    fzf-down --no-hscroll --reverse --ansi +m -d "\t" -n 2 -q "$*") || return
   git checkout $(echo "$target" | awk '{print $2}')
-}
-
-# fshow - git commit browser
-fshow() {
-  git log --graph --color=always \
-      --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
-  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
-      --header "Press CTRL-S to toggle sort" \
-      --preview "echo {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                 xargs -I % sh -c 'git show --color=always % | head -200 '" \
-      --bind "enter:execute:echo {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-              xargs -I % sh -c 'vim fugitive://\$(git rev-parse --show-toplevel)/.git//% < /dev/tty'"
 }
 
 # ftags - search ctags
@@ -403,18 +225,9 @@ fo() {
 }
 
 if [ -n "$TMUX_PANE" ]; then
-  fzf_tmux_helper() {
-    local sz=$1;  shift
-    local cmd=$1; shift
-    tmux split-window $sz \
-      "bash -c \"\$(tmux send-keys -t $TMUX_PANE \"\$(source ~/.fzf.bash; $cmd)\" $*)\""
-  }
-
   # https://github.com/wellle/tmux-complete.vim
   fzf_tmux_words() {
-    fzf_tmux_helper \
-      '-p 40' \
-      'tmuxwords.rb --all --scroll 500 --min 5 | fzf --multi | paste -sd" " -'
+    tmuxwords.rb --all --scroll 500 --min 5 | fzf-down --multi | paste -sd" " -
   }
 
   # ftpane - switch pane (@george-b)
@@ -438,8 +251,7 @@ if [ -n "$TMUX_PANE" ]; then
   }
 
   # Bind CTRL-X-CTRL-T to tmuxwords.sh
-  bind '"\C-x\C-t": "$(fzf_tmux_words)\e\C-e"'
-
+  bind '"\C-x\C-t": "$(fzf_tmux_words)\e\C-e\er"'
 elif [ -d ~/github/iTerm2-Color-Schemes/ ]; then
   ftheme() {
     local base
@@ -453,35 +265,26 @@ fi
 fs() {
   local session
   session=$(tmux list-sessions -F "#{session_name}" | \
-    fzf-tmux --query="$1" --select-1 --exit-0) &&
+    fzf --height 40% --reverse --query="$1" --select-1 --exit-0) &&
   tmux switch-client -t "$session"
 }
 
-# RVM integration
-frb() {
-  local rb
-  rb=$(
-    (echo system; rvm list | grep ruby | cut -c 4-) |
-       awk '{print $1}' |
-       fzf-tmux -l 30 +m --reverse) && rvm use $rb
-}
-
-# Z integration
-source $BASE/z.sh
-unalias z 2> /dev/null
-z() {
-  [ $# -gt 0 ] && _z "$*" && return
-  cd "$(_z -l 2>&1 | fzf-tmux +s --tac --query "$*" | sed 's/^[0-9,.]* *//')"
-}
-
-# v - open files in ~/.viminfo
-v() {
-  local files
-  files=$(grep '^>' ~/.viminfo | cut -c3- |
-          while read line; do
-            [ -f "${line/\~/$HOME}" ] && echo "$line"
-          done | fzf-tmux -d -m -q "$*" -1) && vim ${files//\~/$HOME}
-}
+## Z integration
+#source "$BASE/z.sh"
+#unalias z 2> /dev/null
+#z() {
+#  [ $# -gt 0 ] && _z "$*" && return
+#  cd "$(_z -l 2>&1 | fzf --height 40% --nth 2.. --reverse --inline-info +s --tac --query "${*##-* }" | sed 's/^[0-9,.]* *//')"
+#}
+#
+## v - open files in ~/.viminfo
+#v() {
+#  local files
+#  files=$(grep '^>' ~/.viminfo | cut -c3- |
+#          while read line; do
+#            [ -f "${line/\~/$HOME}" ] && echo "$line"
+#          done | fzf -d -m -q "$*" -1) && vim ${files//\~/$HOME}
+#}
 
 # c - browse chrome history
 c() {
@@ -503,17 +306,19 @@ c() {
     }.join + " " * (2 + cols - len) + "\x1b[m" + url' |
   fzf --ansi --multi --no-hscroll --tiebreak=index |
   sed 's#.*\(https*://\)#\1#' | xargs open
+}
 
+# so - my stackoverflow favorites
+so() {
+  $BASE/bin/stackoverflow-favorites |
+    fzf --ansi --reverse --with-nth ..-2 --tac --tiebreak index |
+    awk '{print $NF}' | while read -r line; do
+      open "$line"
+    done
 }
 
 # GIT heart FZF
 # -------------
-
-export FZF_DEFAULT_OPTS='--extended'
-
-export FZF_COMPLETION_TRIGGER='//'
-bindkey    '^I' fzf-completion
-bindkey -a '//'  fzf-directly-complete
 
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
@@ -522,7 +327,7 @@ is_in_git_repo() {
 gf() {
   is_in_git_repo || return
   git -c color.status=always status --short |
-  fzf-tmux -m --ansi --nth 2..,.. \
+  fzf-down -m --ansi --nth 2..,.. \
     --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
   cut -c4- | sed 's/.* -> //'
 }
@@ -530,7 +335,7 @@ gf() {
 gb() {
   is_in_git_repo || return
   git branch -a --color=always | grep -v '/HEAD\s' | sort |
-  fzf-tmux --ansi --multi --tac --preview-window right:70% \
+  fzf-down --ansi --multi --tac --preview-window right:70% \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -200' |
   sed 's/^..//' | cut -d' ' -f1 |
   sed 's#^remotes/##'
@@ -539,14 +344,14 @@ gb() {
 gt() {
   is_in_git_repo || return
   git tag --sort -version:refname |
-  fzf-tmux --multi --preview-window right:70% \
+  fzf-down --multi --preview-window right:70% \
     --preview 'git show --color=always {} | head -200'
 }
 
 gh() {
   is_in_git_repo || return
   git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph --color=always |
-  fzf-tmux --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
+  fzf-down --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
     --header 'Press CTRL-S to toggle sort' \
     --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | xargs git show --color=always | head -200' |
   grep -o "[a-f0-9]\{7,\}"
@@ -555,19 +360,29 @@ gh() {
 gr() {
   is_in_git_repo || return
   git remote -v | awk '{print $1 "\t" $2}' | uniq |
-  fzf-tmux --tac \
+  fzf-down --tac \
     --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
   cut -d$'\t' -f1
 }
 
-bind '"\er": redraw-current-line'
-bind '"\C-g\C-f": "$(gf)\e\C-e\er"'
-bind '"\C-g\C-b": "$(gb)\e\C-e\er"'
-bind '"\C-g\C-t": "$(gt)\e\C-e\er"'
-bind '"\C-g\C-h": "$(gh)\e\C-e\er"'
-bind '"\C-g\C-r": "$(gr)\e\C-e\er"'
+gs() {
+  is_in_git_repo || return
+  git stash list | fzf-down --reverse -d: --preview 'git show --color=always {1}' |
+  cut -d: -f1
+}
 
-# source $(brew --prefix)/etc/bash_completion
-# source ~/git-completion.bash
-# unset _fzf_completion_loaded
+if [[ $- =~ i ]]; then
+  bind '"\er": redraw-current-line'
+  bind '"\C-g\C-f": "$(gf)\e\C-e\er"'
+  bind '"\C-g\C-b": "$(gb)\e\C-e\er"'
+  bind '"\C-g\C-t": "$(gt)\e\C-e\er"'
+  bind '"\C-g\C-h": "$(gh)\e\C-e\er"'
+  bind '"\C-g\C-r": "$(gr)\e\C-e\er"'
+  bind '"\C-g\C-s": "$(gs)\e\C-e\er"'
+fi
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+export GTK_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+export QT_IM_MODULE=ibus
