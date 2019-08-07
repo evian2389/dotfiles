@@ -8,6 +8,6 @@ ln -s /tmp/temporary ~/
 xrandr --output HDMI1 --primary --left-of HDMI2 --output HDMI2 --auto
 
 
-ibus-daemon -drx
+#ibus-daemon -drx
 synergy &
 #. .xsession
