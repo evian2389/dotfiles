@@ -15,8 +15,9 @@ XDG_CONFIG_HOME=$HOME/.config
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 export GTAGSLABEL=pygments
-export EDITOR=kak
+export EDITOR=nvim
 export VISUAL=emacs
+export QT_QPA_PLATFORMTHEME="qt5ct"
 
 
 # if running bash
@@ -37,8 +38,9 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-GHC_PATH=`stack path | grep compiler-bin | sed -e 's/compiler-bin: //'`
-export PATH="$PATH:$GHC_PATH"
+#GHC_PATH=`stack path | grep compiler-bin | sed -e 's/compiler-bin: //'`
+#export PATH="$PATH:$GHC_PATH"
 
-alias vi='kak'
 ibus-daemon -drx
+
+source ~/workspace/config/pc_config.sh

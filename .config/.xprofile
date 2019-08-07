@@ -1,3 +1,13 @@
-ibus-daemon --xim -d
-gnome-terminal &
+export XMODIFIERS=@im=ibus
+export GTK_IM_MODULE=ibus
+export QT_IM_MODULE=ibus
+
+mkdir /tmp/temporary
+ln -s /tmp/temporary ~/
+
+xrandr --output HDMI1 --primary --left-of HDMI2 --output HDMI2 --auto
+
+
+ibus-daemon -drx
 synergy &
+#. .xsession

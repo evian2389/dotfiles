@@ -2,6 +2,8 @@
 # ~/.bashrc
 #
 
+set -o vi
+
 [[ $- != *i* ]] && return
 
 colors() {
@@ -95,7 +97,12 @@ alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
-alias vi=kak
+alias vi=nvim
+alias cds='cd ~/workspace/hkmc/src/'
+alias cdu='cd ~/workspace/hkmc/src/AppUpgrade'
+alias cdi='cd ~/workspace/hkmc/img/'
+alias cdc='cd ~/workspace/hkmc/meta-mango2/recipes-app/'
+alias cdm='cd /run/media/jongho3/'
 
 xhost +local:root > /dev/null 2>&1
 

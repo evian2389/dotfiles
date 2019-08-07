@@ -327,7 +327,7 @@ wsWRK2  = "WRK:2"
 wsGGC   = "GGC"
 
 -- myWorkspaces = map show [1..9]
-myWorkspaces = [wsGEN, wsWRK, wsWRK2, wsSYS, wsMON, wsFLOAT, wsRW, wsTMP]
+myWorkspaces = [wsGEN, wsWRK, wsWRK2, wsSYS, wsMON, wsFLOAT, wsRW, wsTMP, wsAV, wsDMO]
 
 projects :: [Project]
 projects =
@@ -358,7 +358,12 @@ projects =
                 }
 
     , Project   { projectName       = wsWRK
-                , projectDirectory  = "~/wrk"
+                , projectDirectory  = "~/workspace/hkmc/src"
+                , projectStartHook  = Nothing
+                }
+
+    , Project   { projectName       = wsWRK2
+                , projectDirectory  = "~/workspace/hkmc/meta-mango2/recipes-app"
                 , projectStartHook  = Nothing
                 }
 
@@ -1101,7 +1106,7 @@ myLayoutHook = showWorkspaceName
 -- Bindings                                                             {{{
 ---------------------------------------------------------------------------
 
-myModMask = mod4Mask -- super (and on my system, hyper) keys
+myModMask = mod3Mask -- super (and on my system, hyper) keys
 
 -- Display keyboard mappings using zenity
 -- from https://github.com/thomasf/dotfiles-thomasf-xmonad/
