@@ -6,6 +6,7 @@ mkdir /tmp/temporary
 ln -s /tmp/temporary ~/
 
 xrandr --output HDMI1 --primary --left-of HDMI2 --output HDMI2 --auto
+xrandr --setmonitor VIRTUAL2 auto HDMI1,HDMI2
 
 
 #ibus-daemon -drx
