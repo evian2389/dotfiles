@@ -16,7 +16,7 @@ unlet! g:plug_url_format
 " Autoinstall vim-plug {{{
 if empty(glob('~/.nvim/autoload/plug.vim'))
   silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall
+  "autocmd VimEnter * PlugInstall
 endif
 " }}}
 "nnoremap <C-h> <C-w>h
