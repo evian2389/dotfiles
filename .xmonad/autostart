@@ -6,4 +6,6 @@ udiskie &
 feh --bg-scale /home/orka/Pictures/Wallpapers/milky-way-clipart-1080p-3.jpg &
 ~/bin/wm/init-wallpaper &
 
+xkbcomp -I$HOME/.xkb $HOME/.keymap.xkb $DISPLAY
+
 # urxvt -e ranger
