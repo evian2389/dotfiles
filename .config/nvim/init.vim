@@ -14,7 +14,7 @@ endif
 unlet! g:plug_url_format
 
 " Autoinstall vim-plug {{{
-if empty(glob('~/.nvim/autoload/plug.vim'))
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
   silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   "autocmd VimEnter * PlugInstall
 endif
@@ -1596,10 +1596,10 @@ set nojoinspaces
 " }}}
 
 " %< Where to truncate
-colorscheme jellybeans
+"colorscheme jellybeans
 let g:seoul256_background = 234
 "colorscheme seoul256
-let g:lightline#colorscheme#jellybeans_mod#palette = lightline#colorscheme#flatten(s:p)
+"let g:lightline#colorscheme#jellybeans_mod#palette = lightline#colorscheme#flatten(s:p)
 
 
 set cursorline     " highlight current line

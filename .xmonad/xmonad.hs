@@ -19,7 +19,7 @@
 {-|
 
  GENERAL
- 
+
  * look into X.H.Scripts -- there are things I want to run at startup, for example
  * X.U.SpawnNamedPipe? xmobars. multiple screens.
  * X.U.WindowState
@@ -44,7 +44,7 @@
  * audio tweaking ... volume working in all cases? output selected intelligently
  * ssd cloning via btrfs
  * go through sections of https://wiki.archlinux.org/index.php/List_of_applications and identify category selections, adding them to personal wiki
- 
+
  ACTIVE
 
  * try out XMonad.Layout.Hidden
@@ -86,7 +86,7 @@
  * any utility in XMonad-Hooks-ServerMode (tested briefly, couldn't get it working properly)
  * work on my handling of x selection for utility functions ... timer/delay issue?
 
- DONE 
+ DONE
 
  * DynamicWorkspaces ... will DynamicProjects replace it entirely? Do I not need it
  * keybindings for unmerge are weird... sublayout not great for what might be a common op
@@ -169,8 +169,6 @@ import XMonad.Hooks.DynamicProperty         -- 0.12 broken; works with github ve
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.FadeWindows
 import XMonad.Hooks.InsertPosition
-import XMonad.Hooks.ManageDocks             -- avoid xmobar
-import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.UrgencyHook
 
 --import XMonad.Layout hiding ( (|||) )       -- ||| from X.L.LayoutCombinators
@@ -226,6 +224,9 @@ import XMonad.Util.SpawnOnce
 import XMonad.Util.WorkspaceCompare         -- custom WS functions filtering NSP
 import XMonad.Util.XSelection
 
+import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers
+
 
 -- experimenting with tripane
 import XMonad.Layout.Decoration
@@ -235,6 +236,8 @@ import XMonad.Layout.Maximize
 import XMonad.Layout.SimplestFloat
 import XMonad.Layout.Fullscreen
 import XMonad.Layout.NoBorders
+
+import XMonad.Config.Gnome
 
 -- taffybar specific
 -- import System.Taffybar.Hooks.PagerHints (pagerHints)
@@ -260,7 +263,7 @@ import XMonad.Layout.NoBorders
 -- import XMonad.Layout.TrackFloating
 -- testing
 -- import XMonad.Hooks.ServerMode
--- import XMonad.Actions.Commands 
+-- import XMonad.Actions.Commands
 -- import Control.Concurrent (threadDelay)
 
 ------------------------------------------------------------------------}}}
@@ -270,13 +273,14 @@ import XMonad.Layout.NoBorders
 main = do
 
     xmproc <- spawnPipe myStatusBar
+    -- xmproc <- spawnPipe myDock
 
     -- for independent screens
     -- nScreens <- countScreens
 
     -- for taffybar, add pagerHints below
 
-    xmonad 
+    xmonad
         $ dynamicProjects projects
         $ withNavigation2DConfig myNav2DConf
         -- $ withUrgencyHook NoUrgencyHook
@@ -294,6 +298,7 @@ myConfig p = def
         , manageHook         = myManageHook
         , handleEventHook    = myHandleEventHook
         , layoutHook         = myLayoutHook
+--        , layoutHook         = smartBorders (layoutHook gnomeConfig)
         , logHook            = myLogHook p
         , modMask            = myModMask
         , mouseBindings      = myMouseBindings
@@ -386,18 +391,22 @@ projects =
 
 --myTerminal          = "terminator"
 --myTerminalClass     = "Terminator"
-myTerminal          = "urxvt"
---myTerminal          = "gnome-terminal"
+--myTerminal          = "urxvt"
+--myAltTerminal       = "gnome-terminal"
 --myAltTerminal       = "cool-retro-term"
-myAltTerminal       = "gnome-terminal"
+myAltTerminal       = "urxvt"
+myTerminal          = "gnome-terminal"
 myBrowser           = "google-chrome-stable" -- chrome with WS profile dirs
 --myBrowser           = "firefox" -- chrome with WS profile dirs
 myBrowserClass      = "Google-chrome-stable"
---myStatusBar         = "xmobar -x0 ~/.xmonad/xmobar.conf"
-myStatusBar         = "xmobar"
+myStatusBar         = "xmobar ~/.xmonad/xmobar.conf"
+myDock              = "plank"
+--myStatusBar         = "xmobar"
 --myLauncher          = "dmenu_run"
 --myLauncher          = "rofi -matching fuzzy -show run"
-myLauncher          = "rofi -matching fuzzy -modi combi -show combi -combi-modi run,drun"
+--myLauncher          = "rofi -matching fuzzy -modi combi -show combi -combi-modi run,drun"
+myLauncher          = "ulauncher"
+mySudoLauncher          = "gksudo ulauncher"
 myFileManager       = "ranger"
 
 
@@ -467,7 +476,7 @@ scratchpads =
     ,   (NS "plex"  plexCommand isPlex defaultFloating)
     ,   (NS "console"  myConsole isConsole nonFloating)
     ,   (NS "xawtv" "xawtv" (resource =? "xawtv") (customFloating $ W.RationalRect (2/3) (1/6) (1/5) (1/3)) )
-    ] 
+    ]
 
 ------------------------------------------------------------------------}}}
 -- Theme                                                                {{{
@@ -494,17 +503,17 @@ cyan    = "#2aa198"
 green       = "#859900"
 
 -- sizes
-gap         = 2
-topbar      = 10
-myBorder      = 0
+gap         = 0
+topbar      = 4
+myBorder    = 3
 prompt      = 20
 status      = 20
 
-myNormalBorderColor     = "#000000"
+myNormalBorderColor     = "#cccccc"
 myFocusedBorderColor    = active
 
-active      = blue
-activeWarn  = red
+active      = red
+activeWarn  = yellow
 inactive    = base02
 focusColor  = blue
 unfocusColor = base02
@@ -516,7 +525,7 @@ unfocusColor = base02
 myFont      = "xft:D2Conding:pixelsize=10:style=Regular:hinting=true"
 myBigFont   = "xft:D2Conding:pixelsize=20:style=Bold:hinting=true"
 myWideFont  = "xft:D2Conding:pixelsize=160:style=Bold:hinting=true"
-            
+
 
 -- this is a "fake title" used as a highlight bar in lieu of full borders
 -- (I find this a cleaner and less visually intrusive solution)
@@ -571,7 +580,7 @@ myShowWNameTheme = def
     { swn_font              = myWideFont
     , swn_fade              = 0.5
     , swn_bgcolor           = "#000000"
-    , swn_color             = "#FFFFFF"
+    , swn_color             = "#888888"
     }
 
 ------------------------------------------------------------------------}}}
@@ -768,7 +777,7 @@ myLayoutHook = showWorkspaceName
     --  myLayout = addTabs shrinkText def
     --           $ subLayout [0,1,2] (Simplest ||| Tall 1 0.2 0.5 ||| Circle)
     --                    $ Tall 1 0.2 0.5 ||| Full
-   
+
     -- this is a flexible sublayout layout that has only one container
     -- layout style (depending on screen)
     --     flexiSub = named "Flexi SubLayouts"
@@ -821,7 +830,7 @@ myLayoutHook = showWorkspaceName
                   -- Using "Full" here (instead of Simplest) will retain the
                   -- tabbed sublayout structure and allow paging through each
                   -- group/window in full screen mode. However my preference
-                  -- is to just see all the windows as tabs immediately.  
+                  -- is to just see all the windows as tabs immediately.
                   -- Using "Simplest" here will do this: display all windows
                   -- as tabs across the top, no "paging" required. However
                   -- this is misleading as the sublayouts are of course still
@@ -847,7 +856,7 @@ myLayoutHook = showWorkspaceName
               $ mySpacing
               $ myGaps
               $ ResizableTall 1 (1/300) (2/3) []
-              
+
     simpleThree = named "Three Col"
               $ avoidStruts
               $ addTopBar
@@ -1120,7 +1129,7 @@ showKeybindings x = addName "Show Keybindings" $ io $ do
     hClose h
     return ()
 
--- some of the structure of the following cribbed from 
+-- some of the structure of the following cribbed from
 -- https://github.com/SimSaladin/configs/blob/master/.xmonad/xmonad.hs
 -- https://github.com/paul-axe/dotfiles/blob/master/.xmonad/xmonad.hs
 -- https://github.com/pjones/xmonadrc (+ all the dyn project stuff)
@@ -1152,7 +1161,7 @@ getSortByIndexNoSP =
         fmap (.namedScratchpadFilterOutWorkspace) getSortByIndex
 
 -- toggle any workspace but scratchpad
-myToggle = windows $ W.view =<< W.tag . head . filter 
+myToggle = windows $ W.view =<< W.tag . head . filter
         ((\x -> x /= "NSP" && x /= "SP") . W.tag) . W.hidden
 
 myKeys conf = let
@@ -1230,6 +1239,7 @@ myKeys conf = let
     -----------------------------------------------------------------------
     subKeys "Launchers"
     [ ("M-<Space>"              , addName "Launcher"                        $ spawn myLauncher)
+    , ("M-C-<Space>"            , addName "SudoLauncher"                    $ spawn mySudoLauncher)
     , ("M-<Return>"             , addName "Terminal"                        $ spawn myTerminal)
     , ("M-S-<Return>"           , addName "File Manager"                    $ safeSpawn myTerminal ["ranger ~"])  --runInTerm myFileManager "~")
     , ("M-C-<Return>"           , addName "AltTerminal"                     $ spawn myAltTerminal)
@@ -1276,7 +1286,7 @@ myKeys conf = let
     , ("M-p"                    , addName "Hide window to stack"            $ withFocused hide)
     , ("M-S-p"                  , addName "Restore hidden window (FIFO)"    $ withFocused reveal)
 
-    , ("M-b"                    , addName "Promote"                         $ promote) 
+    , ("M-b"                    , addName "Promote"                         $ promote)
 
     , ("M-g"                    , addName "Un-merge from sublayout"         $ withFocused (sendMessage . UnMerge))
     , ("M-S-g"                  , addName "Merge all into sublayout"        $ withFocused (sendMessage . MergeAll))
@@ -1284,7 +1294,7 @@ myKeys conf = let
     , ("M-z u"                  , addName "Focus urgent"                    focusUrgent)
     , ("M-z m"                  , addName "Focus master"                    $ windows W.focusMaster)
 
-    --, ("M-<Tab>"              	, addName "Focus down"                      $ windows W.focusDown)
+    --, ("M-<Tab>"                , addName "Focus down"                      $ windows W.focusDown)
     --, ("M-S-<Tab>"              , addName "Focus up"                        $ windows W.focusUp)
 
     , ("M-'"                    , addName "Navigate tabs D"                 $ bindOn LD [("Tabs", windows W.focusDown), ("", onGroup W.focusDown')])
@@ -1415,7 +1425,7 @@ myKeys conf = let
     --
     -- The "sequence_" wrapper is needed because for some reason the windows weren't resizing till
     -- I moved to a different window or refreshed, so I added that here. Shrug.
-    
+
     -- mnemonic: less than / greater than
     --("M4-<L>"                 , addName "Expand (L on BSP)"           $ sequence_ [(tryMessage_ (ExpandTowards L) (Expand)), refresh])
 
@@ -1451,10 +1461,10 @@ myKeys conf = let
  --  ("M4-C-S-."               , addName "toSubl Shrink"               $ toSubl Shrink)
  --, ("M4-C-S-,"               , addName "toSubl Expand"               $ toSubl Expand)
     ]
-		where
-			toggleCopyToAll = wsContainingCopies >>= \ws -> case ws of
-							[] -> windows copyToAll
-							_ -> killAllOtherCopies
+    where
+      toggleCopyToAll = wsContainingCopies >>= \ws -> case ws of
+              [] -> windows copyToAll
+              _ -> killAllOtherCopies
 
     -----------------------------------------------------------------------
     -- Screens
@@ -1565,8 +1575,8 @@ myLogHook h = do
         , ppWsSep               = " "
         , ppLayout              = xmobarColor yellow ""
         , ppOrder               = id
-        , ppOutput              = hPutStrLn h  
-        , ppSort                = fmap 
+        , ppOutput              = hPutStrLn h
+        , ppSort                = fmap
                                   (namedScratchpadFilterOutWorkspace.)
                                   (ppSort def)
                                   --(ppSort defaultPP)
@@ -1578,7 +1588,7 @@ myFadeHook = composeAll
     , (className =? "Terminator") <&&> (isUnfocused) --> opacity 0.9
     , (className =? "URxvt") <&&> (isUnfocused) --> opacity 0.9
     , fmap ("Google" `isPrefixOf`) className --> opaque
-    , isDialog --> opaque 
+    , isDialog --> opaque
     --, isUnfocused --> opacity 0.55
     --, isFloating  --> opacity 0.75
     ]
@@ -1587,9 +1597,13 @@ myFadeHook = composeAll
 -- Actions                                                              {{{
 ---------------------------------------------------------------------------
 
+-- sudoSpawn command = withPrompt "Password" $ run command
+--  where run command password = spawn $ concat ["echo ", password, " | sudo -S ", command]
+
+-- withPrompt prompt fn = inputPrompt xpConf prompt ?+ fn
 
 ---------------------------------------------------------------------------
--- Urgency Hook                                                            
+-- Urgency Hook
 ---------------------------------------------------------------------------
 -- from https://pbrisbin.com/posts/using_notify_osd_for_xmonad_notifications/
 data LibNotifyUrgencyHook = LibNotifyUrgencyHook deriving (Read, Show)

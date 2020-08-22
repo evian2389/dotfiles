@@ -587,10 +587,10 @@ before packages are loaded."
    (setq-default dotspacemacs-configuration-layers '(
     (treemacs :variables treemacs-use-git-mode 'deferred)))
 
-    (eval-after-load 'google-c-style
-    (dolist (v google-c-style)
-      (when (and (listp v) (eq (car v) 'c-basic-offset)) 
-        (setcdr v 4))))
+    ;; (eval-after-load 'google-c-style
+    ;; (dolist (v google-c-style)
+    ;;   (when (and (listp v) (eq (car v) 'c-basic-offset))
+    ;;     (setcdr v 4))))
 
   )
 
@@ -601,17 +601,10 @@ before packages are loaded."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- ;; '(ansi-color-names-vector
- ;;   ["#080808" "#d70000" "#67b11d" "#875f00" "#268bd2" "#af00df" "#00ffff" "#b2b2b2"])
- ;; '(custom-safe-themes
- ;;   (quote
- ;;    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
- ;; '(evil-want-Y-yank-to-eol nil)
- '(helm-ag-base-command "rg --vimgrep --no-heading --smart-case %s")
  '(counsel-grep-base-command "rg --vimgrep --no-heading --smart-case %s")
+ '(helm-ag-base-command "rg --vimgrep --no-heading --smart-case %s")
  '(package-selected-packages
-   (quote
-    (lv transient tide typescript-mode powerline org-mime hydra parent-mode projectile pkg-info epl flx treepy graphql smartparens iedit anzu evil goto-chg undo-tree highlight bind-map bind-key packed f dash s helm avy helm-core async popup fzf yapfify xterm-color unfill stickyfunc-enhance srefactor shell-pop ranger pyvenv pytest pyenv-mode py-isort pip-requirements spinner org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download noflet mwim multi-term magit-gh-pulls live-py-mode intero insert-shebang hy-mode dash-functional htmlize hlint-refactor hindent helm-pydoc helm-hoogle haskell-snippets gnuplot github-search github-clone github-browse-file git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gist gh marshal logito pcache ht flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck-haskell flycheck fish-mode eshell-z eshell-prompt-extras esh-help erc-yt erc-view-log erc-social-graph erc-image erc-hl-nicks ensime sbt-mode scala-mode disaster diff-hl cython-mode company-shell company-ghci company-ghc ghc haskell-mode company-cabal company-c-headers company-anaconda cmm-mode cmake-mode clang-format auto-dictionary anaconda-mode pythonic counsel swiper ivy helm-themes helm-swoop helm-projectile helm-mode-manager helm-gtags helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag ace-jump-helm-line smeargle orgit mmm-mode markdown-toc markdown-mode magit-gitflow gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md ggtags fuzzy evil-magit magit magit-popup git-commit ghub let-alist with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete counsel-gtags counsel-ebdb evil-unimpaired ws-butler winum which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-make google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word counsel-projectile column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link))))
+   '(imenu-list helm-css-scss haml-mode emmet-mode drupal-mode php-mode company-web web-completion-data web-mode tagedit slim-mode scss-mode sass-mode pug-mode phpunit phpcbf php-extras php-auto-yasnippets lv transient tide typescript-mode powerline org-mime hydra parent-mode projectile pkg-info epl flx treepy graphql smartparens iedit anzu evil goto-chg undo-tree highlight bind-map bind-key packed f dash s helm avy helm-core async popup fzf yapfify xterm-color unfill stickyfunc-enhance srefactor shell-pop ranger pyvenv pytest pyenv-mode py-isort pip-requirements spinner org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download noflet mwim multi-term magit-gh-pulls live-py-mode intero insert-shebang hy-mode dash-functional htmlize hlint-refactor hindent helm-pydoc helm-hoogle haskell-snippets gnuplot github-search github-clone github-browse-file git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gist gh marshal logito pcache ht flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck-haskell flycheck fish-mode eshell-z eshell-prompt-extras esh-help erc-yt erc-view-log erc-social-graph erc-image erc-hl-nicks ensime sbt-mode scala-mode disaster diff-hl cython-mode company-shell company-ghci company-ghc ghc haskell-mode company-cabal company-c-headers company-anaconda cmm-mode cmake-mode clang-format auto-dictionary anaconda-mode pythonic counsel swiper ivy helm-themes helm-swoop helm-projectile helm-mode-manager helm-gtags helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag ace-jump-helm-line smeargle orgit mmm-mode markdown-toc markdown-mode magit-gitflow gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md ggtags fuzzy evil-magit magit magit-popup git-commit ghub let-alist with-editor company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete counsel-gtags counsel-ebdb evil-unimpaired ws-butler winum which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-make google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word counsel-projectile column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
@@ -635,3 +628,9 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  )
 )
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
