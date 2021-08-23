@@ -1,16 +1,9 @@
+udiskie &
+
 export XMODIFIERS=@im=ibus
 export GTK_IM_MODULE=ibus
 export QT_IM_MODULE=ibus
-
-
-xrandr --output DP-2 --primary --left-of DP-4 --output DP-2 --auto
-#xrandr --setmonitor VIRTUAL2 auto HDMI1,HDMI2
-
-
+XDG_CONFIG_HOME=$HOME/.config
 
 ibus-daemon -drx
-#barrier &
-#synergy &
-#. .xsession
-#xkbcomp -I$HOME/.xkb $HOME/.keymap.xkb $DISPLAY
 

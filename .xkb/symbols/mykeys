@@ -1,65 +1,200 @@
 default  partial alphanumeric_keys modifier_keys
 xkb_symbols "mykeys" {
+    key  <ESC> {         [       Caps_Lock ] };
+    key <AE01> {         [               1,          exclam ] };
+    key <AE02> {         [               2,              at ] };
+    key <AE03> {         [               3,      numbersign ] };
+    key <AE04> {         [               4,          dollar ] };
+    key <AE05> {         [               5,         percent ] };
+    key <AE06> {         [               6,     asciicircum ] };
+    key <AE07> {         [               7,       ampersand ] };
+    key <AE08> {         [               8,        asterisk ] };
+    key <AE09> {         [               9,       parenleft ] };
+    key <AE10> {         [               0,      parenright ] };
+    key <AE11> {         [           minus,      underscore ] };
+    key <AE12> {         [           equal,            plus ] };
+    key <BKSP> {         [       BackSpace,       BackSpace ] };
+    key  <TAB> {         [             Tab,    ISO_Left_Tab ] };
+    //key  <AC08>  {       [               k,                K],  [1], [Prior]   };
+    //key  <AC06>  {       [               h,                H],  [2], [Home] };
+    //key  <AC09>  {       [               l,                L],  [3], [End] };
+    //key  <AC07>  {       [               j,                J],  [4], [Next] };
+    key <HNGL> {
+        type= "ONE_LEVEL",
+        symbols[Group1]= [ISO_Next_Group],
+        symbols[Group2]= [ISO_Prev_Group],
+        symbols[Group3]= [ISO_Prev_Group]
+    };
+    key <RALT> {
+        type= "ONE_LEVEL",
+        symbols[Group1]= [ISO_Prev_Group],
+        symbols[Group2]= [ISO_Next_Group],
+        symbols[Group3]= [ISO_Next_Group]
+    };
+    key <AD01> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               q,               Q ],
+        symbols[Group2]= [               1,          exclam ],
+        symbols[Group3]= [               F1,         exclam ]
+    };
+    key <AD02> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               w,               W ],
+        symbols[Group2]= [               2,              at ],
+        symbols[Group3]= [               F2,             at ]
+    };
+    key <AD03> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               e,               E ],
+        symbols[Group2]= [               3,      numbersign ],
+        symbols[Group3]= [               F3,      numbersign ]
+    };
+    key <AD04> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               r,               R ],
+        symbols[Group2]= [               4,          dollar ],
+        symbols[Group3]= [               F4,          dollar ]
+    };
+    key <AD05> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               t,               T ],
+        symbols[Group2]= [               5,         percent ],
+        symbols[Group3]= [               F5,         percent ]
+    };
+    key <AD06> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               y,               Y ],
+        symbols[Group2]= [               Home],
+        symbols[Group3]= [               Delete,          Y ]
+    };
+    key <AD07> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               u,               U ],
+        symbols[Group2]= [               Next],
+        symbols[Group3]= [               7,               U ]
+    };
+    key <AD08> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               i,               I ],
+        symbols[Group2]= [               Prior],
+        symbols[Group3]= [               8,               I ]
+    };
+    key <AD09> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               o,               O ],
+        symbols[Group2]= [               End],
+        symbols[Group3]= [               9,               O ]
+    };
+    key <AD10> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               p,               P ],
+        symbols[Group2]= [               minus,           underscore ],
+        symbols[Group3]= [               minus,           underscore ]
+    };
+    key <AC01> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               a,               A ],
+        symbols[Group2]= [               6,               asciicircum ],
+        symbols[Group3]= [               F6,               asciicircum ]
+    };
+    key <AC02> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               s,               S ],
+        symbols[Group2]= [               7,               ampersand ],
+        symbols[Group3]= [               F7,               ampersand ]
+    };
+    key <AC03> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               d,               D ],
+        symbols[Group2]= [               8,               asterisk ],
+        symbols[Group3]= [               F8,              asterisk ]
+    };
+    key <AC04> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               f,               F ],
+        symbols[Group2]= [               9,               parenleft ],
+        symbols[Group3]= [               F9,              parenleft ]
+    };
+    key <AC05> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               g,               G ],
+        symbols[Group2]= [               0,               parenright ],
+        symbols[Group3]= [               F10,             parenright ]
+    };
+    key <AC06> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               h,               H ],
+        symbols[Group2]= [               Left],
+        symbols[Group3]= [               BackSpace]
+    };
+    key <AC07> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               j,               J ],
+        symbols[Group2]= [               Down],
+        symbols[Group3]= [               4,               J ]
+    };
+    key <AC08> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               k,               K ],
+        symbols[Group2]= [               Up],
+        symbols[Group3]= [               5,               K ]
+    };
+    key <AC09> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               l,               L ],
+        symbols[Group2]= [               Right],
+        symbols[Group3]= [               6,               L ]
+    };
+    key <AC10> {         [       semicolon,           colon ], [plus, equal] , [plus, equal]};
+    key <AC11> {         [      apostrophe,        quotedbl ], [asterisk, percent ], [asterisk, percent ]};
+    key <TLDE> {         [           grave,      asciitilde ] };
+    key <LFSH> {         [         Shift_L ] };
+    key <BKSL> {         [       backslash,             bar ] };
+    key <AB01> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               z,               Z ],
+        symbols[Group2]= [           slash,        question ],
+        symbols[Group3]= [               F11,             Z ]
+    };
+    key <AB02> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               x,               X ],
+        symbols[Group2]= [               asterisk,  percent ],
+        symbols[Group3]= [               F12,             X ]
+    };
+    key <AB03> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               c,               C ],
+        symbols[Group2]= [               minus,           underscore ],
+        symbols[Group3]= [               F12,             X ]
+    };
+    key <AB04> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               v,               V ],
+        symbols[Group2]= [               plus,         equal],
+        symbols[Group3]= [               F12,             X ]
+    };
+    key <AB05> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               b,               B ],
+        symbols[Group2]= [               asciicircum,     asciicircum],
+        symbols[Group3]= [               grave,           asciitilde ]
 
-    key <ESC>  {	[ Caps_Lock		]	};
+    };
+    key <AB06> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               n,               N ],
+        symbols[Group2]= [               Return,          Return ],
+        symbols[Group3]= [               0,               0 ]
+    };
+    key <AB07> {
+        type= "ALPHABETIC",
+        symbols[Group1]= [               m,               M ],
+        symbols[Group2]= [               m,               M ],
+        symbols[Group3]= [               1,               M ]
+    };
+    key <CAPS> {         [       Control_L ] };
 
-    // The extra key on many European keyboards:
-    key <LSGT> {	[ less, greater, bar, brokenbar ] };
-
-    // The following keys are common to all layouts.
-    key <BKSL> {	[ backslash,	bar	]	};
-    key <SPCE> {	[ 	 space		]	};
-
-    include "srvr_ctrl(fkey2vt)"
-    include "pc"
-    include "keypad(x11)"
-
-    key <BKSP> {	[ BackSpace, BackSpace	]	};
-
-    key  <TAB> {	[ Tab,	ISO_Left_Tab	]	};
-    key <RTRN> {	[ Return		]	};
-
-    key <CAPS> {	[ Control_L		]	};
-    key <NMLK> {	[ Num_Lock 		]	};
-
-    key <LFSH> {	[ Shift_L		]	};
-    key <LCTL> {	[ Escape		]	};
-    key <LWIN> {	[ Super_L		]	};
-
-    key <RTSH> {	[ Shift_R		]	};
-    key <RCTL> {	[ Control_R		]	};
-    key <RWIN> {	[ Super_R		]	};
-    key <MENU> {	[ Menu			]	};
-    key <HJCV> {	[ Hangul_Hanja          ]	};
-
-    // Beginning of modifier mappings.
-    modifier_map Shift  { Shift_L, Shift_R };
-    modifier_map Lock   { Caps_Lock };
-    modifier_map Control{ Control_L, Control_R };
-    modifier_map Mod2   { Num_Lock };
-    modifier_map Mod4   { Super_L, Super_R };
-    modifier_map Mod3   { Hangul_Hanja };  //<HJCV>
-
-    // Fake keys for virtual<->real modifiers mapping:
-    key <LVL3> {	[ ISO_Level3_Shift	]	};
-    key <MDSW> {	[ Mode_switch 		]	};
-    modifier_map Mod5   { <LVL3>, <MDSW> };
-
-    key <ALT>  {	[ NoSymbol, Alt_L	]	};
-    include "altwin(meta_alt)"
-
-    key <META> {	[ NoSymbol, Meta_L	]	};
-    modifier_map Mod1   { <META> };
-
-    key <SUPR> {	[ NoSymbol, Super_L	]	};
-    modifier_map Mod4   { <SUPR> };
-
-    key <HYPR> {	[ NoSymbol, Hyper_L	]	};
-    modifier_map Mod4   { <HYPR> };
-    // End of modifier mappings.
-
-    key <OUTP> { [ XF86Display ] };
-    key <KITG> { [ XF86KbdLightOnOff ] };
-    key <KIDN> { [ XF86KbdBrightnessDown ] };
-    key <KIUP> { [ XF86KbdBrightnessUp ] };
+    modifier_map Lock { <ESC> };
+    modifier_map Control { <CAPS> };
 };

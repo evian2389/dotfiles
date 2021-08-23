@@ -98,10 +98,15 @@ alias free='free -m'                      # show sizes in MB
 alias np='nano -w PKGBUILD'
 alias more=less
 alias vi=nvim
-alias cds='cd ~/workspace/hkmc/src/'
-alias cdu='cd ~/workspace/hkmc/src/AppUpgrade'
-alias cdi='cd ~/workspace/hkmc/img/'
-alias cdc='cd ~/workspace/hkmc/meta-mango2/recipes-app/'
+alias cds='cd ~/workspace/hkmc/hkmc5th/src/'
+alias cdu='cd ~/workspace/hkmc/hkmc5th/src/AppUpgrade'
+alias cdi='cd ~/workspace/hkmc/hkmc5th/img/'
+alias cdc='cd ~/workspace/hkmc/hkmc5th/meta-mango2/recipes-app/'
+alias cdcc='cd ~/workspace/hkmc/ccIc/'
+alias cdcs='cd ~/workspace/hkmc/ccIc/src/'
+alias cdcu='cd ~/workspace/hkmc/ccIc/src/updateservice'
+alias cdcb='cd ~/workspace/hkmc/ccIc/src/build-coconut'
+alias cdci='cd ~/workspace/hkmc/ccIc/img'
 alias cdm='cd /run/media/jongho3/'
 
 xhost +local:root > /dev/null 2>&1
@@ -348,14 +353,14 @@ gb() {
   sed 's#^remotes/##'
 }
 
-gt() {
+gitt() {
   is_in_git_repo || return
   git tag --sort -version:refname |
   fzf-down --multi --preview-window right:70% \
     --preview 'git show --color=always {} | head -200'
 }
 
-gh() {
+gith() {
   is_in_git_repo || return
   git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph --color=always |
   fzf-down --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
@@ -364,7 +369,7 @@ gh() {
   grep -o "[a-f0-9]\{7,\}"
 }
 
-gr() {
+gitr() {
   is_in_git_repo || return
   git remote -v | awk '{print $1 "\t" $2}' | uniq |
   fzf-down --tac \
@@ -372,7 +377,7 @@ gr() {
   cut -d$'\t' -f1
 }
 
-gs() {
+gits() {
   is_in_git_repo || return
   git stash list | fzf-down --reverse -d: --preview 'git show --color=always {1}' |
   cut -d: -f1
@@ -380,12 +385,12 @@ gs() {
 
 if [[ $- =~ i ]]; then
   bind '"\er": redraw-current-line'
-  bind '"\C-g\C-f": "$(gf)\e\C-e\er"'
-  bind '"\C-g\C-b": "$(gb)\e\C-e\er"'
-  bind '"\C-g\C-t": "$(gt)\e\C-e\er"'
-  bind '"\C-g\C-h": "$(gh)\e\C-e\er"'
-  bind '"\C-g\C-r": "$(gr)\e\C-e\er"'
-  bind '"\C-g\C-s": "$(gs)\e\C-e\er"'
+  bind '"\C-g\C-f": "$(gitf)\e\C-e\er"'
+  bind '"\C-g\C-b": "$(gitb)\e\C-e\er"'
+  bind '"\C-g\C-t": "$(gitt)\e\C-e\er"'
+  bind '"\C-g\C-h": "$(gith)\e\C-e\er"'
+  bind '"\C-g\C-r": "$(gitr)\e\C-e\er"'
+  bind '"\C-g\C-s": "$(gits)\e\C-e\er"'
 fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
@@ -393,3 +398,8 @@ fi
 export GTK_IM_MODULE=ibus
 export XMODIFIERS=@im=ibus
 export QT_IM_MODULE=ibus
+
+export LANG=en_US.UTF-8
+
+#Xkbcomp -I$HOME/.xkb $HOME/.keymap.xkb $DISPLAY
+#xkbcomp ~/.config/xkb.dump $DISPLAY

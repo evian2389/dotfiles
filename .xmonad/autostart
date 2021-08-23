@@ -1,13 +1,17 @@
 #!/bin/sh
 
-#udiskie &
+udiskie &
 
+ibus-daemon -drx
+#synergy &
+xkbcomp -I$HOME/.xkb $HOME/.keymap.xkb $DISPLAY
 # Set background image with feh
-feh --bg-scale /home/orka/Pictures/Wallpapers/wallpaper.jpg &
-#~/bin/wm/init-wallpaper &
+feh --bg-scale /home/orka/Pictures/Wallpapers/milky-way-clipart-1080p-3.jpg &
+~/bin/wm/init-wallpaper &
 
-#xkbcomp -I$HOME/.xkb $HOME/.keymap.xkb $DISPLAY
+#source (xkbcomp -I$HOME/.xkb $HOME/.keymap.xkb $DISPLAY)
+xkbcomp ~/.config/xkb.dump $DISPLAY
 
-export SUDO_ASKPASS=ssh-askpass
+
 
 urxvt -e ranger

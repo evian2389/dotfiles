@@ -15,10 +15,11 @@ XDG_CONFIG_HOME=$HOME/.config
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 export GTAGSLABEL=pygments
-export EDITOR=nvim
+export EDITOR=emacs
 export VISUAL=emacs
 export QT_QPA_PLATFORMTHEME="qt5ct"
 
+export HU_IP=10.159.156.39
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
@@ -38,9 +39,16 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
+alias cdus="cd /home/jongho3/mnt/ccIcBuildServer/workspace/ccIc/src/updateservice"
+alias cdcs="cd /home/jongho3/mnt/ccIcBuildServer/workspace/ccIc/src/"
+
 #GHC_PATH=`stack path | grep compiler-bin | sed -e 's/compiler-bin: //'`
 #export PATH="$PATH:$GHC_PATH"
 
-ibus-daemon -drx
+#ibus-daemon -drx
+#xkbcomp -I$HOME/.xkb $HOME/.keymap.xkb $DISPLAY
 
 source ~/workspace/config/pc_config.sh
+export HOSTALIASES=~/.hosts
+
+alias vi=vim

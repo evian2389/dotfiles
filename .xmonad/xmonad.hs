@@ -312,27 +312,28 @@ myConfig p = def
 -- Workspaces                                                           {{{
 ---------------------------------------------------------------------------
 
-wsAV    = "AV"
-wsBSA   = "BSA"
+wsGEN   = "1.GEN"
+wsWRK   = "2.WRK"
+wsWRK2  = "3.WRK"
+wsSYS   = "4.SYS"
+wsMON   = "5.MON"
+wsBSA   = "6.BSA"
+wsRW    = "7.RW"
+wsTMP   = "8.TMP"
+wsAV    = "9.AV"
+wsDMO   = "10.DMO"
 wsCOM   = "COM"
 wsDOM   = "DOM"
-wsDMO   = "DMO"
 wsFLOAT = "FLT"
-wsGEN   = "GEN"
 wsGCC   = "GCC"
-wsMON   = "MON"
 wsOSS   = "OSS"
 wsRAD   = "RAD"
-wsRW    = "RW"
-wsSYS   = "SYS"
-wsTMP   = "TMP"
 wsVIX   = "VIX"
-wsWRK   = "WRK"
-wsWRK2  = "WRK:2"
 wsGGC   = "GGC"
 
 -- myWorkspaces = map show [1..9]
-myWorkspaces = [wsGEN, wsWRK, wsWRK2, wsSYS, wsMON, wsFLOAT, wsRW, wsTMP, wsAV, wsDMO]
+--myWorkspaces = [wsGEN, wsWRK, wsWRK2, wsSYS, wsMON, wsFLOAT, wsRW, wsTMP, wsAV, wsDMO]
+myWorkspaces = [wsGEN, wsWRK, wsWRK2, wsSYS, wsMON, wsBSA, wsRW, wsTMP, wsAV, wsDMO]
 
 projects :: [Project]
 projects =
@@ -391,21 +392,21 @@ projects =
 
 --myTerminal          = "terminator"
 --myTerminalClass     = "Terminator"
---myTerminal          = "urxvt"
---myAltTerminal       = "gnome-terminal"
+myTerminal          = "urxvt"
+myAltTerminal       = "gnome-terminal"
 --myAltTerminal       = "cool-retro-term"
-myAltTerminal       = "urxvt"
-myTerminal          = "gnome-terminal"
-myBrowser           = "google-chrome-stable" -- chrome with WS profile dirs
---myBrowser           = "firefox" -- chrome with WS profile dirs
+--myAltTerminal       = "urxvt"
+--myTerminal          = "gnome-terminal"
+--myBrowser           = "google-chrome-stable" -- chrome with WS profile dirs
+myBrowser           = "firefox" -- firefox
 myBrowserClass      = "Google-chrome-stable"
 myStatusBar         = "xmobar ~/.xmonad/xmobar.conf"
 myDock              = "plank"
 --myStatusBar         = "xmobar"
 --myLauncher          = "dmenu_run"
 --myLauncher          = "rofi -matching fuzzy -show run"
---myLauncher          = "rofi -matching fuzzy -modi combi -show combi -combi-modi run,drun"
-myLauncher          = "ulauncher"
+myLauncher          = "rofi -matching fuzzy -modi combi -show combi -combi-modi run,drun"
+--myLauncher          = "ulauncher"
 mySudoLauncher          = "gksudo ulauncher"
 myFileManager       = "ranger"
 
@@ -1242,7 +1243,7 @@ myKeys conf = let
     , ("M-C-<Space>"            , addName "SudoLauncher"                    $ spawn mySudoLauncher)
     , ("M-<Return>"             , addName "Terminal"                        $ spawn myTerminal)
     , ("M-S-<Return>"           , addName "File Manager"                    $ safeSpawn myTerminal ["ranger ~"])  --runInTerm myFileManager "~")
-    , ("M-C-<Return>"           , addName "AltTerminal"                     $ spawn myAltTerminal)
+    , ("S-C-<Return>"           , addName "AltTerminal"                     $ spawn myAltTerminal)
     , ("M-\\"                   , addName "Browser"                         $ spawn myBrowser)
     , ("M-c"                    , addName "NSP Chat"                        $ bindOn WS [(wsWRK, namedScratchpadAction scratchpads "hangoutsWork"),
                                                                               ("", namedScratchpadAction scratchpads "hangoutsPersonal")])
@@ -1439,14 +1440,15 @@ myKeys conf = let
 --    , ("C-S-<U>"                , addName "Shrink (U on BSP)"           $ tryMsgR (ShrinkFrom D) (MirrorShrink))
 --    , ("C-S-<D>"                , addName "Shrink (D on BSP)"           $ tryMsgR (ShrinkFrom U) (MirrorExpand))
 --
---      ("M-["                    , addName "Expand (L on BSP)"           $ tryMsgR (ExpandTowards L) (Shrink))
---    , ("M-]"                    , addName "Expand (R on BSP)"           $ tryMsgR (ExpandTowards R) (Expand))
---    , ("M-S-["                  , addName "Expand (U on BSP)"           $ tryMsgR (ExpandTowards U) (MirrorShrink))
---    , ("M-S-]"                  , addName "Expand (D on BSP)"           $ tryMsgR (ExpandTowards D) (MirrorExpand))
---    , ("M-C-["                  , addName "Shrink (L on BSP)"           $ tryMsgR (ShrinkFrom R) (Shrink))
---    , ("M-C-]"                  , addName "Shrink (R on BSP)"           $ tryMsgR (ShrinkFrom L) (Expand))
---    , ("M-C-S-["                , addName "Shrink (U on BSP)"           $ tryMsgR (ShrinkFrom D) (MirrorShrink))
---    , ("M-C-S-]"                , addName "Shrink (D on BSP)"           $ tryMsgR (ShrinkFrom U) (MirrorExpand))
+      ("M-["                    , addName "Expand (L on BSP)"           $ tryMsgR (ExpandTowards L) (Shrink))
+    , ("M-]"                    , addName "Expand (R on BSP)"           $ tryMsgR (ExpandTowards R) (Expand))
+    , ("M-S-["                  , addName "Expand (U on BSP)"           $ tryMsgR (ExpandTowards U) (MirrorShrink))
+    , ("M-S-]"                  , addName "Expand (D on BSP)"           $ tryMsgR (ExpandTowards D) (MirrorExpand))
+
+    , ("M-C-["                  , addName "Shrink (L on BSP)"           $ tryMsgR (ShrinkFrom R) (Shrink))
+    , ("M-C-]"                  , addName "Shrink (R on BSP)"           $ tryMsgR (ShrinkFrom L) (Expand))
+    , ("M-C-S-["                , addName "Shrink (U on BSP)"           $ tryMsgR (ShrinkFrom D) (MirrorShrink))
+    , ("M-C-S-]"                , addName "Shrink (D on BSP)"           $ tryMsgR (ShrinkFrom U) (MirrorExpand))
 --    , ("M-r"                    , addName "Mirror (BSP rotate)"         $ tryMsgR (Rotate) (XMonad.Layout.MultiToggle.Toggle MIRROR))
 --    , ("M-S-C-m"                , addName "Mirror (always)"             $ sendMessage $ XMonad.Layout.MultiToggle.Toggle MIRROR)
 --    , ("M4-r"                   , addName "BSP Rotate"                  $ sendMessage Rotate)
@@ -1458,8 +1460,8 @@ myKeys conf = let
 --    , ("M4-m"                   , addName "BSP Move Node"               $ sendMessage MoveNode)
 
  -- sublayout specific (unused)
- --  ("M4-C-S-."               , addName "toSubl Shrink"               $ toSubl Shrink)
- --, ("M4-C-S-,"               , addName "toSubl Expand"               $ toSubl Expand)
+--   ("M4-C-S-."               , addName "toSubl Shrink"               $ toSubl Shrink)
+-- , ("M4-C-S-,"               , addName "toSubl Expand"               $ toSubl Expand)
     ]
     where
       toggleCopyToAll = wsContainingCopies >>= \ws -> case ws of

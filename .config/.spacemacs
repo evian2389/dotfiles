@@ -2,6 +2,9 @@
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
+(eval-when-compile
+  (require 'cl))
+
 (defun dotspacemacs/layers ()
   "Layer configuration:
 This function should only modify configuration layer settings."
@@ -222,6 +225,8 @@ It should only modify the values of Spacemacs settings."
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(spacemacs-dark
                          spacemacs-light
+                         doom-gruvbox-light
+                         cyberpunk
                          ujelly
                          monokai
                          badwolf
@@ -514,12 +519,26 @@ dump."
   (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
   (setq css-indent-offset n) ; css-mode
   )
+
+(defun set-bfr-to-8-unx ()
+  (interactive)
+  (set-buffer-file-coding-system
+   'utf-8-unix)
+  )
+
 (defun dotspacemacs/user-config ()
   "Configuration for user code:
 This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  (setq-default buffer-file-coding-system 'utf-8-unix)
+  (setq-default default-buffer-file-coding-system 'utf-8-unix)
+  (set-default-coding-systems 'utf-8-unix)
+  (prefer-coding-system 'utf-8-unix)
+  (global-set-key (kbd "C-c u")
+                  'set-bfr-to-8-unx
+                  )
   ;; Make linums relative by default
    ;; (spacemacs/set-leader-keys "fz" 'fzf-git)
    ;; (spacemacs/set-leader-keys "fxp" 'fzf-projectile)
@@ -538,6 +557,14 @@ before packages are loaded."
    (setq counsel-ag "rg --vimgrep --no-heading --smart-case %s")
 
    (setq-default evil-escape-key-sequence "jk")
+
+   (spacemacs/set-leader-keys "ar" 'ranger)
+
+   (spacemacs/declare-prefix "o" "own-menu")
+   (spacemacs/set-leader-keys "os" 'multi-occur-in-this-mode)
+   (spacemacs/set-leader-keys "or" 'ranger)
+   ;; global key for `multi-occur-in-this-mode' - you should change this.
+   (global-set-key [(meta /)] 'multi-occur-in-this-mode)
 
 
    ;; (with-eval-after-load 'counsel-gtags
@@ -592,6 +619,13 @@ before packages are loaded."
     ;;   (when (and (listp v) (eq (car v) 'c-basic-offset))
     ;;     (setcdr v 4))))
 
+   (spaceline-define-segment buffer-id
+     (if (buffer-file-name)
+         (abbreviate-file-name (buffer-file-name))
+       (powerline-buffer-id)))
+   ;;
+
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -634,3 +668,25 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(defun occur-selection ()
+  (interactive)
+  (when (region-active-p)
+    (let (deactivate-mark)
+      (occur (regexp-quote (buffer-substring (region-beginning) (region-end)))))))
+
+(defun get-buffers-matching-mode (mode)
+  "Returns a list of buffers where their major-mode is equal to MODE"
+  (let ((buffer-mode-matches '()))
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (if (eq mode major-mode)
+            (add-to-list 'buffer-mode-matches buf))))
+    buffer-mode-matches))
+
+(defun multi-occur-in-this-mode ()
+  "Show all lines matching REGEXP in buffers with this major mode."
+  (interactive)
+  (multi-occur
+   (get-buffers-matching-mode major-mode)
+   (car (occur-read-primary-args))))
