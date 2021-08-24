@@ -1,6 +1,6 @@
 #!/bin/sh
 
-xrandr --output HDMI1 --mode 1920x1080 --primary --auto --output HDMI2 --mode 1920x1080 --right-of HDMI1 --auto
+xrandr --output DP-2 --mode 2560x1080 --primary --auto --output DP-4 --mode 1920x1080 --right-of DP-2 --auto
 
 # System tray
 if [ -z "$(pgrep trayer)" ] ; then
@@ -59,9 +59,11 @@ if [ -z "$(pgrep insync)" ] ; then
     insync start &
 fi
 
-feh --bg-scale /home/jongho3/Pictures/Wallpapers/gr.jpg &
+feh --bg-max ~/Pictures/Wallpapers/lonely_rainy_night.jpeg &
 barrier
 udiskie &
+# dunst &
+deadd-notification-center
 
 # xbindkeys
 #xbindkeys
