@@ -11,6 +11,11 @@ import XMonad
 import XMonad.Actions.Navigation2D
 import XMonad.Actions.UpdatePointer
 import XMonad.Actions.CycleWS
+import XMonad.Actions.CopyWindow
+import XMonad.Actions.PhysicalScreens
+import XMonad.Actions.DynamicWorkspaces as DynaW
+import XMonad.Actions.SpawnOn
+import XMonad.Actions.Submap
 
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -314,6 +319,9 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
   -- Eject CD tray.
   , ((0, 0x1008FF2C),
      spawn "eject -T")
+
+  , ((modMask , xK_i        ), sequence_ $ [windows $ copy i | i <- XMonad.workspaces conf])    -- copy to the other workspaces
+  , ((modMask .|. controlMask  , xK_i        ), killAllOtherCopies)    -- remove from all but current
 
   --------------------------------------------------------------------
   -- "Standard" xmonad key bindings
