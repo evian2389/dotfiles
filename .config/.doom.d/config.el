@@ -6,8 +6,8 @@
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
-(setq user-full-name "jongho3.lee"
-      user-mail-address "jongho3.lee@lge.com")
+(setq user-full-name "evian2389"
+      user-mail-address "evian2389@gmail.com")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -120,9 +120,11 @@
     :after org-roam
     :commands (org-roam-ui-mode))
 
-
 (after! org-ref
   (setq org-ref-default-bibliography `,(list (concat org-directory "braindump/org/biblio.bib"))))
 
 (use-package! org-roam-protocol
   :after org-protocol)
+
+(setq default-input-method "korean-hangul")
+(global-set-key (kbd "<S-SPC>") 'toggle-input-method)
