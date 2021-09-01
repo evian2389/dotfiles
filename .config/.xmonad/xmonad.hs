@@ -16,6 +16,7 @@ import XMonad.Actions.PhysicalScreens
 import XMonad.Actions.DynamicWorkspaces as DynaW
 import XMonad.Actions.SpawnOn
 import XMonad.Actions.Submap
+import XMonad.Actions.TagWindows
 
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -40,7 +41,7 @@ import XMonad.Layout.WindowNavigation
 import XMonad.Layout.ZoomRow
 
 import XMonad.Util.Run(spawnPipe)
-import XMonad.Util.EZConfig(additionalKeys)
+import XMonad.Util.EZConfig(additionalKeys, additionalKeysP)
 import XMonad.Util.Cursor
 
 import Graphics.X11.ExtraTypes.XF86
@@ -248,6 +249,17 @@ myTabTheme = def
     , inactiveTextColor     = base00
     }
 
+-- toggleFollowTags x
+--     | y <- hasTag "followScreen" x =  delTag "followScreen" x
+--     | otherwise = addTag "followScreen" x
+-- toggleAvoidTags x
+--     | y <- hasTag "avoidScreen" x =  delTag "avoidScreen" x
+--     | otherwise = addTag "avoidScreen" x
+
+toggleFloat w = windows (\s -> if M.member w (W.floating s)
+	then W.sink w s
+	else (W.float w (W.RationalRect (51/100) (3/100) (49/100) (97/100)) s))
+
 ------------------------------------------------------------------------
 -- Key bindings
 --
@@ -258,6 +270,7 @@ myTabTheme = def
 --
 myModMask = mod4Mask
 altMask = mod1Mask
+
 
 myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
   ----------------------------------------------------------------------
@@ -320,8 +333,12 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
   , ((0, 0x1008FF2C),
      spawn "eject -T")
 
-  , ((modMask , xK_i        ), sequence_ $ [windows $ copy i | i <- XMonad.workspaces conf])    -- copy to the other workspaces
-  , ((modMask .|. controlMask  , xK_i        ), killAllOtherCopies)    -- remove from all but current
+   , ((modMask , xK_i        ), sequence_ $ [windows $ copy i | i <- XMonad.workspaces conf])    -- copy to the other workspaces
+   , ((modMask .|. controlMask  , xK_i        ), killAllOtherCopies)    -- remove from all but current
+--  , ((modMask , xK_o )        , toggleFollowTags)    -- tag follow screen focus
+--  , ((modMask , xK_v )        , toggleAvoidTags)    -- tag avoid screen focus
+  -- , ((modMask , xK_v        ), addTag "avoidScreen")    -- tag avoid screen
+  -- , ((modMask , xK_v        ), shiftPrevScreen)    -- copy to the other workspaces
 
   --------------------------------------------------------------------
   -- "Standard" xmonad key bindings
@@ -376,8 +393,11 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
      sendMessage Expand)
 
   -- Push window back into tiling.
-  , ((modMask, xK_t),
+  , ((modMask, xK_T),
      withFocused $ windows . W.sink)
+
+  , ((modMask, xK_t),
+     withFocused $ toggleFloat)
 
   -- Increment the number of windows in the master area.
   , ((modMask, xK_comma),
