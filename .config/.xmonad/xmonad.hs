@@ -30,6 +30,9 @@ import XMonad.Layout.BinarySpacePartition as BSP
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Tabbed
 import XMonad.Layout.ThreeColumns
+import XMonad.Layout.ResizableThreeColumns
+import XMonad.Layout.TwoPane
+import XMonad.Layout.TwoPanePersistent
 import XMonad.Layout.Spacing
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.MultiToggle.Instances
@@ -55,7 +58,7 @@ import qualified Data.Map        as M
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal = "konsole"
+myTerminal = "gnome-terminal"
 
 -- The command to lock the screen or show the screensaver.
 myScreensaver = "dm-tool switch-to-greeter"
@@ -147,7 +150,10 @@ layouts      = avoidStruts (
                   $ myGaps
                   $ addSpace (BSP.emptyBSP)
                 )
+                ||| TwoPane (15/100) (55/100)
                 ||| tab
+		||| ThreeCol 1 (3/100) (1/2)
+		||| ThreeColMid 1 (3/100) (1/2)
                )
 
 myLayout    = smartBorders
