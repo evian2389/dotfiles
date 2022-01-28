@@ -48,7 +48,7 @@ alias cdcs="cd /home/jongho3/mnt/ccIcBuildServer/workspace/ccIc/src/"
 #ibus-daemon -drx
 #xkbcomp -I$HOME/.xkb $HOME/.keymap.xkb $DISPLAY
 
-source ~/workspace/config/pc_config.sh
+#source ~/workspace/config/pc_config.sh
 export HOSTALIASES=~/.hosts
 
-alias vi=vim
+alias vi=nvim

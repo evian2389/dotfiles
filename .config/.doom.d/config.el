@@ -127,4 +127,6 @@
   :after org-protocol)
 
 (setq default-input-method "korean-hangul")
+(set-language-environment "Korean")
+(prefer-coding-system 'utf-8)
 (global-set-key (kbd "<S-SPC>") 'toggle-input-method)

@@ -3,7 +3,8 @@
 udiskie &
 
 # Set background image with feh
-feh --bg-scale /home/orka/Pictures/Wallpapers/milky-way-clipart-1080p-3.jpg &
+feh --bg-scale /usr/share/wallpapers/Autumn/contents/images/1920x1080.jpg &
 ~/bin/wm/init-wallpaper &
+deadd-notification-center
 
 # urxvt -e ranger
