@@ -3,4 +3,5 @@ export GTK_IM_MODULE=ibus
 export QT_IM_MODULE=ibus
 ibus-daemon -drx
 
-xrandr --output DP-1 --left-of DVI-D-1
+
+xrandr --output eDP-1 --right-of HDMI-1

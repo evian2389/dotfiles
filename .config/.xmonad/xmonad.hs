@@ -61,7 +61,7 @@ import qualified Data.Map        as M
 myTerminal = "konsole"
 
 -- The command to lock the screen or show the screensaver.
-myScreensaver = "dm-tool switch-to-greeter"
+myScreensaver = "i3lock -c 000000"
 
 -- The command to take a selective screenshot, where you select
 -- what you'd like to capture on the screen.
@@ -222,10 +222,14 @@ unfocusColor = base02
 
 -- myFont      = "-*-Zekton-medium-*-*-*-*-160-*-*-*-*-*-*"
 -- myBigFont   = "-*-Zekton-medium-*-*-*-*-240-*-*-*-*-*-*"
-myFont      = "xft:Zekton:size=9:bold:antialias=true"
-myBigFont   = "xft:Zekton:size=9:bold:antialias=true"
-myWideFont  = "xft:Eurostar Black Extended:"
-            ++ "style=Regular:pixelsize=180:hinting=true"
+--myFont      = "xft:Zekton:size=9:bold:antialias=true"
+--myBigFont   = "xft:Zekton:size=9:bold:antialias=true"
+--myWideFont  = "xft:Eurostar Black Extended:"
+--            ++ "style=Regular:pixelsize=180:hinting=true"
+myFont      = "xft:D2Conding:size=10:style=Regular:hinting=true"
+myBigFont   = "xft:D2Conding:size=10:style=Bold:hinting=true"
+myWideFont  = "xft:D2Conding:pixelsize=160:style=Bold:hinting=true"
+
 
 -- this is a "fake title" used as a highlight bar in lieu of full borders
 -- (I find this a cleaner and less visually intrusive solution)

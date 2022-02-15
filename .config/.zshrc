@@ -25,16 +25,20 @@ export VISUAL=emacs
 
 alias vi=nvim
 alias vim=nvim
-alias cds='cd ~/workspace/hkmc/hkmc5th/src/'
-alias cdu='cd ~/workspace/hkmc/hkmc5th/src/AppUpgrade'
-alias cdi='cd ~/workspace/hkmc/hkmc5th/img/'
-alias cdc='cd ~/workspace/hkmc/hkmc5th/meta-mango2/recipes-app/'
-alias cdcc='cd ~/workspace/hkmc/ccIc/'
-alias cdcs='cd ~/workspace/hkmc/ccIc/src/'
-alias cdcu='cd ~/workspace/hkmc/ccIc/src/updateservice'
-alias cdcb='cd ~/workspace/hkmc/ccIc/src/build-coconut'
-alias cdci='cd ~/workspace/hkmc/ccIc/img'
-alias cdcl='cd ~/workspace/hkmc/ccIc/log'
-alias cdcm='cd ~/workspace/hkmc/ccIc/src/meta-ccic'
-alias cdm='cd /run/media/jongho3/'
 
+alias cdic='cd ~/workspace/hkmc/ccIc/'
+alias cdis='cd ~/workspace/hkmc/ccIc/src/'
+alias cdiu='cd ~/workspace/hkmc/ccIc/src/updateservice'
+alias cdib='cd ~/workspace/hkmc/ccIc/src/build-coconut'
+alias cdii='cd ~/workspace/hkmc/ccIc/img'
+alias cdil='cd ~/workspace/hkmc/ccIc/log'
+alias cdim='cd ~/workspace/hkmc/ccIc/src/meta-ccic'
+
+alias cdrc='cd ~/workspace/hkmc/ccRC/'
+alias cdrs='cd ~/workspace/hkmc/ccRC/src/'
+alias cdru='cd ~/workspace/hkmc/ccRC/src/updateservice'
+alias cdrb='cd ~/workspace/hkmc/ccRC/src/build-coconut'
+alias cdri='cd ~/workspace/hkmc/ccRC/img'
+alias cdrl='cd ~/workspace/hkmc/ccRC/log'
+alias cdrm='cd ~/workspace/hkmc/ccRC/src/meta-ccic'
+alias cdm='cd /run/media/jongho3/'
