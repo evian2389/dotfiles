@@ -1,0 +1,64 @@
+
+theme = "darcula"
+#theme = "onedark"
+#theme = "catppuccin_macchiato"
+
+
+[editor]
+line-number = "relative"
+scroll-lines = 1
+cursorline = true
+auto-save = false
+completion-trigger-len = 1
+true-color = true
+color-modes = true
+auto-pairs = true
+#rulers = [120]
+idle-timeout = 50
+#mouse = false
+# Show currently open buffers, only when more than one exists.
+bufferline = "multiple"
+# Number of lines of padding around the edge of the screen when scrolling
+scrolloff = 10
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+#hidden = false
+#parents = false
+#git-ignore = false
+
+[editor.indent-guides]
+character = "▏"
+render = true
+
+[editor.whitespace]
+render = "all"
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+[editor.statusline]
+left = ["mode", "spinner", "file-name", "file-type", "total-line-numbers", "file-encoding"]
+center = []
+right = ["selections", "primary-selection-length", "position", "position-percentage", "spacer", "diagnostics", "workspace-diagnostics", "version-control"]
+
+[keys.normal]
+# Use system clipboard
+y = "yank_main_selection_to_clipboard"
+p = "paste_clipboard_before"
+#C-f = [":new", ":insert-output lf-pick", "split_selection_on_newline", "goto_file", "goto_last_modification", "goto_last_modified_file", ":buffer-close!", ":theme nord", ":theme default"]
+
+[keys.insert]
+j = { k = "normal_mode" } # Maps `jk` to exit insert mode
+
+[editor.soft-wrap]
+enable = true
+#max-wrap = 25 # increase value to reduce forced mid-word wrapping
+#max-indent-retain = 0
+wrap-indicator = "~~~~"  # set wrap-indicator to "" to hide it
+

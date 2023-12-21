@@ -1,0 +1,186 @@
+ls
+exa
+exit
+zellij
+nushell
+exit
+nu
+nushell
+helix ~/.config/zellij/config.kdl
+helix
+zellij
+helix ~/.config/zellij/config.kdl
+zellij
+helix ~/.config/zellij/config.kdl
+zellij
+helix ~/.config/zellij/config.kdl
+yay -Sy fish
+cd workspace/
+ls
+exa
+zellij
+hx 
+helix ~/.config/nushell/env.nu
+helix ~/.config/nushell/config.nu
+exit
+hx
+helix ~/.config/nushell/config.nu
+hx
+exit
+nu
+exit
+which nu
+hx .config/nushell/config.nu
+hx .config/zellij/config.kdl
+zellij 
+hx .config/zellij/config.kdl
+zellij 
+which nu
+hx .config/zellij/config.kdl
+ls
+exit
+zellij 
+yay -Sy clang
+shutdown -h now
+arandr
+yazi
+yay -Sy on-my-posh
+yay -Sy oh-my-posh
+oh-my-posh init nu --config ~/.poshthemes/atomic.omp.json
+hx .config/zellij/config.kdl
+hx .config/nushell/config.nu
+exit
+oh-my-posh init nu --config ~/.poshthemes/lambdageneration
+exit
+oh-my-posh init nu --config ~/.poshthemes/lamdageneration.omp.json
+oh-my-posh init nu --config ~/.poshthemes/lambdageneration.omp.json
+oh-my-posh init nu --config https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/lambdageneration.omp.json
+oh-my-posh init nu --config 'https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/lambdageneration.omp.json'
+oh-my-posh init nu --config 'https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/lambdageneration.omp.json' | Invoke-Expression
+mkdir .poshthemes
+oh-my-posh init nu --config 'https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/lambdageneration.omp.json' | Invoke-Expression
+oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/jandedobbeleer.omp.json' | Invoke-Expression
+oh-my-posh init nu --config 'themes/lambdageneration.omp.json'
+ls
+ls -al
+ls .poshthemes/
+ls 
+ls -al
+mv lambdageneration.omp.json .poshthemes/
+oh-my-posh init nu --config '.poshthemes/lambdageneration.omp.json'
+oh-my-posh init nu --config '.poshthemes/iterm2.omp.json'
+ls
+oh-my-posh init nu --config '.poshthemes/atomic.omp.json'
+ls
+cd workspace/
+ls
+cd ..
+hx .poshthemes/atomic.omp.json
+cd workspace/
+oh-my-posh font install
+yay -Sy starship
+mkdir ~/.cache/starship<\n>starship init nu | save -f ~/.cache/starship/init.nu<\n>
+hx .config/nushell/config.nu
+ls
+starship preset nerd-font-symbols -o ~/.config/starship.toml<\n>
+starship preset plain-text-symbols -o ~/.config/starship.toml<\n>
+cd workspace/
+ls
+cd rust/
+ls
+cd practice/
+ls
+starship preset pastel-powerline -o ~/.config/starship.toml<\n>
+starship preset tokyo-night -o ~/.config/starship.toml<\n>
+starship preset plain-text-symbols -o ~/.config/starship.toml<\n>
+starship preset tokyo-night -o ~/.config/starship.toml<\n>
+hx ~/.config/starship.toml
+starship preset pastel-powerline -o ~/.config/starship.toml<\n>
+hx ~/.config/starship.toml
+starship preset tokyo-night -o ~/.config/starship.toml<\n>
+starship preset pastel-powerline -o ~/.config/starship.toml<\n>
+hx ~/.config/starship.toml
+time
+date
+date now
+time
+date
+date now
+hx ~/.config/starship.toml
+yay -Sy btop
+yay -Sy bat
+zellij
+zellij setup --generate-auto-start bash
+zellij setup --generate-auto-start ny
+zellij setup --generate-auto-start nu
+zellij setup --generate-auto-start nushell
+zellij setup --generate-auto-start nu
+zellij setup --generate-auto-start nu-shell
+zellij setup --generate-auto-start nushell
+hx
+ls
+hx
+hx ~/.config/nushell/config.nu
+hx ~/.config/helix/config.toml
+ls
+cd .config/
+ls
+cd /data/
+ls
+cd homeBackUp/
+ls
+cd dotfiles/
+ls
+cd .config/
+ls
+rm -rf kak
+rm -rf nvim
+cd ~/.config/
+ls
+mv zellij/ /data/homeBackUp/dotfiles/.config/
+mv helix/ /data/homeBackUp/dotfiles/.config/
+cd ..
+git status
+git add helix/
+git add nushell/
+git add zellij/
+git commit .
+git push origin
+yay -Sy github
+yay -Sy github-desktop-bin
+git 
+git format-patch HEAD^
+git status
+ls
+mkdir backup
+mv zellij/ backup/
+mv nushell/ backup/
+mv helix/ backup/
+git reset --hard HEAD^^^^
+git pull
+cd .sshls
+cd .ssh
+ls
+cd ~/.ssh
+ls
+cat id_ed25519.pub
+ls
+cd -
+ls
+git am 0001-helix.patch
+git diff
+git status
+hx .xmonad/autostart
+git am --skip
+git status
+git am --abort
+git am --continue
+git reset --hard HEAD
+git log
+ls
+mv backup/* .
+ls backup/q
+ls backup/
+ls
+rm -rf backup/
+git add nushell/ helix/ zellij/
