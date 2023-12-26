@@ -20,9 +20,10 @@ export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.g
 
 setopt noEXTENDED_GLOB
 export GTAGSLABEL=pygments
-export EDITOR=emacs
-export VISUAL=emacs
+export EDITOR=code
+export VISUAL=helix
 
+alias hx=helix
 alias vi=nvim
 alias vim=nvim
 
