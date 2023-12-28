@@ -20,12 +20,13 @@ export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.g
 
 setopt noEXTENDED_GLOB
 export GTAGSLABEL=pygments
-export EDITOR=code
-export VISUAL=helix
+export EDITOR=helix
+export VISUAL=neovide-lunarvim
 
 alias hx=helix
-alias vi=nvim
-alias vim=nvim
+alias vi=lvim
+alias vim=lvim
+alias nvim=neovide-lunarvim
 
 alias cdic='cd ~/workspace/hkmc/ccIc/'
 alias cdis='cd ~/workspace/hkmc/ccIc/src/'
