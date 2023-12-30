@@ -12,8 +12,11 @@ import XMonad.Actions.CycleWS
 import XMonad.Actions.CopyWindow
 import XMonad.Actions.PhysicalScreens
 import XMonad.Actions.DynamicWorkspaces as DynaW
+import XMonad.Actions.GroupNavigation
 
+import XMonad.Layout.PerScreen
 import XMonad.Layout.Fullscreen
+import XMonad.Layout.Master
  --   ( fullscreenEventHook, fullscreenManageHook, fullscreenSupport, fullscreenFull )
 import XMonad.Layout.BinarySpacePartition as BSP
 import XMonad.Layout.NoBorders
@@ -71,6 +74,9 @@ myClickJustFocuses = False
 --
 myModMask       = mod4Mask
 
+mySpacing       = spacing gap
+
+smallMonResWidth    = 1920
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
 -- workspace name. The number of workspaces is determined by the length
@@ -129,8 +135,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     
     -- launch rofi and dashboard
     , ((modm,               xK_o     ), rofi_launcher)
-    , ((modm,               xK_p     ), centerlaunch)
-    , ((modm .|. shiftMask, xK_p     ), ewwclose)
+    , ((modm,               xK_u     ), centerlaunch)
+    , ((modm .|. shiftMask, xK_u     ), ewwclose)
 
     -- launch eww sidebar
     , ((modm,               xK_s     ), sidebarlaunch)
@@ -160,6 +166,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Turn do not disturb on and off
     , ((modm,               xK_d     ), spawn "exec ~/bin/do_not_disturb.sh")
 
+    , ((modm,               xK_p     ), nextMatch History (return True))
     -- close focused window
     , ((modm .|. shiftMask, xK_c     ), kill)
 
@@ -225,7 +232,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
 
     -- Toggle current focus window to fullscreen
-    , ((modm              , xK_f), sendMessage $ Toggle FULL)
+    , ((modm              , xK_f), sendMessage $ Toggle NBFULL)
 
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
@@ -306,6 +313,93 @@ tab          =  avoidStruts
                $ myGaps
                $ tabbed shrinkText myTabTheme
 
+masterTabbedP   = named "MASTER TABBED"
+          $ addTopBar
+          $ avoidStruts
+          $ mySpacing
+          $ myGaps
+          $ mastered (1/100) (1/2) $ tabbed shrinkText myTabTheme
+
+-----------------------------------------------------------------------
+-- Master-Tabbed Dymamic                                             --
+-----------------------------------------------------------------------
+--
+-- Dynamic 3 pane layout with one tabbed panel using X.L.Master
+-- advantage is that it can do a nice 3-up on both ultrawide and
+-- standard (laptop in my case) screen sizes, where the layouts
+-- look like this:
+--
+-- Ultrawide:
+-- --------------------------------------------
+-- |          |                    |          |
+-- |          |                    |          |
+-- |          |                    |          |
+-- |  Master  |       Master       |   Tabs   |
+-- |          |                    |          |
+-- |          |                    |          |
+-- |          |                    |          |
+-- --------------------------------------------
+-- \____________________ _____________________/
+--                      '
+--                 all one layout
+--
+-- Standard:
+-- ---------------------------------
+-- |                    |          |
+-- |                    |          |
+-- |                    |          |
+-- |       Master       |   Tabs   |
+-- |                    |          |
+-- |                    |          |
+-- |                    |          |
+-- ---------------------------------
+-- \_______________ _______________/
+--                 '
+--            all one layout
+--
+-- Advantages to this use of X.L.Master to created this dynamic
+-- layout include:
+--
+--   * No fussing with special keys to swap windows between the
+--     Tabs and Master zones
+--
+--   * Window movement and resizing is very straightforward
+--
+--   * Limited need to maintain a mental-map of the layout
+--     (pretty easy to understand... it's just a layout)
+--
+-- Disadvantages include:
+--
+--   * Swapping a window from tabbed area will of necessity swap
+--     one of the Master windows back into tabs (since there can
+--     only be two master windows)
+--
+--   * Master area can have only one/two windows in std/wide modes
+--     respectively
+--
+--   * When switching from wide to standard, the leftmost pane
+--     (which is visually secondary to the large central master
+--     window) becomes the new dominant master window on the
+--     standard display (this is easy enough to deal with but
+--     is a non-intuitive effect)
+
+masterTabbedDynamic = named "Master-Tabbed Dynamic"
+          $ ifWider smallMonResWidth masterTabbedWide masterTabbedStd
+
+masterTabbedStd = named "Master-Tabbed Standard"
+          $ addTopBar
+          $ avoidStruts
+          $ mastered (1/100) (1/2)
+          $ tabbed shrinkText myTabTheme
+
+masterTabbedWide = named "Master-Tabbed Wide"
+          $ addTopBar
+          $ avoidStruts
+          $ mastered (1/100) (1/4)
+          $ mastered (1/100) (2/4)
+          $ tabbed shrinkText myTabTheme
+
+
 -- layouts      = avoidStruts (
 --                 (
 --                     renamed [CutWordsLeft 1]
@@ -328,10 +422,11 @@ tab          =  avoidStruts
 --               $ layouts
 
 -- layoutHook = gaps [(L,10), (R,10), (U,40), (D,60)] $ spacingRaw True (Border 10 10 10 10) True (Border 5 5 5 5) True $ smartBorders $ mkToggle (NOBORDERS ?? FULL ?? EOT) $ myLayout,
-myLayout    = gaps [(L,0), (R,0), (U,35), (D,0)] $ spacingRaw True (Border 10 10 10 10) True (Border 5 5 5 5) True
-              $ smartBorders
-              $ mkToggle (NOBORDERS ?? FULL ?? EOT)
-              $ avoidStruts(TwoPane (15/100) (55/100) ||| ThreeColMid 1 (3/100) (1/2) ||| tab ||| tiled)
+-- myLayout    = gaps [(L,0), (R,0), (U,35), (D,0)] $ spacingRaw True (Border 10 10 10 10) True (Border 5 5 5 5) True
+myLayout    = smartBorders
+              $ mkToggle (NOBORDERS ?? NBFULL ?? EOT)
+              $ avoidStruts(masterTabbedDynamic ||| tab ||| emptyBSP)
+              -- $ avoidStruts(masterTabbedDynamic ||| ThreeColMid 1 (3/100) (1/2) ||| tab ||| tiled)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -394,7 +489,7 @@ green   = "#859900"
 
 -- sizes
 gap         = 2
-topbar      = 4
+topbar      = 0
 border      = 0
 prompt      = 20
 status      = 20
@@ -498,7 +593,7 @@ myEventHook = fullscreenEventHook
 -- Perform an arbitrary action on each internal state change or X event.
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
-myLogHook = return ()
+myLogHook = historyHook
 
 ------------------------------------------------------------------------
 -- Startup hook
