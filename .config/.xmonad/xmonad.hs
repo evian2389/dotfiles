@@ -40,7 +40,7 @@ import XMonad.Layout.Gaps
       gaps,
       setGaps,
       GapMessage(DecGap, ToggleGaps, IncGap) )
-
+import XMonad.Layout.FocusTracking
 import Data.Monoid ()
 import System.Exit
 import XMonad.Util.SpawnOnce ( spawnOnce )
@@ -307,18 +307,19 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 outerGaps    = 2
 myGaps       = gaps [(U, outerGaps), (R, outerGaps), (L, outerGaps), (D, outerGaps)]
 addSpace     = renamed [CutWordsLeft 2] . spacing gap
-tab          =  avoidStruts
+myTabbed     = avoidStruts
                $ renamed [Replace "Tabbed"]
                $ addTopBar
                $ myGaps
                $ tabbed shrinkText myTabTheme
-
-masterTabbedP   = named "MASTER TABBED"
+ 
+masterTabbedP   = (named "MASTER TABBED"
           $ addTopBar
           $ avoidStruts
           $ mySpacing
           $ myGaps
-          $ mastered (1/100) (1/2) $ tabbed shrinkText myTabTheme
+          $ mastered (1/100) (1/2) $ myTabbed)
+          -- $ mastered (1/100) (1/2) $ tabbed shrinkText myTabTheme
 
 -----------------------------------------------------------------------
 -- Master-Tabbed Dymamic                                             --
@@ -425,7 +426,7 @@ masterTabbedWide = named "Master-Tabbed Wide"
 -- myLayout    = gaps [(L,0), (R,0), (U,35), (D,0)] $ spacingRaw True (Border 10 10 10 10) True (Border 5 5 5 5) True
 myLayout    = smartBorders
               $ mkToggle (NOBORDERS ?? NBFULL ?? EOT)
-              $ avoidStruts(masterTabbedDynamic ||| tab ||| emptyBSP)
+              $ avoidStruts(masterTabbedDynamic ||| myTabbed ||| emptyBSP)
               -- $ avoidStruts(masterTabbedDynamic ||| ThreeColMid 1 (3/100) (1/2) ||| tab ||| tiled)
   where
      -- default tiling algorithm partitions the screen into two panes
@@ -645,7 +646,7 @@ defaults = def {
       -- hooks, layouts
         manageHook = myManageHook, 
         -- layoutHook = gaps [(L,10), (R,10), (U,40), (D,60)] $ spacingRaw True (Border 10 10 10 10) True (Border 5 5 5 5) True $ smartBorders $ mkToggle (NOBORDERS ?? FULL ?? EOT) $ myLayout,
-        layoutHook = myLayout,
+        layoutHook = focusTracking myLayout,
         handleEventHook    = myEventHook,
         logHook            = myLogHook,
         startupHook        = myStartupHook >> addEWMHFullscreen
