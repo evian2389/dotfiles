@@ -24,9 +24,9 @@ export EDITOR=helix
 export VISUAL=neovide-lunarvim
 
 alias hx=helix
-alias vi=lvim
-alias vim=lvim
-alias nvim=neovide-lunarvim
+alias vi=nvim
+alias vim=nvim
+#alias nvim=neovide-lunarvim
 
 alias cdic='cd ~/workspace/hkmc/ccIc/'
 alias cdis='cd ~/workspace/hkmc/ccIc/src/'

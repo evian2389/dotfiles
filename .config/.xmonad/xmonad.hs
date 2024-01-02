@@ -304,8 +304,11 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 --
 
 
-outerGaps    = 2
-myGaps       = gaps [(U, outerGaps), (R, outerGaps), (L, outerGaps), (D, outerGaps)]
+outerUpGaps    = 40
+outerRightGaps    = 10
+outerLeftGaps    = 10
+outerDownGaps    = 60
+myGaps       = gaps [(U, outerUpGaps), (R, outerRightGaps), (L, outerLeftGaps), (D, outerDownGaps)]
 addSpace     = renamed [CutWordsLeft 2] . spacing gap
 myTabbed     = avoidStruts
                $ renamed [Replace "Tabbed"]
@@ -424,7 +427,8 @@ masterTabbedWide = named "Master-Tabbed Wide"
 
 -- layoutHook = gaps [(L,10), (R,10), (U,40), (D,60)] $ spacingRaw True (Border 10 10 10 10) True (Border 5 5 5 5) True $ smartBorders $ mkToggle (NOBORDERS ?? FULL ?? EOT) $ myLayout,
 -- myLayout    = gaps [(L,0), (R,0), (U,35), (D,0)] $ spacingRaw True (Border 10 10 10 10) True (Border 5 5 5 5) True
-myLayout    = smartBorders
+myLayout    = myGaps
+              $ smartBorders
               $ mkToggle (NOBORDERS ?? NBFULL ?? EOT)
               $ avoidStruts(masterTabbedDynamic ||| myTabbed ||| emptyBSP)
               -- $ avoidStruts(masterTabbedDynamic ||| ThreeColMid 1 (3/100) (1/2) ||| tab ||| tiled)
