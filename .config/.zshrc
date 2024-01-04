@@ -44,3 +44,5 @@ alias cdri='cd ~/workspace/hkmc/ccRC/img'
 alias cdrl='cd ~/workspace/hkmc/ccRC/log'
 alias cdrm='cd ~/workspace/hkmc/ccRC/src/meta-ccic'
 alias cdm='cd /run/media/jongho3/'
+
+eval "$(zellij setup --generate-auto-start zsh)"
