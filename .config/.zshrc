@@ -17,6 +17,12 @@ plugins=(git ssh-agent)
 export XMODIFIERS=@im=ibus
 export GTK_IM_MODULE=ibus
 export QT_IM_MODULE=ibus
+export ZELLIJ_AUTO_ATTACH=true
+#export ZELLIJ_AUTO_EXIT=false
+
+
+
+
 XDG_CONFIG_HOME=$HOME/.config
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
@@ -48,4 +54,16 @@ alias cdrl='cd ~/workspace/hkmc/ccRC/log'
 alias cdrm='cd ~/workspace/hkmc/ccRC/src/meta-ccic'
 alias cdm='cd /run/media/jongho3/'
 
-eval "$(zellij setup --generate-auto-start zsh)"
+# eval "$(zellij setup --generate-auto-start zsh)"
+
+if [[ -z "$ZELLIJ" ]]; then
+    if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
+        zellij attach -c d
+    else
+        zellij
+    fi
+
+    if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
+        exit
+    fi
+fi

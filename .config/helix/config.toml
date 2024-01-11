@@ -58,6 +58,11 @@ right = ["selections", "primary-selection-length", "position", "position-percent
   "search_selection",
   "global_search",
 ]
+"&" = [
+  "move_prev_word_start",
+  "move_next_word_end",
+  "search_selection",
+]
 
 [keys.insert]
 j = { k = "normal_mode" } # Maps `jk` to exit insert mode
