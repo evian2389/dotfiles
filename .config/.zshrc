@@ -27,6 +27,9 @@ XDG_CONFIG_HOME=$HOME/.config
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 
+source /usr/share/fzf/key-bindings.zsh
+source /usr/share/fzf/completion.zsh
+
 setopt noEXTENDED_GLOB
 export GTAGSLABEL=pygments
 export EDITOR=helix
@@ -54,16 +57,16 @@ alias cdrl='cd ~/workspace/hkmc/ccRC/log'
 alias cdrm='cd ~/workspace/hkmc/ccRC/src/meta-ccic'
 alias cdm='cd /run/media/jongho3/'
 
-# eval "$(zellij setup --generate-auto-start zsh)"
+#eval "$(zellij setup --generate-auto-start zsh)"
 
-if [[ -z "$ZELLIJ" ]]; then
-    if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
-        zellij attach -c d
-    else
-        zellij
-    fi
+# if [[ -z "$ZELLIJ" ]]; then
+#     if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
+#         zellij attach -c d
+#     else
+#         zellij
+#     fi
 
-    if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
-        exit
-    fi
-fi
+#     if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
+#         exit
+#     fi
+# fi

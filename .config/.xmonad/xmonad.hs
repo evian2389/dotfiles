@@ -61,7 +61,7 @@ myTerminal      = "alacritty"
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
-myFocusFollowsMouse = True
+myFocusFollowsMouse = False
 
 -- Whether clicking on a window to focus also passes the click to the window
 myClickJustFocuses :: Bool
@@ -174,7 +174,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- GAPS!!!
     , ((modm,               xK_g), sendMessage $ ToggleGaps)               -- toggle all gaps
-    , ((modm .|. shiftMask, xK_g), sendMessage $ setGaps [(L,0), (R,0), (U,35), (D,0)]) -- reset the GapSpec
+    , ((modm .|. shiftMask, xK_g), sendMessage $ setGaps [(L,0), (R,0), (U,32), (D,0)]) -- reset the GapSpec
     
     , ((modm .|. controlMask, xK_t), sendMessage $ IncGap 10 L)              -- increment the left-hand gap
     , ((modm .|. shiftMask, xK_t     ), sendMessage $ DecGap 10 L)           -- decrement the left-hand gap
@@ -306,10 +306,10 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 --
 
 
-outerUpGaps    = 40
-outerRightGaps    = 10
-outerLeftGaps    = 10
-outerDownGaps    = 60
+outerUpGaps    = 32
+outerRightGaps    = 0
+outerLeftGaps    = 0
+outerDownGaps    = 0
 myGaps       = gaps [(U, outerUpGaps), (R, outerRightGaps), (L, outerLeftGaps), (D, outerDownGaps)]
 addSpace     = renamed [CutWordsLeft 2] . spacing gap
 myTabbed     = avoidStruts

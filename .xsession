@@ -4,4 +4,5 @@ export QT_IM_MODULE=ibus
 ibus-daemon -drx
 
 
-xrandr --output DVI-D-0 --primary --right-of DP-2
+xrandr --output eDP-1 --primary --right-of HDMI-1
+xrandr --output DP-1  --left-of HDMI-1
