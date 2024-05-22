@@ -1,3 +1,0 @@
-/home/orka/dotfiles/.config/kak/autoload/kakoune-extra/fzy.kak 27.29,27.29
-/home/orka/dotfiles/.config/kak/autoload/rofi.kak 15.1,15.1
-/home/orka/dotfiles/.config/.spacemacs 50.6,50.6

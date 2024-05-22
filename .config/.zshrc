@@ -35,7 +35,6 @@ export GTAGSLABEL=pygments
 export EDITOR=helix
 export VISUAL=neovide-lunarvim
 
-alias hx=helix
 alias vi=nvim
 alias vim=nvim
 #alias nvim=neovide-lunarvim
@@ -70,3 +69,9 @@ alias cdm='cd /run/media/jongho3/'
 #         exit
 #     fi
 # fi
+
+. /opt/asdf-vm/asdf.sh
+
+export HELIX_RUNTIME=~/src/helix/runtime
+
+export PATH=~/elixir-ls:~/src/helix/runtime:$PATH
