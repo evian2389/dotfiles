@@ -10,6 +10,7 @@ fi
 # fi
 
 eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
 
 
 plugins=(git ssh-agent)
@@ -19,6 +20,9 @@ export GTK_IM_MODULE=ibus
 export QT_IM_MODULE=ibus
 export ZELLIJ_AUTO_ATTACH=true
 #export ZELLIJ_AUTO_EXIT=false
+export ASDF_CONFIG_FILE=~/.asdf
+export ASDF_DATA_DIR=~/.asdf
+export ASDF_DIR=~/.asdf
 
 
 
@@ -32,11 +36,11 @@ source /usr/share/fzf/completion.zsh
 
 setopt noEXTENDED_GLOB
 export GTAGSLABEL=pygments
-export EDITOR=helix
-export VISUAL=neovide-lunarvim
+export EDITOR=hx
+export VISUAL=hx
 
-alias vi=nvim
-alias vim=nvim
+alias vi=hx
+alias vim=hx
 #alias nvim=neovide-lunarvim
 
 alias cdic='cd ~/workspace/hkmc/ccIc/'
@@ -70,8 +74,9 @@ alias cdm='cd /run/media/jongho3/'
 #     fi
 # fi
 
-. /opt/asdf-vm/asdf.sh
+. $HOME/.asdf/asdf.sh
 
 export HELIX_RUNTIME=~/src/helix/runtime
 
-export PATH=~/elixir-ls:~/src/helix/runtime:$PATH
+export PATH=~/elixir-ls:~/src/helix/runtime:/home/orka/.asdf/bin:$PATH
+

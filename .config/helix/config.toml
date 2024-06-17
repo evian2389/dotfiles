@@ -1,5 +1,5 @@
 
-theme = "darcula"
+theme = "ayu_dark"
 #theme = "onedark"
 #theme = "catppuccin_macchiato"
 
@@ -8,6 +8,7 @@ theme = "darcula"
 line-number = "relative"
 scroll-lines = 1
 cursorline = true
+cursorcolumn = true
 auto-save = false
 completion-trigger-len = 1
 true-color = true
@@ -63,6 +64,7 @@ right = ["selections", "primary-selection-length", "position", "position-percent
   "move_next_word_end",
   "search_selection",
 ]
+C-j = ["insert_mode", "insert_newline", "normal_mode"]
 
 [keys.insert]
 j = { k = "normal_mode" } # Maps `jk` to exit insert mode
