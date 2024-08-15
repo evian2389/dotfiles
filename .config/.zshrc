@@ -33,6 +33,9 @@ export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.g
 
 source /usr/share/fzf/key-bindings.zsh
 source /usr/share/fzf/completion.zsh
+source <(fzf --zsh)
+
+alias ine='hx $(fzf -m --preview="bat --color=always {}")'
 
 setopt noEXTENDED_GLOB
 export GTAGSLABEL=pygments
