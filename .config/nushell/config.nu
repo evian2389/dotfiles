@@ -891,14 +891,18 @@ $env.config = {
     ]
 }
 
+use '/home/orka/.config/broot/launcher/nushell/br' *
 use ~/.cache/starship/init.nu
 #source ~/.oh-my-posh.nu
 
-$env.EDITOR = helix
-$env.VISUAL = helix
+$env.EDITOR = hx
+$env.VISUAL = hx
 
 #alias hx = helix
 #alias ll = ls -al
+
+alias br = broot
+alias zhx = zellij --layout $env.HOME/.config/zellij/layouts/helix.kdl
 
 alias cdw = cd ~/workspace/
 #alias cdh = cd ~/workspace/hkmc/
@@ -920,4 +924,6 @@ def start_zellij [] {
   }
 }
 
+
 start_zellij
+

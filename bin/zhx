@@ -1,0 +1,1 @@
+zellij --layout $HOME/.config/zellij/layouts/helix.kdl

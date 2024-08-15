@@ -83,3 +83,5 @@ export HELIX_RUNTIME=~/src/helix/runtime
 
 export PATH=~/elixir-ls:~/src/helix/runtime:/home/orka/.asdf/bin:$PATH
 
+
+source /home/orka/.config/broot/launcher/bash/br

@@ -62,7 +62,7 @@ config.show_update_window = true
 
 config.window_decorations = 'RESIZE'
 
-config.leader = { key = 'a', mods = 'CTRL', timeout_miliseconds = 1000 }
+config.leader = { key = 'j', mods = 'CTRL', timeout_miliseconds = 1000 }
 config.keys = {
   { key = 'a', mods = 'LEADER|CTRL', action = act.SendKey { key = 'a', mods = 'CTRL' } },
   { key = 'c', mods = 'LEADER', action = act.ActivateCopyMode },

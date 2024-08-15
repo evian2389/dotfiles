@@ -65,6 +65,17 @@ right = ["selections", "primary-selection-length", "position", "position-percent
   "search_selection",
 ]
 C-j = ["insert_mode", "insert_newline", "normal_mode"]
+C-y = ":sh zellij run -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh"
+
+[keys.normal.space.","]
+b = ":sh helix-wezterm.sh blame"
+c = ":sh helix-wezterm.sh check"
+e = ":sh helix-wezterm.sh explorer"
+f = ":sh helix-wezterm.sh fzf"
+g = ":sh helix-wezterm.sh lazygit"
+o = ":sh helix-wezterm.sh open"
+r = ":sh helix-wezterm.sh run"
+t = ":sh helix-wezterm.sh test"
 
 [keys.insert]
 j = { k = "normal_mode" } # Maps `jk` to exit insert mode
@@ -74,4 +85,5 @@ enable = true
 #max-wrap = 25 # increase value to reduce forced mid-word wrapping
 #max-indent-retain = 0
 wrap-indicator = "~~~~"  # set wrap-indicator to "" to hide it
+
 
