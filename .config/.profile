@@ -8,14 +8,16 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-export XMODIFIERS=@im=ibus
-export GTK_IM_MODULE=ibus
-export QT_IM_MODULE=ibus
 XDG_CONFIG_HOME=$HOME/.config
+
+
+export GTK_IM_MODULE=kime
+export QT_IM_MODULE=kime
+export XMODIFIERS=@im=kime
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 export GTAGSLABEL=pygments
-export EDITOR=kak
+export EDITOR=hx
 export VISUAL=emacs
 
 
@@ -37,8 +39,7 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-GHC_PATH=`stack path | grep compiler-bin | sed -e 's/compiler-bin: //'`
-export PATH="$PATH:$GHC_PATH"
+#GHC_PATH=`stack path | grep compiler-bin | sed -e 's/compiler-bin: //'`
+#export PATH="$PATH:$GHC_PATH"
 
-alias vi='kak'
-ibus-daemon -drx
+source ~/.aider_api_key

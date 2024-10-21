@@ -215,7 +215,7 @@ simplified_ui true
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
 
-default_shell "/usr/bin/nu"
+default_shell "/usr/bin/zsh"
 
 // Choose the path to override cwd that zellij will use for opening new panes
 //

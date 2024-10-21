@@ -1,7 +1,7 @@
 
-theme = "ayu_dark"
+#theme = "ayu_dark"
 #theme = "onedark"
-#theme = "catppuccin_macchiato"
+theme = "catppuccin_mocha"
 
 
 [editor]
