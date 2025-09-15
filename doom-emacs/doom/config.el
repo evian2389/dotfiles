@@ -36,11 +36,12 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type `relative)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "/data/orka/notes/")
+(setq org-directory "/data/orka/notes/"
+      org-roam-directory "/data/orka/notes/resources/")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
@@ -128,11 +129,12 @@
                              (meow-leader-define-key '("p" . meow-clipboard-yank))
                              )
 
-       (keymap-global-set "s-SPC" 'toggle-input-method)
-       (keymap-global-set "s-h" 'windmove-left)
-       (keymap-global-set "s-l" 'windmove-right)
-       (keymap-global-set "s-j" 'windmove-down)
-       (keymap-global-set "s-k" 'windmove-up)
+       ;(keymap-global-set "s-SPC" 'toggle-input-method)
+       ;(keymap-global-set "s-h" 'windmove-left)
+       ;(keymap-global-set "s-l" 'windmove-right)
+       ;(keymap-global-set "s-j" 'windmove-down)
+       ;(keymap-global-set "s-k" 'windmove-up)
+       (global-set-key (kbd "M-n") 'ace-window)
 
 ;;; Theme and Fonts ----------------------------------------
        (set-frame-parameter nil 'alpha-background 95) ; For current frame
@@ -191,7 +193,16 @@
            (end-of-line)
            (unless (bolp)
              (newline)))
-         (define-key org-mode-map (kbd "M-o") 'rde-org-goto-end-of-heading)
+         ;(define-key org-mode-map (kbd "M-o") 'rde-org-goto-end-of-heading)
+
+         (use-package org-roam
+           :ensure t
+           :init
+           (setq org-roam-v2-ack t)
+           :custom
+           (org-roam-completion-everywhere t)
+           :config
+           (org-roam-setup))
 
          ;;; find by titles and tags  :TODO:check if this works..
          (setq org-roam-node-display-template
@@ -509,4 +520,64 @@
                ((agenda ""))
                ((org-agenda-tag-filter-preset '("-OFFICE"))))
               )))
+
+         (with-eval-after-load 'org-superstar
+           :config
+           (setq org-superstar-leading-bullet " ")
+           (setq org-superstar-headline-bullets-list '("◉" "○" "•" "➤" "-" ("🞛" ?◈) "◆" "◇" "▷" "●" "○" "⚬"))
+           (setq org-superstar-special-todo-items t) ;; makes todo header bullets into boxes
+           (setq org-superstar-todo-bullet-alist '(("TODO" . 9744)
+                                                   ("START" . 9744)
+                                                   ("HOLD" . 9744)
+                                                   ("WAIT" . 9744)
+                                                   ("IDEA" . 9744)
+                                                   ("DONE" . 9745)
+                                                   ("DELIGATED" . 9745)
+                                                   ))
+           )
+
+
+         (with-eval-after-load 'geiser-mode
+           (setq geiser-mode-auto-p nil)
+           (defun orka-geiser-connect ()
+             (interactive)
+             (geiser-connect 'guile "localhost" "37146"))
+
+           (define-key geiser-mode-map (kbd "C-c M-j") 'orka-geiser-connect))
+
+         (with-eval-after-load 'simple
+           (setq-default display-fill-column-indicator-column 80)
+           (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+
+
+         (use-package org-brain :ensure t
+           :init
+           (setq org-brain-path "/data/orka/notes/brain")
+           ;; For Evil users
+           (with-eval-after-load 'evil
+             (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
+           :config
+           (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
+           (setq org-id-track-globally t)
+           (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+           (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
+           (push '("b" "Brain" plain (function org-brain-goto-end)
+                   "* %i%?" :empty-lines 1)
+                 org-capture-templates)
+           (setq org-brain-visualize-default-choices 'all)
+           (setq org-brain-title-max-length 12)
+           (setq org-brain-include-file-entries nil
+                 org-brain-file-entries-use-title nil))
+
+         ;; Allows you to edit entries directly from org-brain-visualize
+         (use-package polymode
+           :config
+           (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
+
+         (use-package org-auto-tangle
+           :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
+           :defer t
+           :hook (org-src-mode . org-auto-tangle-mode))
+
        )
+

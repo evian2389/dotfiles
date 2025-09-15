@@ -47,6 +47,15 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
+(package! org-present)
+(package! org-brain)
+(package! org-roam-ui)
+(package! org-auto-tangle)
+(package! ace-window)
 
 (package! svg-tag-mode)
-(package! geiser-mode)
+;(package! geiser-mode)
+(package! eat
+  :recipe (:host codeberg
+           :repo "akib/emacs-eat"
+           :files ("*.el" ("term" "term/*.el") "*.texi" "*.ti" ("terminfo/e" "terminfo/e/*") ("terminfo/65" "terminfo/65/*") ("integration" "integration/*") (:exclude ".dir-locals.el" "*-tests.el"))))
