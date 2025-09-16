@@ -1,0 +1,1926 @@
+:PROPERTIES:
+:ID:       aa51f447-06bf-4977-a11b-8f12d7227b1f
+:END:
+#+title: dotfiles
+#+PROPERTY: header-args :mkdirp yes
+#+auto_tangle: nil
+
+* emacs
+** doom emacs
+*** .config/doom/config.el
+**** setting doom
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; sync' after modifying this file!
+
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets. It is optional.
+;; (setq user-full-name "John Doe"
+;;       user-mail-address "john@doe.com")
+
+;; Doom exposes five (optional) variables for controlling fonts in Doom:
+;;
+;; - `doom-font' -- the primary font to use
+;; - `doom-variable-pitch-font' -- a non-monospace font (where applicable)
+;; - `doom-big-font' -- used for `doom-big-font-mode'; use this for
+;;   presentations or streaming.
+;; - `doom-symbol-font' -- for symbols
+;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
+;;
+;; See 'C-h v doom-font' for documentation and more examples of what they
+;; accept. For example:
+;;
+;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
+;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+;;
+;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
+;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
+;; refresh your font settings. If Emacs still can't find your font, it likely
+;; wasn't installed correctly. Font issues are rarely Doom issues!
+
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. This is the default:
+
+;; The exceptions to this rule:
+;;
+;;   - Setting file/directory variables (like `org-directory')
+;;   - Setting variables which explicitly tell you to set them before their
+;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
+;;   - Setting doom variables (which start with 'doom-' or '+').
+;;
+;; Here are some additional functions/macros that will help you configure Doom.
+;;
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
+;; etc).
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
+;;
+;;
+;;
+
+
+(setq doom-theme 'doom-one)
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 15))
+#+END_SRC
+**** Theme and Fonts
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+;;; Theme and Fonts ----------------------------------------
+(set-frame-parameter nil 'alpha-background 95) ; For current frame
+(add-to-list 'default-frame-alist '(alpha-background . 95)) ; For all new frames henceforth
+
+;; Let the desktop background show through
+(defun kb/toggle-window-transparency ()
+  "Toggle transparency."
+  (interactive)
+  (let ((alpha-transparency 95))
+    (if (< (or (frame-parameter nil 'alpha-background) 100) 100)
+        (set-frame-parameter nil 'alpha-background 100)
+      (set-frame-parameter nil 'alpha-background alpha-transparency))))
+
+;; Install doo-thmemes
+;; (unless (package-installed-p 'doom-themes)
+;;   (package-install 'doom-themes))
+
+;; Load up doom-palenight for the System Crafters look
+;; (load-theme 'doom-palenight t)
+
+;; Set reusable font name variables
+;; (defvar my/fixed-width-font "JetBrains Mono"
+;;   "The font to use for monospaced (fixed width) text.")
+;; (set-fontset-font t 'hangul (font-spec :family "D2Coding"))
+;; (defvar my/fixed-width-font "D2CodingLigature Nerd Font"
+;;   "The font to use for monospaced (fixed width) text.")
+(defvar my/fixed-width-font "JetBrainsMono Nerd Font"
+  "The font to use for monospaced (fixed width) text.")
+
+(defvar my/variable-width-font "Iosevka Aile"
+  "The font to use for variable-pitch (document) text.")
+
+(defvar my/hangul-font "D2CodingLigature Nerd Font"
+  "The font to use for hangul (document) text.")
+
+;; NOTE: These settings might not be ideal for your machine, tweak them as needed!
+(set-face-attribute 'default nil :font my/fixed-width-font :weight 'light :height 110)
+(set-face-attribute 'fixed-pitch nil :font my/fixed-width-font :weight 'light :height 110)
+(set-face-attribute 'variable-pitch nil :font my/variable-width-font :weight 'light :height 1.1)
+;;(set-face-attribute 'hangul nil :font my/hangul-font :weight 'light :height 120)
+(set-fontset-font t 'hangul (font-spec :family my/hangul-font :height 120)) ;
+
+
+#+END_SRC
+**** editor settings
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+
+(setq display-line-numbers-type `relative)
+;;set ui-helpers
+(global-display-line-numbers-mode 1)
+(setq display-line-numbers 'relative)
+(setq display-line-numbers-width 'auto)
+
+;; Set the cursor color
+                                        ;(setq-default cursor-type 'bar) ;; or '(bar . 2) for a thicker bar
+(set-cursor-color "coral") ;; Replace "red" with your desired color
+
+(setq default-input-method "korean-hangul")
+(add-hook 'post-command-hook
+          (lambda ()
+            (set-cursor-color
+             (if current-input-method "tan" "coral"))))
+
+
+(with-eval-after-load 'simple
+  (setq-default display-fill-column-indicator-column 80)
+  (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+
+;;FONTS
+;; (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font-11"))
+;; (add-to-list 'default-frame-alist '(font . "D2CodingLigature Nerd Font-11"))
+;; (set-fontset-font t 'hangul (font-spec :family "font-jetbrains-mono"))
+;; (add-to-list 'language-specific-font-alist '("korean" . "D2CodingLigature Nerd Font-11"))
+
+(set-language-environment "Korean")
+(prefer-coding-system 'utf-8)
+
+;; #set editing tools
+(map! :leader
+      :desc "Comment line" ";" #'comment-line)
+
+
+;;##consult-repgrep - search
+;; You can use this hydra menu that have all the commands
+;; (map! :n "s-SPC" 'harpoon-quick-menu-hydra)
+;; (map! :n "s-s" 'harpoon-add-file)
+(defun consult-ripgrep-with-last-regex ()
+  "Run consult-ripgrep with the last regex from regex-search-ring."
+  (interactive)
+  (consult-ripgrep nil (car regexp-search-ring)))
+
+(with-eval-after-load 'simple
+  (setq-default display-fill-column-indicator-column 80)
+  (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+
+
+#+END_SRC
+***** vundo : visualize undo tree
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+;;##vundo
+(use-package vundo
+  :commands (vundo)
+
+  :config
+  ;; Take less on-screen space.
+  (setq vundo-compact-display t)
+
+  ;; Better contrasting highlight.
+  (custom-set-faces
+    '(vundo-node ((t (:foreground "#808080"))))
+    '(vundo-stem ((t (:foreground "#808080"))))
+    '(vundo-highlight ((t (:foreground "#FFFF00")))))
+
+  ;; Use `HJKL` VIM-like motion, also Home/End to jump around.
+  (define-key vundo-mode-map (kbd "l") #'vundo-forward)
+  (define-key vundo-mode-map (kbd "<right>") #'vundo-forward)
+  (define-key vundo-mode-map (kbd "h") #'vundo-backward)
+  (define-key vundo-mode-map (kbd "<left>") #'vundo-backward)
+  (define-key vundo-mode-map (kbd "j") #'vundo-next)
+  (define-key vundo-mode-map (kbd "<down>") #'vundo-next)
+  (define-key vundo-mode-map (kbd "k") #'vundo-previous)
+  (define-key vundo-mode-map (kbd "<up>") #'vundo-previous)
+  (define-key vundo-mode-map (kbd "<home>") #'vundo-stem-root)
+  (define-key vundo-mode-map (kbd "<end>") #'vundo-stem-end)
+  (define-key vundo-mode-map (kbd "q") #'vundo-quit)
+  (define-key vundo-mode-map (kbd "C-g") #'vundo-quit)
+  (define-key vundo-mode-map (kbd "RET") #'vundo-confirm)
+
+  )
+(with-eval-after-load 'meow
+  (meow-leader-define-key '("U" . vundo))
+  )
+
+#+END_SRC
+***** jinx : dictionary
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+(use-package jinx
+;  :hook (org-mode . jinx-mode)
+  :bind (("M-$" . jinx-correct)
+         ("C-M-$" . jinx-languages)))
+
+
+#+END_SRC
+***** harpoon : quickly open file
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+;; You can use this hydra menu that have all the commands
+;; (map! :n "s-SPC" 'harpoon-quick-menu-hydra)
+;; (map! :n "s-s" 'harpoon-add-file)
+(with-eval-after-load 'meow
+  (meow-normal-define-key '("R" . harpoon-quick-menu-hydra))
+  (meow-normal-define-key '("S" . harpoon-add-file))
+  )
+;; And the vanilla commands
+(map! :leader "j c" 'harpoon-clear)
+(map! :leader "j f" 'harpoon-toggle-file)
+(map! :leader "1" 'harpoon-go-to-1)
+(map! :leader "2" 'harpoon-go-to-2)
+(map! :leader "3" 'harpoon-go-to-3)
+(map! :leader "4" 'harpoon-go-to-4)
+(map! :leader "5" 'harpoon-go-to-5)
+(map! :leader "6" 'harpoon-go-to-6)
+(map! :leader "7" 'harpoon-go-to-7)
+(map! :leader "8" 'harpoon-go-to-8)
+(map! :leader "9" 'harpoon-go-to-9)
+
+
+#+END_SRC
+***** geiser-mode : lisp in emacs
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+(with-eval-after-load 'geiser-mode
+  (setq geiser-mode-auto-p nil)
+  (defun orka-geiser-connect ()
+    (interactive)
+    (geiser-connect 'guile "localhost" "37146"))
+
+  (define-key geiser-mode-map (kbd "C-c M-j") 'orka-geiser-connect))
+
+
+#+END_SRC
+
+**** meow settings
+***** key bindings
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+(with-eval-after-load 'meow
+  (meow-normal-define-key '("C-j" . meow-page-down))
+  (meow-normal-define-key '("C-k" . meow-page-up))
+  (meow-normal-define-key '("/" . isearch-forward-regexp))
+  (meow-normal-define-key '("?" . consult-ripgrep-with-last-regex))
+  (meow-normal-define-key '("M-f" . find-grep-dired))
+  (meow-normal-define-key '("M-o" . browse-url-at-point))
+  (meow-normal-define-key '("C-o" . pop-global-mark))
+  (meow-leader-define-key '("y" . meow-clipboard-save))
+  (meow-leader-define-key '("p" . meow-clipboard-yank))
+  )
+
+#+END_SRC
+***** key bindings
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+#+END_SRC
+
+**** window navigation
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+(global-set-key (kbd "M-n") 'ace-window)
+#+END_SRC
+
+**** TODO: lsp settings
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+#+END_SRC
+***** lsp-booster
+****** install lsp-booster
+#+BEGIN_SRC bash
+cargo install emacs-lsp-booster
+#+END_SRC
+****** config init
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+(defun lsp-booster--advice-json-parse (old-fn &rest args)
+  "Try to parse bytecode instead of json."
+  (or
+   (when (equal (following-char) ?#)
+     (let ((bytecode (read (current-buffer))))
+       (when (byte-code-function-p bytecode)
+         (funcall bytecode))))
+   (apply old-fn args)))
+(advice-add (if (progn (require 'json)
+                       (fboundp 'json-parse-buffer))
+                'json-parse-buffer
+              'json-read)
+            :around
+            #'lsp-booster--advice-json-parse)
+
+(defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+  "Prepend emacs-lsp-booster command to lsp CMD."
+  (let ((orig-result (funcall old-fn cmd test?)))
+    (if (and (not test?)                             ;; for check lsp-server-present?
+             (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+             lsp-use-plists
+             (not (functionp 'json-rpc-connection))  ;; native json-rpc
+             (executable-find "emacs-lsp-booster"))
+        (progn
+          (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+            (setcar orig-result command-from-exec-path))
+          (message "Using emacs-lsp-booster for %s!" orig-result)
+          (cons "emacs-lsp-booster" orig-result))
+      orig-result)))
+(advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+#+END_SRC
+***** c++
+install clangd
+#+BEGIN_SRC bash
+paru -Sy clangd
+#+END_SRC
+
+config
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+    (use-package lsp-mode
+      :commands lsp
+      :hook ((c-mode c++-mode) . lsp-deferred)
+      :config
+      (setq lsp-prefer-flymake nil) ; or t, depending on preference
+      ;; Add other clangd-specific settings here if needed
+      )
+#+END_SRC
+***** rust
+install rust-analyzer
+#+BEGIN_SRC bash
+    rustup component add rust-analyzer
+#+END_SRC
+
+config
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+    (use-package rustic
+      :mode "\\.rs\\'"
+      :hook (rustic-mode . lsp-deferred)
+      :config
+      ;; Add rustic/rust-analyzer specific settings here
+      (setq rustic-format-on-save t) ; Example: enable formatting on save
+      )
+#+END_SRC
+
+**** org mode
+***** basic settings
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+(setq org-directory "~/notes/"
+      org-roam-directory "~/notes/resources/")
+
+(add-hook 'org-mode-hook #'hl-todo-mode)
+
+(require 'org-indent)
+
+(setq org-log-reschedule 'time)
+
+  (custom-set-variables
+   '(org-agenda-custom-commands
+     '(("o" "Office agenda, ignore PERSONAL tag"
+        ((agenda ""))
+        ((org-agenda-tag-filter-preset '("-PERSONAL"))))
+       ("v" "Personal agenda, ignore OFFICE tag"
+        ((agenda ""))
+        ((org-agenda-tag-filter-preset '("-OFFICE"))))
+       )))
+
+(with-eval-after-load 'meow
+  (meow-leader-define-key '("N" . org-roam-node-find))
+  (meow-leader-define-key '("P" . org-roam-capture))
+  (meow-leader-define-key '("C" . org-capture))
+  )
+
+
+#+END_SRC
+***** after org load - start
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+(with-eval-after-load 'org
+  (setq org-use-speed-commands t)
+  (setq org-enforce-todo-dependencies t)
+
+#+END_SRC
+***** org - todo
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+  (setq org-lowest-priority ?F)  ;; Gives us priorities A through F
+  (setq org-default-priority ?E) ;; If an item has no priority, it is considered [#E].
+
+  (setq org-priority-faces
+        '((65 . "#BF616A")
+          (66 . "#EBCB8B")
+          (67 . "#B48EAD")
+          (68 . "#81A1C1")
+          (69 . "#5E81AC")
+          (70 . "#4C566A")))
+
+  (setq org-todo-keywords
+        '((sequence
+           "TODO(t)" "START(s)" "HOLD(h)" "WAIT(w)" "IDEA(i)" ; Needs further action
+           "|"
+           "DONE(d)" "DELIGATED(e)")))                           ; Needs no action currently
+
+  (setq org-todo-keyword-faces
+        '(("TODO"      :inherit (org-todo region) :foreground "#A3BE8C" :weight bold)
+          ("START"      :inherit (org-todo region) :foreground "#88C0D0" :weight bold)
+          ("HOLD"      :inherit (org-todo region) :foreground "#8FBCBB" :weight bold)
+          ("WAIT"     :inherit (org-todo region) :foreground "#81A1C1" :weight bold)
+          ("IDEA"      :inherit (org-todo region) :foreground "#EBCB8B" :weight bold)
+          ("DONE"      :inherit (org-todo region) :foreground "#30343d" :weight bold)
+          ("DELIGATED" :inherit (org-todo region) :foreground "#20242d" :weight bold)
+          ))
+
+
+#+END_SRC
+
+***** org visual - theme & fonts
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+  (custom-theme-set-faces!
+    'doom-one
+    ;; '(org-level-8 :inherit outline-3 :height 1.0)
+    ;; '(org-level-7 :inherit outline-3 :height 1.0)
+    ;; '(org-level-6 :inherit outline-3 :height 1.1)
+    ;; '(org-level-5 :inherit outline-3 :height 1.2)
+    ;; '(org-level-4 :inherit outline-3 :height 1.3)
+    ;; '(org-level-3 :inherit outline-3 :height 1.4)
+    ;; '(org-level-2 :inherit outline-2 :height 1.5)
+    ;; '(org-level-1 :inherit outline-1 :height 1.6)
+    ;; '(org-document-title  :height 1.8 :bold t :underline nil))
+
+;; Make the document title a bit bigger
+  (set-face-attribute 'org-document-title nil :font my/variable-width-font :weight 'bold :height 1.8)
+
+  ;; Resize Org headings
+  (dolist (face '((org-level-1 . 1.6)
+                  (org-level-2 . 1.5)
+                  (org-level-3 . 1.4)
+                  (org-level-4 . 1.3)
+                  (org-level-5 . 1.2)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.0)
+                  (org-level-8 . 1.0)))
+    (set-face-attribute (car face) nil :font my/variable-width-font :weight 'medium :height (cdr face)))
+
+
+    ;; Make sure certain org faces use the fixed-pitch face when variable-pitch-mode is on
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  (plist-put org-format-latex-options :scale 2)
+
+  (setq org-adapt-indentation t
+        org-hide-leading-stars t
+        org-hide-emphasis-markers t
+        org-pretty-entities t
+        )
+
+  (setq org-src-fontify-natively t
+        org-src-tab-acts-natively t
+        org-edit-src-content-indentation 0)
+
+;;; Centering Org Documents --------------------------------
+
+  ;; Install visual-fill-column
+  ;; (unless (package-installed-p 'visual-fill-column)
+  ;;   (package-install 'visual-fill-column))
+
+  ;; Configure fill width
+  (setq visual-fill-column-width 110
+        visual-fill-column-center-text t)
+
+
+
+#+END_SRC
+
+***** org roam
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+  (use-package org-roam
+    :ensure t
+    :init
+    (setq org-roam-v2-ack t)
+    :custom
+    (org-roam-completion-everywhere t)
+    :config
+    (org-roam-setup))
+
+         ;;; find by titles and tags  :TODO:check if this works..
+  (setq org-roam-node-display-template
+        (concat "${title:*} "
+                (propertize "${tags:10}" 'face 'org-tag)))
+
+
+#+END_SRC
+***** org present
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+;;; Org Present --------------------------------------------
+
+  ;; Install org-present if needed
+  ;; (unless (package-installed-p 'org-present)
+  ;;   (package-install 'org-present))
+
+  (defun my/org-present-prepare-slide (buffer-name heading)
+    ;; Show only top-level headlines
+    (org-overview)
+
+    ;; Unfold the current entry
+    (org-show-entry)
+
+    ;; Show only direct subheadings of the slide but don't expand them
+    (org-show-children))
+
+  (defun my/org-present-start ()
+    ;; Tweak font sizes
+    (setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
+                                       (header-line (:height 4.0) variable-pitch)
+                                       (org-document-title (:height 1.75) org-document-title)
+                                       (org-code (:height 1.55) org-code)
+                                       (org-verbatim (:height 1.55) org-verbatim)
+                                       (org-block (:height 1.25) org-block)
+                                       (org-block-begin-line (:height 0.7) org-block)))
+
+    ;; Set a blank header line string to create blank space at the top
+    (setq header-line-format " ")
+
+    ;; Display inline images automatically
+    (org-display-inline-images)
+
+    ;; Center the presentation and wrap lines
+    (visual-fill-column-mode 1)
+    (setq display-line-numbers nil)
+    (visual-line-mode 1)
+    )
+
+  (defun my/org-present-end ()
+    ;; Reset font customizations
+    (setq-local face-remapping-alist '((default variable-pitch default)))
+
+    ;; Clear the header line string so that it isn't displayed
+    (setq header-line-format nil)
+
+    ;; Stop displaying inline images
+    (org-remove-inline-images)
+
+    ;; Stop centering the document
+    (visual-fill-column-mode 0)
+    (setq display-line-numbers 'relative)
+    (visual-line-mode 0))
+
+
+#+END_SRC
+***** org pretty-symbols
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+  (defun my/prettify-symbols-setup ()
+    "Beautify keywords"
+    (setq prettify-symbols-alist
+          (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
+                  '(; Greek symbols
+                    ("lambda" . ?λ)
+                    ("delta"  . ?Δ)
+                    ("gamma"  . ?Γ)
+                    ("phi"    . ?φ)
+                    ("psi"    . ?ψ)
+                                        ; Org headers
+                    ("#+title:"  . "")
+                    ("#+author:" . "")
+                    ("#+date:"   . "")
+                                        ; Checkboxes
+                    ("[ ]" . "")
+                    ("[X]" . "")
+                    ("[-]" . "")
+                                        ; Blocks
+                    ("#+begin_src"   . "") ; 
+                    ("#+end_src"     . "")
+                    ("#+begin_quote" . "‟")
+                    ("#+end_quote" . "”")
+                    ("#+begin_export" . "------")
+                    ("#+end_export" . "------")
+                    ("#+begin_example" . "------")
+                    ("#+end_example" . "------")
+                                        ; Drawers
+                                        ;    ⚙️
+                    (":properties:" . "")
+                                        ; Agenda scheduling
+                    ("SCHEDULED:"   . "🕘")
+                    ("DEADLINE:"    . "⏰")
+                                        ; Agenda tags  
+                    (":@projects:"  . "☕")
+                    (":work:"       . "🚀")
+                    (":@inbox:"     . "✉️")
+                    (":goal:"       . "🎯")
+                    (":task:"       . "📋")
+                    (":@thesis:"    . "📝")
+                    (":thesis:"     . "📝")
+                    (":uio:"        . "🏛️")
+                    (":emacs:"      . "")
+                    (":learn:"      . "🌱")
+                    (":code:"       . "💻")
+                    (":fix:"        . "🛠️")
+                    (":bug:"        . "🚩")
+                    (":read:"       . "📚")
+                                        ; Roam tags
+                    ("#+filetags:"  . "📎")
+                    (":wip:"        . "🏗️")
+                    (":ct:"         . "➡️") ; Category Theory
+                                        ; ETC
+                    (":verb:"       . "🌐") ; HTTP Requests in Org mode
+                    )))
+    (prettify-symbols-mode))
+#+END_SRC
+
+***** org svg-tag-mode
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+(use-package svg-tag-mode
+  :after org
+    :config
+    (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
+    (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
+    (defconst day-re "[A-Za-z]\\{3\\}")
+    (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
+
+    (defun svg-progress-percent (value)
+      (svg-image (svg-lib-concat
+                  (svg-lib-progress-bar (/ (string-to-number value) 100.0)
+                                        nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+                  (svg-lib-tag (concat value "%")
+                               nil :stroke 0 :margin 0)) :ascent 'center))
+
+    (defun svg-progress-count (value)
+      (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+             (count (float (car seq)))
+             (total (float (cadr seq))))
+        (svg-image (svg-lib-concat
+                    (svg-lib-progress-bar (/ count total) nil
+                                          :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+                    (svg-lib-tag value nil
+                                 :stroke 0 :margin 0)) :ascent 'center)))
+    (setq svg-tag-tags
+          `(;; Org tags
+            ;; (":\\([A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
+            ;; (":\\([A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
+
+            ;; Task priority
+            ("\\[#[A-Z]\\]" . ( (lambda (tag)
+                                  (svg-tag-make tag :face 'org-priority
+                                                :beg 2 :end -1 :margin 0))))
+
+            ;; Progress
+            ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
+                                                (svg-progress-percent (substring tag 1 -2)))))
+            ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
+                                              (svg-progress-count (substring tag 1 -1)))))
+
+            ;; TODO / DONE
+            ;; ("TODO" . ((lambda (tag) (svg-tag-make "TODO" :face 'org-todo
+            ;;                                                                                   :inverse t :margin 0))))
+            ;; ("DONE" . ((lambda (tag) (svg-tag-make "DONE" :face 'org-done :margin 0))))
+
+
+            ;; Citation of the form [cite:@Knuth:1984]
+            ("\\(\\[cite:@[A-Za-z]+:\\)" . ((lambda (tag)
+                                              (svg-tag-make tag
+                                                            :inverse t
+                                                            :beg 7 :end -1
+                                                            :crop-right t))))
+            ("\\[cite:@[A-Za-z]+:\\([0-9]+\\]\\)" . ((lambda (tag)
+                                                       (svg-tag-make tag
+                                                                     :end -1
+                                                                     :crop-left t))))
+
+
+            ;; Active date (with or without day name, with or without time)
+            (,(format "\\(<%s>\\)" date-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :beg 1 :end -1 :margin 0))))
+            (,(format "\\(<%s \\)%s>" date-re day-time-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
+            (,(format "<%s \\(%s>\\)" date-re day-time-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
+
+            ;; Inactive date  (with or without day name, with or without time)
+            (,(format "\\(\\[%s\\]\\)" date-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
+            (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
+            (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
+             ((lambda (tag)
+                (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date)))))))
+#+END_SRC
+***** hook & call
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+  (defun my/org-mode-start ()
+    ;; Tweak font sizes
+    (variable-pitch-mode)
+    ;;(org-superstar-mode)
+    (my/prettify-symbols-setup)
+    ;;(svg-tag-mode)
+    ;; (set-face-attribute org-level-1 nil :foreground "yellow")
+    ;; (set-face-attribute org-level-2 nil :foreground "blue")
+    ;; (set-face-attribute org-level-3 nil :foreground "blue")
+    ;; (set-face-attribute org-level-4 nil :foreground "blue")
+    ;; (set-face-attribute org-level-5 nil :foreground "blue")
+    ;; (set-face-attribute org-level-6 nil :foreground "blue")
+    )
+
+  (defun my/org-agenda-mode-start ()
+    (my/prettify-symbols-setup)
+    ;;(org-super-agenda-mode)
+    )
+
+
+  ;; Turn on variable pitch fonts in Org Mode buffers
+  (add-hook 'org-agenda-mode-hook 'my/prettify-symbols-setup)
+  (add-hook 'org-mode-hook 'my/org-mode-start)
+
+  ;; Register hooks with org-present
+  (add-hook 'org-present-mode-hook 'my/org-present-start)
+  (add-hook 'org-present-mode-quit-hook 'my/org-present-end)
+  (add-hook 'org-present-after-navigate-functions 'my/org-present-prepare-slide)
+
+
+
+
+#+END_SRC
+***** org brain
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+  (use-package org-brain :ensure t
+    :init
+    (setq org-brain-path "/data/orka/notes/brain")
+    ;; For Evil users
+    (with-eval-after-load 'evil
+      (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
+    :config
+    (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
+    (setq org-id-track-globally t)
+    (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+    (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
+    (push '("b" "Brain" plain (function org-brain-goto-end)
+            "* %i%?" :empty-lines 1)
+          org-capture-templates)
+    (setq org-brain-visualize-default-choices 'all)
+    (setq org-brain-title-max-length 12)
+    (setq org-brain-include-file-entries nil
+          org-brain-file-entries-use-title nil))
+
+  ;; Allows you to edit entries directly from org-brain-visualize
+  ;; (use-package polymode
+  ;;   :config
+  ;;   (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
+
+#+END_SRC
+***** org babel
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+  (use-package org-auto-tangle
+    :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
+    :defer t
+    :hook (org-src-mode . org-auto-tangle-mode))
+
+#+END_SRC
+
+***** after org load - end
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+
+
+
+)
+#+END_SRC
+
+**** TODO: needs to organize
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+                                        ;       (with-eval-after-load 'geiser-mode
+                                        ;        (setq geiser-mode-auto-p nil)
+                                        ;       (defun orka-geiser-connect ()
+                                        ;        (interactive)
+                                        ;       (geiser-connect 'guile "localhost" "37146"))
+
+                                        ;    (define-key geiser-mode-map (kbd "C-c M-j") 'orka-geiser-connect))
+
+#+END_SRC
+*** home dir
+  #+name: config.el-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/doom/config.el :mkdirp yes
+  <<config.el>>
+  #+END_SRC
+
+** init.el
+#+NAME: emacs-init.el
+#+auto_tangle: nil
+#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/doom-emacs/doom/init.el :mkdirp yes
+;;; init.el -*- lexical-binding: t; -*-
+
+;; This file controls what Doom modules are enabled and what order they load
+;; in. Remember to run 'doom sync' after modifying it!
+
+;; NOTE Press 'SPC h d h' (or 'C-h d h' for non-vim users) to access Doom's
+;;      documentation. There you'll find a link to Doom's Module Index where all
+;;      of our modules are listed, including what flags they support.
+
+;; NOTE Move your cursor over a module's name (or its flags) and press 'K' (or
+;;      'C-c c k' for non-vim users) to view its documentation. This works on
+;;      flags as well (those symbols that start with a plus).
+;;
+;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
+;;      directory (for easy access to its source code).
+
+(doom! :input
+       ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
+       ;;chinese
+       ;;japanese
+       ;;layout            ; auie,ctsrnm is the superior home row
+
+       :completion
+       ;;company           ; the ultimate code completion backend
+       (corfu +orderless)  ; complete with cap(f), cape and a flying feather!
+       ;;helm              ; the *other* search engine for love and life
+       ;;ido               ; the other *other* search engine...
+       ;;ivy               ; a search engine for love and life
+       vertico           ; the search engine of the future
+       jinx              ;; Enchnated spell checker
+
+       :ui
+       ;;deft              ; notational velocity for Emacs
+       doom              ; what makes DOOM look the way it does
+       doom-dashboard    ; a nifty splash screen for Emacs
+       ;;doom-quit         ; DOOM quit-message prompts when you quit Emacs
+       ;;(emoji +unicode)  ; 🙂
+       hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
+       ;;indent-guides     ; highlighted indent columns
+       ligatures         ; ligatures and symbols to make your code pretty again
+       minimap           ; show a map of the code on the side
+       modeline          ; snazzy, Atom-inspired modeline, plus API
+       ;;nav-flash         ; blink cursor line after big motions
+       ;;neotree           ; a project drawer, like NERDTree for vim
+       ophints           ; highlight the region an operation acts on
+       (popup +defaults)   ; tame sudden yet inevitable temporary windows
+       ;;smooth-scroll     ; So smooth you won't believe it's not butter
+       ;;tabs              ; a tab bar for Emacs
+       ;;treemacs          ; a project drawer, like neotree but cooler
+       ;;unicode           ; extended unicode support for various languages
+       (vc-gutter +pretty) ; vcs diff in the fringe
+       vi-tilde-fringe   ; fringe tildes to mark beyond EOB
+       ;;window-select     ; visually switch windows
+       workspaces        ; tab emulation, persistence & separate workspaces
+       ;;zen               ; distraction-free coding or writing
+       ace-window          ; move focus among windows..
+
+       :editor
+       ;(evil +everywhere); come to the dark side, we have cookies
+       (meow +qwerty)
+       file-templates    ; auto-snippets for empty files
+       fold              ; (nigh) universal code folding
+       ;;(format +onsave)  ; automated prettiness
+       ;;god               ; run Emacs commands without modifier keys
+       ;;lispy             ; vim for lisp, for people who don't like vim
+       ;;multiple-cursors  ; editing in many places at once
+       ;;objed             ; text object editing for the innocent
+       ;;parinfer          ; turn lisp into python, sort of
+       ;;rotate-text       ; cycle region at point between text candidates
+       snippets          ; my elves. They type so I don't have to
+       ;;word-wrap         ; soft wrapping with language-aware indent
+
+       :emacs
+       dired             ; making dired pretty [functional]
+       electric          ; smarter, keyword-based electric-indent
+       ;;eww               ; the internet is gross
+       ibuffer           ; interactive buffer management
+       undo              ; persistent, smarter undo for your inevitable mistakes
+       vc                ; version-control and Emacs, sitting in a tree
+
+       :term
+       ;;eshell            ; the elisp shell that works everywhere
+       ;;shell             ; simple shell REPL for Emacs
+       ;;term              ; basic terminal emulator for Emacs
+       eat
+
+
+       :checkers
+       syntax              ; tasing you for every semicolon you forget
+       ;;(spell +flyspell) ; tasing you for misspelling mispelling
+       ;;grammar           ; tasing grammar mistake every you make
+
+       :tools
+       ;;ansible
+       ;;biblio            ; Writes a PhD for you (citation needed)
+       ;;collab            ; buffers with friends
+       ;;debugger          ; FIXME stepping through code, to help you add bugs
+       ;;direnv
+       ;;docker
+       ;;editorconfig      ; let someone else argue about tabs vs spaces
+       ;;ein               ; tame Jupyter notebooks with emacs
+       (eval +overlay)     ; run code, run (also, repls)
+       lookup              ; navigate your code and its documentation
+       llm               ; when I said you needed friends, I didn't mean...
+       lsp               ; M-x vscode
+       magit             ; a git porcelain for Emacs
+       make              ; run make tasks from Emacs
+       pass              ; password manager for nerds
+       ;;pdf               ; pdf enhancements
+       ;;terraform         ; infrastructure as code
+       ;;tmux              ; an API for interacting with tmux
+       tree-sitter       ; syntax and parsing, sitting in a tree...
+       upload            ; map local to remote projects via ssh/ftp
+       polymode
+       vundo             ; visualize undo tree
+
+       :os
+       (:if (featurep :system 'macos) macos)  ; improve compatibility with macOS
+       ;;tty               ; improve the terminal Emacs experience
+
+       :lang
+       ;;agda              ; types of types of types of types...
+       ;;beancount         ; mind the GAAP
+       (cc +lsp)         ; C > C++ == 1
+       ;;clojure           ; java with a lisp
+       ;;common-lisp       ; if you've seen one lisp, you've seen them all
+       ;;coq               ; proofs-as-programs
+       ;;crystal           ; ruby at the speed of c
+       ;;csharp            ; unity, .NET, and mono shenanigans
+       ;;data              ; config/data formats
+       ;;(dart +flutter)   ; paint ui and not much else
+       ;;dhall
+       elixir            ; erlang done right
+       ;;elm               ; care for a cup of TEA?
+       emacs-lisp        ; drown in parentheses
+       erlang            ; an elegant language for a more civilized age
+       ;;ess               ; emacs speaks statistics
+       ;;factor
+       ;;faust             ; dsp, but you get to keep your soul
+       ;;fortran           ; in FORTRAN, GOD is REAL (unless declared INTEGER)
+       ;;fsharp            ; ML stands for Microsoft's Language
+       ;;fstar             ; (dependent) types and (monadic) effects and Z3
+       ;;gdscript          ; the language you waited for
+       ;;(go +lsp)         ; the hipster dialect
+       ;;(graphql +lsp)    ; Give queries a REST
+       (haskell +lsp)    ; a language that's lazier than I am
+       ;;hy                ; readability of scheme w/ speed of python
+       ;;idris             ; a language you can depend on
+       ;;json              ; At least it ain't XML
+       ;;janet             ; Fun fact: Janet is me!
+       ;;(java +lsp)       ; the poster child for carpal tunnel syndrome
+       ;;javascript        ; all(hope(abandon(ye(who(enter(here))))))
+       ;;julia             ; a better, faster MATLAB
+       ;;kotlin            ; a better, slicker Java(Script)
+       ;;latex             ; writing papers in Emacs has never been so fun
+       ;;lean              ; for folks with too much to prove
+       ;;ledger            ; be audit you can be
+       ;;lua               ; one-based indices? one-based indices
+       markdown          ; writing docs for people to ignore
+       ;;nim               ; python + lisp at the speed of c
+       ;;nix               ; I hereby declare "nix geht mehr!"
+       ocaml             ; an objective camel
+       (org +roam2 +babel +roam-ui +pretty +super-agenda +ql +present +brain +auto-tangle)              ; organize your plain life in plain text
+       ;;php               ; perl's insecure younger brother
+       plantuml          ; diagrams for confusing people more
+       ;;graphviz          ; diagrams for confusing yourself even more
+       ;;purescript        ; javascript, but functional
+       python            ; beautiful is better than ugly
+       ;;qt                ; the 'cutest' gui framework ever
+       ;;racket            ; a DSL for DSLs
+       ;;raku              ; the artist formerly known as perl6
+       ;;rest              ; Emacs as a REST client
+       ;;rst               ; ReST in peace
+       ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+       (rust +lsp)       ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ;;scala             ; java, but good
+       (scheme +guile)   ; a fully conniving family of lisps
+       sh                ; she sells {ba,z,fi}sh shells on the C xor
+       ;;sml
+       ;;solidity          ; do you need a blockchain? No.
+       ;;swift             ; who asked for emoji variables?
+       ;;terra             ; Earth and Moon in alignment for performance.
+       ;;web               ; the tubes
+       ;;yaml              ; JSON, but readable
+       zig               ; C, but simpler
+
+       :email
+       ;;(mu4e +org +gmail)
+       notmuch
+       ;;(wanderlust +gmail)
+
+       :app
+       ;;calendar
+       ;;emms
+       ;;everywhere        ; *leave* Emacs!? You must be joking
+       ;;irc               ; how neckbeards socialize
+       ;;(rss +org)        ; emacs as an RSS reader
+
+       :config
+       ;;literate
+       (default +bindings +smartparens)
+       harpoon
+       )
+
+#+END_SRC
+*** home dir
+  #+name: emacs-init.el-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/doom/init.el :mkdirp yes
+  <<emacs-init.el>>
+  #+END_SRC
+
+** packages.el
+#+NAME: emacs-packages.el
+#+auto_tangle: nil
+#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/doom-emacs/doom/packages.el :mkdirp yes
+;; -*- no-byte-compile: t; -*-
+;;; $DOOMDIR/packages.el
+
+;; To install a package with Doom you must declare them here and run 'doom sync'
+;; on the command line, then restart Emacs for the changes to take effect -- or
+
+
+;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
+;; (package! some-package)
+
+;; To install a package directly from a remote git repo, you must specify a
+;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
+;; https://github.com/radian-software/straight.el#the-recipe-format
+;; (package! another-package
+;;   :recipe (:host github :repo "username/repo"))
+
+;; If the package you are trying to install does not contain a PACKAGENAME.el
+;; file, or is located in a subdirectory of the repo, you'll need to specify
+;; `:files' in the `:recipe':
+;; (package! this-package
+;;   :recipe (:host github :repo "username/repo"
+;;            :files ("some-file.el" "src/lisp/*.el")))
+
+;; If you'd like to disable a package included with Doom, you can do so here
+;; with the `:disable' property:
+;; (package! builtin-package :disable t)
+
+;; You can override the recipe of a built in package without having to specify
+;; all the properties for `:recipe'. These will inherit the rest of its recipe
+;; from Doom or MELPA/ELPA/Emacsmirror:
+;; (package! builtin-package :recipe (:nonrecursive t))
+;; (package! builtin-package-2 :recipe (:repo "myfork/package"))
+
+;; Specify a `:branch' to install a package from a particular branch or tag.
+;; This is required for some packages whose default branch isn't 'master' (which
+;; our package manager can't deal with; see radian-software/straight.el#279)
+;; (package! builtin-package :recipe (:branch "develop"))
+
+;; Use `:pin' to specify a particular commit to install.
+;; (package! builtin-package :pin "1a2b3c4d5e")
+
+
+;; Doom's packages are pinned to a specific commit and updated from release to
+;; release. The `unpin!' macro allows you to unpin single packages...
+;; (unpin! pinned-package)
+;; ...or multiple packages
+;; (unpin! pinned-package another-pinned-package)
+;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
+;; (unpin! t)
+(package! org-present)
+(package! org-brain)
+(package! org-roam-ui)
+(package! org-auto-tangle)
+(package! harpoon)
+(package! jinx)
+;;(package! org-superstar)
+(package! ace-window)
+(package! polymode)
+(package! vundo)
+
+(package! svg-tag-mode)
+;(package! geiser-mode)
+(package! eat
+  :recipe (:host codeberg
+           :repo "akib/emacs-eat"
+           :files ("*.el" ("term" "term/*.el") "*.texi" "*.ti" ("terminfo/e" "terminfo/e/*") ("terminfo/65" "terminfo/65/*") ("integration" "integration/*") (:exclude ".dir-locals.el" "*-tests.el"))))
+
+
+(package! rustic)
+
+#+END_SRC
+*** home dir
+  #+name: emacs-packages.el-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/doom/packages.el :mkdirp yes
+  <<emacs-packages.el>>
+  #+END_SRC
+
+* *mcron
+** google drive sync
+#+NAME: mcron-gd-notes.guile
+#+auto_tangle: nil
+#+BEGIN_SRC scheme :tangle ~/.config/cron/gd-notes.guile :mkdirp yes
+(job '(next-minute (range 0 60 30))
+      ;; (lambda ()
+      ;;   (system* "rclone sync /data/orka/notes/ gd-notes:notes")
+      ;;   )
+      ;; "sync-gd-notes")
+     "rclone sync /data/orka/notes/ gd-notes:notes")
+#+END_SRC
+*** home dir
+  #+name: gd-notes.guile-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/cron/gd-notes.guile :mkdirp yes
+  <<mcron-gd-notes.guile>>
+  #+END_SRC
+
+* ghostty
+** config
+#+NAME: ghostty-config
+#+auto_tangle: nil
+#+BEGIN_SRC config :tangle /data/orka/dotfiles/config/ghostty/config :mkdirp yes
+font-family = JetBrains Mono
+#font-family = D2Coding
+#font-family = BerkeleyMono Nerd Font
+#font-family = Iosevka Nerd Font
+# font-family = SFMono Nerd Font
+font-size = 12
+theme = GruvboxDarkHard
+shell-integration-features = no-cursor,sudo,no-title
+cursor-style = block
+adjust-cell-height = 35%
+background-opacity = 0.95
+
+mouse-hide-while-typing = true
+mouse-scroll-multiplier = 2
+
+window-padding-balance = true
+window-save-state = always
+macos-titlebar-style=transparent
+window-colorspace = "display-p3"
+background = 1C2021
+# foreground = d4be98
+
+# keybindings
+keybind = cmd+;>r=reload_config
+keybind = cmd+;>x=close_surface
+
+keybind = cmd+;>n=new_window
+
+# tabs
+keybind = cmd+;>c=new_tab
+keybind = cmd+;>shift+l=next_tab
+keybind = cmd+;>shift+h=previous_tab
+keybind = cmd+;>comma=move_tab:-1
+keybind = cmd+;>period=move_tab:1
+
+# quick tab switch
+keybind = cmd+;>1=goto_tab:1
+keybind = cmd+;>2=goto_tab:2
+keybind = cmd+;>3=goto_tab:3
+keybind = cmd+;>4=goto_tab:4
+keybind = cmd+;>5=goto_tab:5
+keybind = cmd+;>6=goto_tab:6
+keybind = cmd+;>7=goto_tab:7
+keybind = cmd+;>8=goto_tab:8
+keybind = cmd+;>9=goto_tab:9
+
+# split
+keybind = cmd+;>\=new_split:right
+keybind = cmd+;>-=new_split:down
+
+keybind = cmd+;>j=goto_split:bottom
+keybind = cmd+;>k=goto_split:top
+keybind = cmd+;>h=goto_split:left
+keybind = cmd+;>l=goto_split:right
+
+keybind = cmd+;>z=toggle_split_zoom
+
+keybind = cmd+;>e=equalize_splits
+
+# other
+copy-on-select = clipboard
+
+
+#+END_SRC
+*** home dir
+  #+name: config-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/ghostty/config :mkdirp yes
+  <<ghostty-config>>
+  #+END_SRC
+
+* helix
+** config
+#+NAME: helix-config.toml
+#+auto_tangle: nil
+#+BEGIN_SRC toml :tangle /data/orka/dotfiles/config/helix/config.toml :mkdirp yes
+
+#theme = "ayu_dark"
+#theme = "onedark"
+#theme = "catppuccin_mocha"
+theme = "vintage"
+
+
+[editor]
+line-number = "relative"
+scroll-lines = 1
+cursorline = true
+cursorcolumn = true
+auto-save = false
+completion-trigger-len = 1
+true-color = true
+color-modes = true
+auto-pairs = true
+
+
+#rulers = [120]
+idle-timeout = 50
+#mouse = false
+# Show currently open buffers, only when more than one exists.
+bufferline = "multiple"
+# Number of lines of padding around the edge of the screen when scrolling
+scrolloff = 10
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+hidden = false
+parents = true
+#git-ignore = false
+
+[editor.indent-guides]
+character = "▏"
+render = true
+
+# https://docs.helix-editor.com/master/configuration.html#editorsoft-wrap-section
+[editor.soft-wrap]
+enable = true
+# wrap-at-text-width = true
+wrap-indicator = "↩ "
+
+### https://docs.helix-editor.com/master/configuration.html#editorwhitespace-section
+[editor.whitespace.render]
+space = "all"
+tab = "all"
+newline = "none"
+
+[editor.whitespace.characters]
+space = " "
+nbsp = "⍽"    # Non Breaking SPace
+tab = "→"
+newline = "⏎"
+tabpad = "·"  # Tabs will look like "→···" (depending on tab width)
+###
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+[editor.statusline]
+left = ["mode", "spinner", "file-name", "file-type", "total-line-numbers", "file-encoding"]
+center = []
+right = ["selections", "primary-selection-length", "position", "position-percentage", "spacer", "diagnostics", "workspace-diagnostics", "version-control"]
+
+[keys.normal]
+# Use system clipboard
+#y = "yank_main_selection_to_clipboard"
+#p = "paste_clipboard_before"
+#C-f = [":new", ":insert-output lf-pick", "split_selection_on_newline", "goto_file", "goto_last_modification", "goto_last_modified_file", ":buffer-close!", ":theme nord", ":theme default"]
+"@" = [
+  "move_prev_long_word_start",
+  "move_next_long_word_end",
+  "search_selection",
+  "global_search",
+]
+"&" = [
+  "move_prev_long_word_start",
+  "move_next_long_word_end",
+  "search_selection",
+]
+C-j = ["insert_mode", "insert_newline", "normal_mode"]
+C-y = ":sh zellij run -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh"
+
+[keys.normal.space.","]
+b = ":sh helix-wezterm.sh blame"
+c = ":sh helix-wezterm.sh check"
+e = ":sh helix-wezterm.sh explorer"
+f = ":sh helix-wezterm.sh fzf"
+g = ":sh helix-wezterm.sh lazygit"
+o = ":sh helix-wezterm.sh open"
+r = ":sh helix-wezterm.sh run"
+t = ":sh helix-wezterm.sh test"
+
+[keys.insert]
+j = { k = "normal_mode" } # Maps `jk` to exit insert mode
+#l = { b = "λ" } # Maps `jk` to exit insert mode
+
+
+
+
+
+#+END_SRC
+#+NAME: helix-languages.toml
+#+auto_tangle: nil
+#+BEGIN_SRC config :tangle /data/orka/dotfiles/config/helix/languages.toml :mkdirp yes
+################################
+### Configuration for lsp-ai ###
+################################
+
+[language-server.lsp-ai]
+command = "lsp-ai"
+
+[language-server.lsp-ai.config.memory]
+file_store = { }
+
+# [language-server.lsp-ai.config.models.model1]
+# type = "anthropic"
+# chat_endpoint = "https://api.anthropic.com/v1/messages"
+# model = "claude-3-5-sonnet-20240620"
+# auth_token_env_var_name = ""
+#
+# [language-server.lsp-ai.config.models.model1]
+# type = "gemini"
+# chat_endpoint = "https://generativelanguage.googleapis.com/v1beta/models/"
+# model = "gemini-2.0-flash-latest"
+# auth_token_env_var_name = ""
+
+[[language-server.lsp-ai.config.chat]]
+trigger = "!C"
+action_display_name = "Chat"
+model = "model1"
+
+[language-server.lsp-ai.config.chat.parameters]
+max_context = 4096
+max_tokens = 1024
+system = "You are a code assistant chatbot. The user will ask you for assistance coding and you will do you best to answer succinctly and accurately"
+
+#################################
+## Configuration for languages ##
+#################################
+
+## Every file type we intend to chat in needs to have lsp-ai enabled
+[[language]]
+name = "markdown"
+#language-servers = ["lsp-ai"]
+language-servers = ["lsp-ai", "markdown-oxide"]
+formatter = { command = "dprint", args = ["fmt", "--stdin", "md"]}
+auto-format = true
+
+#########################
+
+[language-server.steel-language-server]
+command = "steel-language-server"
+
+[[language]]
+name = "scheme"
+language-servers = [ "steel-language-server" ]
+
+
+#+END_SRC
+*** home dir
+  #+NAME: config.kdl-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/helix/config.toml :mkdirp yes
+  <<helix-config.toml>>
+  #+END_SRC
+*** home dir
+  #+NAME: language.kdl-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/helix/languages.toml :mkdirp yes
+  <<helix-languages.toml>>
+  #+END_SRC
+
+* zellij
+** key
+#+NAME: zellij-config.kdl
+#+auto_tangle: nil
+#+BEGIN_SRC config :tangle /data/orka/dotfiles/config/zellij/config.kdl :mkdirp yes
+//
+// THIS FILE WAS AUTOGENERATED BY ZELLIJ, THE PREVIOUS FILE AT THIS LOCATION WAS COPIED TO: /home/orka/.config/zellij/config.kdl.bak
+//
+
+keybinds clear-defaults=true {
+    locked {
+        bind "Ctrl g" { SwitchToMode "normal";}
+    }
+    pane {
+        bind "left" { MoveFocus "left"; }
+        bind "down" { MoveFocus "down"; }
+        bind "up" { MoveFocus "up"; }
+        bind "right" { MoveFocus "right"; }
+        bind "c" { SwitchToMode "renamepane"; PaneNameInput 0; }
+        bind "d" { NewPane "down"; SwitchToMode "locked"; }
+        bind "e" { TogglePaneEmbedOrFloating; SwitchToMode "locked"; }
+        bind "f" { ToggleFocusFullscreen; SwitchToMode "locked"; }
+        bind "h" { MoveFocus "left"; }
+        bind "j" { MoveFocus "down"; }
+        bind "k" { MoveFocus "up"; }
+        bind "l" { MoveFocus "right"; }
+        bind "n" { NewPane; SwitchToMode "locked"; }
+        bind "p" { SwitchToMode "normal"; }
+        bind "r" { NewPane "right"; SwitchToMode "locked"; }
+        bind "w" { ToggleFloatingPanes; SwitchToMode "locked"; }
+        bind "x" { CloseFocus; SwitchToMode "locked"; }
+        bind "z" { TogglePaneFrames; SwitchToMode "locked"; }
+        bind "tab" { SwitchFocus; }
+    }
+    tab {
+        bind "left" { GoToPreviousTab; }
+        bind "down" { GoToNextTab; }
+        bind "up" { GoToPreviousTab; }
+        bind "right" { GoToNextTab; }
+        bind "1" { GoToTab 1; SwitchToMode "locked"; }
+        bind "2" { GoToTab 2; SwitchToMode "locked"; }
+        bind "3" { GoToTab 3; SwitchToMode "locked"; }
+        bind "4" { GoToTab 4; SwitchToMode "locked"; }
+        bind "5" { GoToTab 5; SwitchToMode "locked"; }
+        bind "6" { GoToTab 6; SwitchToMode "locked"; }
+        bind "7" { GoToTab 7; SwitchToMode "locked"; }
+        bind "8" { GoToTab 8; SwitchToMode "locked"; }
+        bind "9" { GoToTab 9; SwitchToMode "locked"; }
+        bind "[" { BreakPaneLeft; SwitchToMode "locked"; }
+        bind "]" { BreakPaneRight; SwitchToMode "locked"; }
+        bind "b" { BreakPane; SwitchToMode "locked"; }
+        bind "h" { GoToPreviousTab; }
+        bind "j" { GoToNextTab; }
+        bind "k" { GoToPreviousTab; }
+        bind "l" { GoToNextTab; }
+        bind "n" { NewTab; SwitchToMode "locked"; }
+        bind "r" { SwitchToMode "renametab"; TabNameInput 0; }
+        bind "s" { ToggleActiveSyncTab; SwitchToMode "locked"; }
+        bind "t" { SwitchToMode "normal"; }
+        bind "x" { CloseTab; SwitchToMode "locked"; }
+        bind "tab" { ToggleTab; }
+    }
+    resize {
+        bind "left" { Resize "Increase left"; }
+        bind "down" { Resize "Increase down"; }
+        bind "up" { Resize "Increase up"; }
+        bind "right" { Resize "Increase right"; }
+        bind "+" { Resize "Increase"; }
+        bind "-" { Resize "Decrease"; }
+        bind "=" { Resize "Increase"; }
+        bind "H" { Resize "Decrease left"; }
+        bind "J" { Resize "Decrease down"; }
+        bind "K" { Resize "Decrease up"; }
+        bind "L" { Resize "Decrease right"; }
+        bind "h" { Resize "Increase left"; }
+        bind "j" { Resize "Increase down"; }
+        bind "k" { Resize "Increase up"; }
+        bind "l" { Resize "Increase right"; }
+        bind "r" { SwitchToMode "normal"; }
+    }
+    move {
+        bind "left" { MovePane "left"; }
+        bind "down" { MovePane "down"; }
+        bind "up" { MovePane "up"; }
+        bind "right" { MovePane "right"; }
+        bind "h" { MovePane "left"; }
+        bind "j" { MovePane "down"; }
+        bind "k" { MovePane "up"; }
+        bind "l" { MovePane "right"; }
+        bind "m" { SwitchToMode "normal"; }
+        bind "n" { MovePane; }
+        bind "p" { MovePaneBackwards; }
+        bind "tab" { MovePane; }
+    }
+    scroll {
+        bind "Alt left" { MoveFocusOrTab "left"; SwitchToMode "locked"; }
+        bind "Alt down" { MoveFocus "down"; SwitchToMode "locked"; }
+        bind "Alt up" { MoveFocus "up"; SwitchToMode "locked"; }
+        bind "Alt right" { MoveFocusOrTab "right"; SwitchToMode "locked"; }
+        bind "e" { EditScrollback; SwitchToMode "locked"; }
+        bind "f" { SwitchToMode "entersearch"; SearchInput 0; }
+        bind "Alt h" { MoveFocusOrTab "left"; SwitchToMode "locked"; }
+        bind "Alt j" { MoveFocus "down"; SwitchToMode "locked"; }
+        bind "Alt k" { MoveFocus "up"; SwitchToMode "locked"; }
+        bind "Alt l" { MoveFocusOrTab "right"; SwitchToMode "locked"; }
+        bind "s" { SwitchToMode "normal"; }
+    }
+    search {
+        bind "c" { SearchToggleOption "CaseSensitivity"; }
+        bind "n" { Search "down"; }
+        bind "o" { SearchToggleOption "WholeWord"; }
+        bind "p" { Search "up"; }
+        bind "w" { SearchToggleOption "Wrap"; }
+    }
+    session {
+        bind "c" {
+            LaunchOrFocusPlugin "configuration" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "locked"
+        }
+        bind "d" { Detach; }
+        bind "o" { SwitchToMode "normal"; }
+        bind "p" {
+            LaunchOrFocusPlugin "plugin-manager" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "locked"
+        }
+        bind "w" {
+            LaunchOrFocusPlugin "session-manager" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "locked"
+        }
+    }
+    shared_among "normal" "locked" {
+        bind "Alt left" { MoveFocusOrTab "left"; }
+        bind "Alt down" { MoveFocus "down"; }
+        bind "Alt up" { MoveFocus "up"; }
+        bind "Alt right" { MoveFocusOrTab "right"; }
+        bind "Alt +" { Resize "Increase"; }
+        bind "Alt -" { Resize "Decrease"; }
+        bind "Alt =" { Resize "Increase"; }
+        bind "Alt [" { PreviousSwapLayout; }
+        bind "Alt ]" { NextSwapLayout; }
+        bind "Alt f" { ToggleFloatingPanes; }
+        bind "Alt h" { MoveFocusOrTab "left"; }
+        bind "Alt j" { MoveFocus "down"; }
+        bind "Alt k" { MoveFocus "up"; }
+        bind "Alt l" { MoveFocusOrTab "right"; }
+        bind "Alt y" { NewTab; }
+        bind "Shift tab" { ToggleTab; }
+        bind "Alt n" { NewPane; }
+        bind "Alt i" { GoToPreviousTab; }
+        bind "Alt o" { GoToNextTab; }
+        bind "Alt m" { ToggleFocusFullscreen; }
+        bind "Alt /" { SwitchToMode "entersearch"; SearchInput 0; }
+        bind "Alt s" { SwitchToMode "scroll"; }
+        //bind "Alt r" { layout "compact";}
+        //bind "Alt t" { layout "default";}
+    }
+    shared_except "locked" "renametab" "renamepane" {
+        bind "Ctrl g" { SwitchToMode "locked"; }
+        bind "Ctrl q" { Quit; }
+    }
+    shared_except "locked" "entersearch" {
+        bind "enter" { SwitchToMode "locked"; }
+    }
+    shared_except "locked" "entersearch" "renametab" "renamepane" {
+        bind "esc" { SwitchToMode "locked"; }
+    }
+    shared_except "locked" "entersearch" "renametab" "renamepane" "move" {
+        bind "m" { SwitchToMode "move"; }
+    }
+    shared_except "locked" "entersearch" "search" "renametab" "renamepane" "session" {
+        bind "o" { SwitchToMode "session"; }
+    }
+    shared_except "locked" "tab" "entersearch" "renametab" "renamepane" {
+        bind "t" { SwitchToMode "tab"; }
+    }
+    shared_except "locked" "tab" "scroll" "entersearch" "renametab" "renamepane" {
+        bind "s" { SwitchToMode "scroll"; }
+    }
+    shared_among "normal" "resize" "tab" "scroll" "prompt" "tmux" {
+        bind "p" { SwitchToMode "pane"; }
+    }
+    shared_except "locked" "resize" "pane" "tab" "entersearch" "renametab" "renamepane" {
+        bind "r" { SwitchToMode "resize"; }
+    }
+    shared_among "scroll" "search" {
+        bind "PageDown" { PageScrollDown; }
+        bind "PageUp" { PageScrollUp; }
+        bind "left" { PageScrollUp; }
+        bind "down" { ScrollDown; }
+        bind "up" { ScrollUp; }
+        bind "right" { PageScrollDown; }
+        bind "Ctrl b" { PageScrollUp; }
+        bind "Ctrl c" { ScrollToBottom; SwitchToMode "locked"; }
+        bind "d" { HalfPageScrollDown; }
+        bind "Ctrl f" { PageScrollDown; }
+        bind "h" { PageScrollUp; }
+        bind "j" { ScrollDown; }
+        bind "k" { ScrollUp; }
+        bind "l" { PageScrollDown; }
+        bind "u" { HalfPageScrollUp; }
+    }
+    entersearch {
+        bind "Ctrl c" { SwitchToMode "scroll"; }
+        bind "esc" { SwitchToMode "scroll"; }
+        bind "enter" { SwitchToMode "search"; }
+    }
+    renametab {
+        bind "esc" { UndoRenameTab; SwitchToMode "tab"; }
+    }
+    shared_among "renametab" "renamepane" {
+        bind "Ctrl c" { SwitchToMode "locked"; }
+    }
+    renamepane {
+        bind "esc" { UndoRenamePane; SwitchToMode "pane"; }
+    }
+}
+
+// Plugin aliases - can be used to change the implementation of Zellij
+// changing these requires a restart to take effect
+plugins {
+    compact-bar location="zellij:compact-bar"
+    configuration location="zellij:configuration"
+    filepicker location="zellij:strider" {
+        cwd "/"
+    }
+    plugin-manager location="zellij:plugin-manager"
+    session-manager location="zellij:session-manager"
+    status-bar location="zellij:status-bar"
+    strider location="zellij:strider"
+    tab-bar location="zellij:tab-bar"
+    welcome-screen location="zellij:session-manager" {
+        welcome_screen true
+    }
+}
+
+// Plugins to load in the background when a new session starts
+// eg. "file:/path/to/my-plugin.wasm"
+// eg. "https://example.com/my-plugin.wasm"
+load_plugins {
+}
+
+// Use a simplified UI without special fonts (arrow glyphs)
+// Options:
+//   - true
+//   - false (Default)
+//
+simplified_ui true
+
+// Choose the theme that is specified in the themes section.
+// Default: default
+//
+theme "dracula"
+
+// Choose the base input mode of zellij.
+// Default: normal
+//
+default_mode "locked"
+
+// Choose the path to the default shell that zellij will use for opening new panes
+// Default: $SHELL
+//
+// default_shell "fish"
+
+// Choose the path to override cwd that zellij will use for opening new panes
+//
+// default_cwd "/tmp"
+
+// The name of the default layout to load on startup
+// Default: "default"
+//
+default_layout "compact"
+
+// The folder in which Zellij will look for layouts
+// (Requires restart)
+//
+// layout_dir "/tmp"
+
+// The folder in which Zellij will look for themes
+// (Requires restart)
+//
+// theme_dir "/tmp"
+
+// Toggle enabling the mouse mode.
+// On certain configurations, or terminals this could
+// potentially interfere with copying text.
+// Options:
+//   - true (default)
+//   - false
+//
+// mouse_mode false
+
+// Toggle having pane frames around the panes
+// Options:
+//   - true (default, enabled)
+//   - false
+//
+pane_frames false
+
+// When attaching to an existing session with other users,
+// should the session be mirrored (true)
+// or should each user have their own cursor (false)
+// (Requires restart)
+// Default: false
+//
+// mirror_session true
+
+// Choose what to do when zellij receives SIGTERM, SIGINT, SIGQUIT or SIGHUP
+// eg. when terminal window with an active zellij session is closed
+// (Requires restart)
+// Options:
+//   - detach (Default)
+//   - quit
+//
+// on_force_close "quit"
+
+// Configure the scroll back buffer size
+// This is the number of lines zellij stores for each pane in the scroll back
+// buffer. Excess number of lines are discarded in a FIFO fashion.
+// (Requires restart)
+// Valid values: positive integers
+// Default value: 10000
+//
+// scroll_buffer_size 10000
+
+// Provide a command to execute when copying text. The text will be piped to
+// the stdin of the program to perform the copy. This can be used with
+// terminal emulators which do not support the OSC 52 ANSI control sequence
+// that will be used by default if this option is not set.
+// Examples:
+//
+// copy_command "xclip -selection clipboard" // x11
+// copy_command "wl-copy"                    // wayland
+// copy_command "pbcopy"                     // osx
+//
+// copy_command "pbcopy"
+
+// Choose the destination for copied text
+// Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
+// Does not apply when using copy_command.
+// Options:
+//   - system (default)
+//   - primary
+//
+copy_clipboard "primary"
+
+// Enable automatic copying (and clearing) of selection when releasing mouse
+// Default: true
+//
+copy_on_select true
+
+// Path to the default editor to use to edit pane scrollbuffer
+// Default: $EDITOR or $VISUAL
+// scrollback_editor "/usr/bin/vim"
+
+// A fixed name to always give the Zellij session.
+// Consider also setting `attach_to_session true,`
+// otherwise this will error if such a session exists.
+// Default: <RANDOM>
+//
+// session_name "My singleton session"
+
+// When `session_name` is provided, attaches to that session
+// if it is already running or creates it otherwise.
+// Default: false
+//
+attach_to_session true
+
+// Toggle between having Zellij lay out panes according to a predefined set of layouts whenever possible
+// Options:
+//   - true (default)
+//   - false
+//
+auto_layout true
+
+// Whether sessions should be serialized to the cache folder (including their tabs/panes, cwds and running commands) so that they can later be resurrected
+// Options:
+//   - true (default)
+//   - false
+//
+// session_serialization false
+
+// Whether pane viewports are serialized along with the session, default is false
+// Options:
+//   - true
+//   - false (default)
+//
+// serialize_pane_viewport false
+
+// Scrollback lines to serialize along with the pane viewport when serializing sessions, 0
+// defaults to the scrollback size. If this number is higher than the scrollback size, it will
+// also default to the scrollback size. This does nothing if `serialize_pane_viewport` is not true.
+//
+// scrollback_lines_to_serialize 10000
+
+// Enable or disable the rendering of styled and colored underlines (undercurl).
+// May need to be disabled for certain unsupported terminals
+// (Requires restart)
+// Default: true
+//
+// styled_underlines false
+
+// How often in seconds sessions are serialized
+//
+// serialization_interval 10000
+
+// Enable or disable writing of session metadata to disk (if disabled, other sessions might not know
+// metadata info on this session)
+// (Requires restart)
+// Default: false
+//
+// disable_session_metadata false
+
+// Enable or disable support for the enhanced Kitty Keyboard Protocol (the host terminal must also support it)
+// (Requires restart)
+// Default: true (if the host terminal supports it)
+//
+// support_kitty_keyboard_protocol false
+
+#+END_SRC
+*** home dir
+  #+name: config.kdl-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/zellij/config.kdl :mkdirp yes
+  <<zellij-config.kdl>>
+  #+END_SRC
+
+* zsh
+** zshrc
+#+NAME: zsh-.zshrc
+#+auto_tangle: nil
+#+BEGIN_SRC zsh :tangle /data/orka/dotfiles/config/zsh/.zshrc :mkdirp yes
+
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+source /usr/share/cachyos-zsh-config/cachyos-config.zsh
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+
+# BEGIN opam configuration
+# This is useful if you're using opam as it adds:
+#   - the correct directories to the PATH
+#   - auto-completion for the opam binary
+# This section can be safely removed at any time if needed.
+[[ ! -r '/home/orka/.opam/opam-init/init.zsh' ]] || source '/home/orka/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
+# END opam configuration
+
+export HELIX_RUNTIME=~/workspace/helix/runtime
+export EDITOR=hx
+
+PATH=~/.local/bin:~/.cargo/bin:$PATH:~/.npm-packages/bin:~/.config/emacs/bin/
+
+source /home/orka/.config/broot/launcher/bash/br
+
+unset SSH_AGENT_PID
+if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+  export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+fi
+export GPG_TTY=$(tty)
+gpg-connect-agent updatestartuptty /bye >/dev/null
+
+alias emacs="emacs -nw"
+alias ls="exa -al"
+#+END_SRC
+*** home dir
+  #+name: zshrc-config-dir
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.zshrc :mkdirp yes
+  <<zsh-.zshrc>>
+  #+END_SRC

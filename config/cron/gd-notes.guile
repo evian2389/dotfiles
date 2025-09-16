@@ -1,0 +1,6 @@
+(job '(next-minute (range 0 60 30))
+      ;; (lambda ()
+      ;;   (system* "rclone sync /data/orka/notes/ gd-notes:notes")
+      ;;   )
+      ;; "sync-gd-notes")
+     "rclone sync /data/orka/notes/ gd-notes:notes")

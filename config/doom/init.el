@@ -83,7 +83,7 @@
        ;;shell             ; simple shell REPL for Emacs
        ;;term              ; basic terminal emulator for Emacs
        eat
-
+    
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
