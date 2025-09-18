@@ -11,7 +11,7 @@
 **** setting doom
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
@@ -83,7 +83,7 @@
 **** Theme and Fonts
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
 ;;; Theme and Fonts ----------------------------------------
 (set-frame-parameter nil 'alpha-background 95) ; For current frame
@@ -132,7 +132,7 @@
 **** editor settings
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 
@@ -189,7 +189,7 @@
 ***** vundo : visualize undo tree
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 ;;##vundo
 (use-package vundo
   :commands (vundo)
@@ -228,7 +228,7 @@
 ***** jinx : dictionary
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 (use-package jinx
 ;  :hook (org-mode . jinx-mode)
   :bind (("M-$" . jinx-correct)
@@ -239,7 +239,7 @@
 ***** harpoon : quickly open file
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 ;; You can use this hydra menu that have all the commands
 ;; (map! :n "s-SPC" 'harpoon-quick-menu-hydra)
 ;; (map! :n "s-s" 'harpoon-add-file)
@@ -265,7 +265,7 @@
 ***** geiser-mode : lisp in emacs
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 (with-eval-after-load 'geiser-mode
   (setq geiser-mode-auto-p nil)
   (defun orka-geiser-connect ()
@@ -281,7 +281,7 @@
 ***** key bindings
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 (with-eval-after-load 'meow
   (meow-normal-define-key '("C-j" . meow-page-down))
   (meow-normal-define-key '("C-k" . meow-page-up))
@@ -298,21 +298,21 @@
 ***** key bindings
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
 #+END_SRC
 
 **** window navigation
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 (global-set-key (kbd "M-n") 'ace-window)
 #+END_SRC
 
 **** TODO: lsp settings
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
 #+END_SRC
 ***** lsp-booster
@@ -321,7 +321,7 @@
 cargo install emacs-lsp-booster
 #+END_SRC
 ****** config init
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."
   (or
@@ -362,7 +362,7 @@ paru -Sy clangd
 config
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
     (use-package lsp-mode
       :commands lsp
       :hook ((c-mode c++-mode) . lsp-deferred)
@@ -380,7 +380,7 @@ install rust-analyzer
 config
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
     (use-package rustic
       :mode "\\.rs\\'"
       :hook (rustic-mode . lsp-deferred)
@@ -394,7 +394,7 @@ config
 ***** basic settings
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/notes/"
@@ -427,7 +427,7 @@ config
 ***** after org load - start
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 (with-eval-after-load 'org
   (setq org-use-speed-commands t)
   (setq org-enforce-todo-dependencies t)
@@ -436,7 +436,7 @@ config
 ***** org - todo
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
   (setq org-lowest-priority ?F)  ;; Gives us priorities A through F
   (setq org-default-priority ?E) ;; If an item has no priority, it is considered [#E].
 
@@ -470,9 +470,9 @@ config
 ***** org visual - theme & fonts
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
-  (custom-theme-set-faces!
-    'doom-one
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+  ;; (custom-theme-set-faces!
+  ;;   'doom-one
     ;; '(org-level-8 :inherit outline-3 :height 1.0)
     ;; '(org-level-7 :inherit outline-3 :height 1.0)
     ;; '(org-level-6 :inherit outline-3 :height 1.1)
@@ -537,7 +537,7 @@ config
 ***** org roam
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
   (use-package org-roam
     :ensure t
     :init
@@ -557,7 +557,7 @@ config
 ***** org present
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
 ;;; Org Present --------------------------------------------
 
@@ -617,7 +617,7 @@ config
 ***** org pretty-symbols
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
   (defun my/prettify-symbols-setup ()
     "Beautify keywords"
@@ -680,7 +680,7 @@ config
 ***** org svg-tag-mode
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 (use-package svg-tag-mode
   :after org
     :config
@@ -764,7 +764,7 @@ config
 ***** hook & call
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
   (defun my/org-mode-start ()
     ;; Tweak font sizes
@@ -802,7 +802,7 @@ config
 ***** org brain
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
   (use-package org-brain :ensure t
     :init
@@ -832,7 +832,7 @@ config
 ***** org babel
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
   (use-package org-auto-tangle
     :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
@@ -844,7 +844,7 @@ config
 ***** after org load - end
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 
 
 
@@ -854,7 +854,7 @@ config
 **** TODO: needs to organize
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/doom-emacs/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
                                         ;       (with-eval-after-load 'geiser-mode
                                         ;        (setq geiser-mode-auto-p nil)
                                         ;       (defun orka-geiser-connect ()
@@ -873,7 +873,7 @@ config
 ** init.el
 #+NAME: emacs-init.el
 #+auto_tangle: nil
-#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/doom-emacs/doom/init.el :mkdirp yes
+#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/config/doom/init.el :mkdirp yes
 ;;; init.el -*- lexical-binding: t; -*-
 
 ;; This file controls what Doom modules are enabled and what order they load
@@ -1088,7 +1088,7 @@ config
 ** packages.el
 #+NAME: emacs-packages.el
 #+auto_tangle: nil
-#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/doom-emacs/doom/packages.el :mkdirp yes
+#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/config/doom/packages.el :mkdirp yes
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
 

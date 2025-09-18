@@ -349,8 +349,8 @@
           ("DELIGATED" :inherit (org-todo region) :foreground "#20242d" :weight bold)
           ))
 
-  (custom-theme-set-faces!
-    'doom-one
+  ;; (custom-theme-set-faces!
+  ;;   'doom-one
     ;; '(org-level-8 :inherit outline-3 :height 1.0)
     ;; '(org-level-7 :inherit outline-3 :height 1.0)
     ;; '(org-level-6 :inherit outline-3 :height 1.1)
