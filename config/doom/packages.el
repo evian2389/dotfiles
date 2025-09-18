@@ -57,6 +57,7 @@
 (package! ace-window)
 (package! polymode)
 (package! vundo)
+(package! visual-fill-column)
 
 (package! svg-tag-mode)
 ;(package! geiser-mode)

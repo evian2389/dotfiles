@@ -297,6 +297,7 @@
       org-roam-directory "~/notes/resources/")
 
 (add-hook 'org-mode-hook #'hl-todo-mode)
+(setq display-line-numbers-width 'auto)
 
 (require 'org-indent)
 
@@ -472,8 +473,13 @@
 
     ;; Stop centering the document
     (visual-fill-column-mode 0)
+    (visual-line-mode 0)
+    (setq display-line-numbers-type `relative)
+    ;;set ui-helpers
+    (global-display-line-numbers-mode 1)
     (setq display-line-numbers 'relative)
-    (visual-line-mode 0))
+    (setq display-line-numbers-width 'auto)
+    )
 
   (defun my/prettify-symbols-setup ()
     "Beautify keywords"

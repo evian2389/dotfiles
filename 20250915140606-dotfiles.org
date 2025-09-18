@@ -7,7 +7,24 @@
 
 * emacs
 ** doom emacs
+*** pre-install
+****** install lsp-booster
+#+BEGIN_SRC bash
+cargo install emacs-lsp-booster
+#+END_SRC
+install clangd
+#+BEGIN_SRC bash
+paru -Sy clangd
+#+END_SRC
+install rust-analyzer
+#+BEGIN_SRC bash
+rustup component add rust-analyzer
+#+END_SRC
+
 *** .config/doom/config.el
+:PROPERTIES:
+:header-args: :noweb-ref emacs-config.el
+:END:
 **** setting doom
 #+NAME: config.el
 #+auto_tangle: nil
@@ -316,10 +333,6 @@
 
 #+END_SRC
 ***** lsp-booster
-****** install lsp-booster
-#+BEGIN_SRC bash
-cargo install emacs-lsp-booster
-#+END_SRC
 ****** config init
 #+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
@@ -354,10 +367,6 @@ cargo install emacs-lsp-booster
 (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 #+END_SRC
 ***** c++
-install clangd
-#+BEGIN_SRC bash
-paru -Sy clangd
-#+END_SRC
 
 config
 #+NAME: config.el
@@ -372,11 +381,6 @@ config
       )
 #+END_SRC
 ***** rust
-install rust-analyzer
-#+BEGIN_SRC bash
-    rustup component add rust-analyzer
-#+END_SRC
-
 config
 #+NAME: config.el
 #+auto_tangle: nil
@@ -401,6 +405,7 @@ config
       org-roam-directory "~/notes/resources/")
 
 (add-hook 'org-mode-hook #'hl-todo-mode)
+(setq display-line-numbers-width 'auto)
 
 (require 'org-indent)
 
@@ -609,8 +614,13 @@ config
 
     ;; Stop centering the document
     (visual-fill-column-mode 0)
+    (visual-line-mode 0)
+    (setq display-line-numbers-type `relative)
+    ;;set ui-helpers
+    (global-display-line-numbers-mode 1)
     (setq display-line-numbers 'relative)
-    (visual-line-mode 0))
+    (setq display-line-numbers-width 'auto)
+    )
 
 
 #+END_SRC
@@ -867,7 +877,7 @@ config
 *** home dir
   #+name: config.el-config-dir
   #+BEGIN_SRC conf :noweb yes :tangle ~/.config/doom/config.el :mkdirp yes
-  <<config.el>>
+  <<emacs-config.el>>
   #+END_SRC
 
 ** init.el
@@ -930,6 +940,7 @@ config
        workspaces        ; tab emulation, persistence & separate workspaces
        ;;zen               ; distraction-free coding or writing
        ace-window          ; move focus among windows..
+       visual-fill-column
 
        :editor
        ;(evil +everywhere); come to the dark side, we have cookies
@@ -1148,6 +1159,7 @@ config
 (package! ace-window)
 (package! polymode)
 (package! vundo)
+(package! visual-fill-column)
 
 (package! svg-tag-mode)
 ;(package! geiser-mode)

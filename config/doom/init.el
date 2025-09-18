@@ -54,6 +54,7 @@
        workspaces        ; tab emulation, persistence & separate workspaces
        ;;zen               ; distraction-free coding or writing
        ace-window          ; move focus among windows..
+       visual-fill-column
 
        :editor
        ;(evil +everywhere); come to the dark side, we have cookies
