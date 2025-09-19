@@ -210,7 +210,6 @@
 ;; (map! :n "s-s" 'harpoon-add-file)
 (with-eval-after-load 'meow
   (meow-normal-define-key '("R" . harpoon-quick-menu-hydra))
-  (meow-normal-define-key '("S" . harpoon-add-file))
   )
 ;; And the vanilla commands
 (map! :leader "j c" 'harpoon-clear)
@@ -248,7 +247,57 @@
 
 (global-set-key (kbd "M-n") 'ace-window)
 
+;; Enable Vertico.
+(use-package vertico
+  :custom
+  (vertico-scroll-margin 0) ;; Different scroll margin
+  ;; (vertico-count 20) ;; Show more candidates
+  (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
+  (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+  :init
+  (vertico-mode))
 
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; Emacs minibuffer configurations.
+(use-package emacs
+  :custom
+  ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
+  ;; to switch display modes.
+  (context-menu-mode t)
+  ;; Support opening new minibuffers from inside existing minibuffers.
+  (enable-recursive-minibuffers t)
+  ;; Hide commands in M-x which do not work in the current mode.  Vertico
+  ;; commands are hidden in normal buffers. This setting is useful beyond
+  ;; Vertico.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  ;; Do not allow the cursor in the minibuffer prompt
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt)))
+ ;; Option 1: Additional bindings
+(keymap-set vertico-map "?" #'minibuffer-completion-help)
+(keymap-set vertico-map "M-RET" #'minibuffer-force-complete-and-exit)
+(keymap-set vertico-map "M-TAB" #'minibuffer-complete)
+
+;; Option 2: Replace `vertico-insert' to enable TAB prefix expansion.
+;; (keymap-set vertico-map "TAB" #'minibuffer-complete)
+(setq completion-styles '(basic substring partial-completion flex))
+(setq read-file-name-completion-ignore-case t
+      read-buffer-completion-ignore-case t
+      completion-ignore-case t)
+(setq completion-in-region-function #'consult-completion-in-region)
+
+(use-package! lsp-proxy
+  :config
+  (set-lookup-handlers! 'lsp-proxy-mode
+    :definition '(lsp-proxy-find-definition :async t)
+    :references '(lsp-proxy-find-references :async t)
+    :implementations '(lsp-proxy-find-implementations :async t)
+    :type-definition '(lsp-proxy-find-type-definition :async t)
+    :documentation '(lsp-proxy-describe-thing-at-point :async t)))
 
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."

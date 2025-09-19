@@ -184,6 +184,8 @@
        ;;web               ; the tubes
        ;;yaml              ; JSON, but readable
        zig               ; C, but simpler
+       lsp-proxy
+       eglot
 
        :email
        ;;(mu4e +org +gmail)
