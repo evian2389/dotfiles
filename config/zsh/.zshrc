@@ -33,5 +33,20 @@ fi
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
 
-alias emacs="emacs -nw"
+alias em="emacs -nw"
 alias ls="exa -al"
+
+# export ZELLIJ=zellij
+# export ZELLIJ_SESSION_NAME=main
+
+if [[ -z "$ZELLIJ" ]]; then
+    if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
+        zellij attach -c
+    else
+        zellij
+    fi
+
+    if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
+        exit
+    fi
+fi

@@ -63,7 +63,8 @@
 ;;
 
 
-(setq doom-theme 'doom-one)
+;(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-gruvbox)
 (setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 15))
 
 ;;; Theme and Fonts ----------------------------------------
@@ -111,6 +112,8 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 
+(setq auto-save-list-file-prefix "~/.config/emacs")
+
 (setq display-line-numbers-type `relative)
 ;;set ui-helpers
 (global-display-line-numbers-mode 1)
@@ -144,6 +147,8 @@
 ;; #set editing tools
 (map! :leader
       :desc "Comment line" ";" #'comment-line)
+(map! :leader
+      :desc "consult bookmark" "B" #'consult-bookmark)
 
 
 ;;##consult-repgrep - search
@@ -158,6 +163,8 @@
 (with-eval-after-load 'simple
   (setq-default display-fill-column-indicator-column 80)
   (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+
+(setopt text-mode-ispell-word-completion nil)
 
 ;;##vundo
 (use-package vundo
@@ -236,9 +243,8 @@
   (meow-normal-define-key '("C-o" . pop-global-mark))
   (meow-leader-define-key '("y" . meow-clipboard-save))
   (meow-leader-define-key '("p" . meow-clipboard-yank))
+  (meow-leader-define-key '("B" . consult-bookmark))
   )
-
-
 
 (global-set-key (kbd "M-n") 'ace-window)
 
@@ -317,7 +323,10 @@
   (meow-leader-define-key '("N" . org-roam-node-find))
   (meow-leader-define-key '("P" . org-roam-capture))
   (meow-leader-define-key '("C" . org-capture))
-  )
+  (meow-leader-define-key '("G" . org-roam-graph))
+  (meow-leader-define-key '("D" . org-roam-dailies-capture-today))
+  (meow-leader-define-key '("T" . org-roam-dailies-goto-date))
+)
 
 (with-eval-after-load 'org
   (setq org-use-speed-commands t)
@@ -409,19 +418,52 @@
   (setq visual-fill-column-width 110
         visual-fill-column-center-text t)
 
-  (use-package org-roam
-    :ensure t
-    :init
-    (setq org-roam-v2-ack t)
-    :custom
-    (org-roam-completion-everywhere t)
-    :config
-    (org-roam-setup))
+(use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-completion-everywhere t)
+  :config
+  (org-roam-setup))
 
          ;;; find by titles and tags  :TODO:check if this works..
-  (setq org-roam-node-display-template
-        (concat "${title:*} "
-                (propertize "${tags:10}" 'face 'org-tag)))
+
+;; (setq org-roam-node-display-template
+;;       (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+(setq org-roam-node-display-template
+      (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+
+(setq org-roam-capture-templates
+      '(("e" "etc" plain "%?"
+         :if-new (file+head "main/${slug}.org"
+                            "#+filetags: :etc:\n#+date: %U\n#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t)
+        ("r" "reference" plain "%?"
+         :if-new (file+head "reference/${title}.org"
+                            "#+filetags: :reference:\n#+date: %U\n#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t)
+        ("a" "article" plain "%?"
+         :if-new (file+head "articles/${title}.org"
+                            "#+filetags: :article:\n#+date: %U\n#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t)
+        ("p" "projects" plain "%?"
+         :if-new (file+head "projects/${title}.org"
+                            "#+filetags: :project:\n#+date: %U\n#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t)
+        ("d" "default" plain "%?"
+         :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                            "#+filetags: :etc:\n#+date: %U\n#+title: ${title}\n")
+         :unnarrowed t)
+        ("n" "Note" plain "%?"
+         :if-new (file+head "reference/note/${slug}.org"
+                            "#+filetags: :note:\n#+date: %U\n#+title: ${title}\n")
+         :unnarrowed t)
+        ))
 
 ;;; Org Present --------------------------------------------
 
