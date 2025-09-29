@@ -385,6 +385,23 @@ rustup component add rust-analyzer
   (completion-category-defaults nil) ;; Disable defaults, use our settings
   (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
 #+END_SRC
+**** git
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/doom/config.el :mkdirp yes
+(use-package blamer
+  :bind (("s-i" . blamer-show-commit-info))
+  :defer 20
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-min-offset 70)
+  :custom-face
+  (blamer-face ((t :foreground "#7a88cf"
+                    :background nil
+                    :height 140
+                    :italic t)))
+  :config
+  (global-blamer-mode 1))
+#+END_SRC
+
 **** TODO: lsp settings
 ***** pre-install
 #+BEGIN_EXAMPLE
@@ -403,6 +420,34 @@ npm install -g emacs-lsp-proxy
     :documentation '(lsp-proxy-describe-thing-at-point :async t)))
 
 #+END_SRC
+***** lsp-ui mode
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+(add-hook 'lsp-mode-hook 'lsp-ui-doc-mode)
+
+(use-package lsp-ui
+  :after lsp-mode
+  :config
+  (setq lsp-ui-peek-enable t)
+  ;; Enable lsp-ui-doc-mode globally
+
+  ;; Disable automatic display on cursor hover if preferred
+  (setq lsp-ui-doc-show-on-cursor nil)
+
+  (define-key lsp-ui-mode-map (kbd "M-,") #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-references)
+  )      ;; Enable lsp-ui-peek
+#+END_SRC
+***** company mode
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+   (require 'company)
+   (global-company-mode t)
+   (add-hook 'lsp-mode-hook 'company-mode)
+   ;; Enable lsp-ui-signature-mode globally
+   (add-hook 'lsp-mode-hook 'lsp-ui-signature-mode)
+   ;; Enable lsp-ui-flycheck-mode globally
+   ;;(add-hook 'lsp-mode-hook 'lsp-ui-flycheck-mode)
+#+END_SRC
+
 ***** lsp-booster
 ****** config init
 #+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
@@ -438,8 +483,7 @@ npm install -g emacs-lsp-proxy
 (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 #+END_SRC
 ***** c++
-
-config
+****** config
 #+NAME: config.el
 #+auto_tangle: nil
 #+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
@@ -451,6 +495,7 @@ config
       ;; Add other clangd-specific settings here if needed
       )
 #+END_SRC
+*****
 ***** rust
 config
 #+NAME: config.el
@@ -1013,7 +1058,7 @@ config
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       ;;company           ; the ultimate code completion backend
+       company           ; the ultimate code completion backend
        (corfu +orderless)  ; complete with cap(f), cape and a flying feather!
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
@@ -1112,6 +1157,7 @@ config
        ;;tty               ; improve the terminal Emacs experience
 
        :lang
+       lsp-ui
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP
        (cc +lsp)         ; C > C++ == 1
@@ -1281,6 +1327,7 @@ config
 
 (package! rustic)
 
+(package! blamer)
 #+END_SRC
 *** home dir
   #+name: emacs-packages.el-config-dir
@@ -1320,7 +1367,7 @@ font-family = JetBrains Mono
 #font-family = Iosevka Nerd Font
 # font-family = SFMono Nerd Font
 font-size = 12
-theme = GruvboxDarkHard
+theme = Gruvbox Dark Hard
 shell-integration-features = no-cursor,sudo,no-title
 cursor-style = block
 adjust-cell-height = 35%
@@ -1804,7 +1851,7 @@ language-servers = [ "steel-language-server" ]
           bind "space" { NextSwapLayout; }
           bind "\"" { NewPane "down"; SwitchToMode "locked"; }
           bind "%" { NewPane "right"; SwitchToMode "locked"; }
-          bind "," { SwitchToMode "renametab"; }
+          bind "," { SwitchToMode "renametab"; SwitchToMode "locked"; }
           bind "[" { SwitchToMode "scroll"; }
           bind "Ctrl b" { Write 2; SwitchToMode "locked"; }
           bind "c" { NewTab; SwitchToMode "locked"; }
@@ -1819,7 +1866,6 @@ language-servers = [ "steel-language-server" ]
           bind "f" { TogglePaneFrames; SwitchToMode "locked"; }
           bind "w" { ToggleFloatingPanes; SwitchToMode "locked"; }
           bind "esc" { SwitchToMode "locked"; }
-
       }
   }
 

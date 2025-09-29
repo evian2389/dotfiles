@@ -299,6 +299,29 @@
     :type-definition '(lsp-proxy-find-type-definition :async t)
     :documentation '(lsp-proxy-describe-thing-at-point :async t)))
 
+(add-hook 'lsp-mode-hook 'lsp-ui-doc-mode)
+
+(use-package lsp-ui
+  :after lsp-mode
+  :config
+  (setq lsp-ui-peek-enable t)
+  ;; Enable lsp-ui-doc-mode globally
+
+  ;; Disable automatic display on cursor hover if preferred
+  (setq lsp-ui-doc-show-on-cursor nil)
+
+  (define-key lsp-ui-mode-map (kbd "M-,") #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-references)
+  )      ;; Enable lsp-ui-peek
+
+   (require 'company)
+   (global-company-mode t)
+   (add-hook 'lsp-mode-hook 'company-mode)
+   ;; Enable lsp-ui-signature-mode globally
+   (add-hook 'lsp-mode-hook 'lsp-ui-signature-mode)
+   ;; Enable lsp-ui-flycheck-mode globally
+   ;;(add-hook 'lsp-mode-hook 'lsp-ui-flycheck-mode)
+
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."
   (or

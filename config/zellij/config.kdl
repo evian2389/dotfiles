@@ -231,7 +231,7 @@
           bind "space" { NextSwapLayout; }
           bind "\"" { NewPane "down"; SwitchToMode "locked"; }
           bind "%" { NewPane "right"; SwitchToMode "locked"; }
-          bind "," { SwitchToMode "renametab"; }
+          bind "," { SwitchToMode "renametab"; SwitchToMode "locked"; }
           bind "[" { SwitchToMode "scroll"; }
           bind "Ctrl b" { Write 2; SwitchToMode "locked"; }
           bind "c" { NewTab; SwitchToMode "locked"; }
@@ -246,7 +246,6 @@
           bind "f" { TogglePaneFrames; SwitchToMode "locked"; }
           bind "w" { ToggleFloatingPanes; SwitchToMode "locked"; }
           bind "esc" { SwitchToMode "locked"; }
-
       }
   }
 

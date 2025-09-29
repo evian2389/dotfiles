@@ -70,3 +70,5 @@
                 :files ("*.el")))
 
 (package! rustic)
+
+(package! blamer)
