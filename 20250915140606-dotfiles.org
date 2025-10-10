@@ -5,20 +5,32 @@
 #+PROPERTY: header-args :mkdirp yes
 #+auto_tangle: nil
 
+* pre-install
+** pre-install
+#+BEGIN_SRC bash
+
+## install clangd, rust-analyzer
+paru -Sy clangd rust-analyzer
+
+## install broot
+cargo install --locked --features clipboard broot
+broot --install
+
+#+END_SRC
+
+
+
 * emacs
 ** doom emacs
 *** pre-install
-****** install lsp-booster
 #+BEGIN_SRC bash
+### install lsp-booster
 cargo install emacs-lsp-booster
-#+END_SRC
-install clangd
-#+BEGIN_SRC bash
-paru -Sy clangd
-#+END_SRC
-install rust-analyzer
-#+BEGIN_SRC bash
-rustup component add rust-analyzer
+
+## install clangd, rust-analyzer
+paru -Sy clangd rust-analyzer
+
+
 #+END_SRC
 
 *** .config/doom/config.el
@@ -304,6 +316,7 @@ rustup component add rust-analyzer
 #+NAME: config.el
 #+auto_tangle: nil
 #+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+
 (with-eval-after-load 'meow
   (meow-normal-define-key '("C-j" . meow-page-down))
   (meow-normal-define-key '("C-k" . meow-page-up))
@@ -545,6 +558,9 @@ config
   (meow-leader-define-key '("D" . org-roam-dailies-capture-today))
   (meow-leader-define-key '("T" . org-roam-dailies-goto-date))
 )
+
+(define-key org-mode-map (kbd "M-p") 'org-previous-block)
+(define-key org-mode-map (kbd "M-n") 'org-next-block)
 
 
 #+END_SRC
@@ -2157,11 +2173,57 @@ language-servers = [ "steel-language-server" ]
   // post_command_discovery_hook "echo $RESURRECT_COMMAND | sed <your_regex_here>"
 
 #+END_SRC
-*** home dir
+** home dir
   #+name: config.kdl-config-dir
   #+BEGIN_SRC conf :noweb yes :tangle ~/.config/zellij/config.kdl :mkdirp yes
   <<zellij-config.kdl>>
   #+END_SRC
+
+* fish
+** config
+#+NAME: config.fish
+#+auto_tangle: nil
+#+BEGIN_SRC config :tangle /data/orka/dotfiles/config/fish/config.fish :mkdirp yes
+source /usr/share/cachyos-fish-config/cachyos-config.fish
+
+# overwrite greeting
+# potentially disabling fastfetch
+#function fish_greeting
+#    # smth smth
+#end
+
+set PATH ~/.cargo/bin ~/.config/emacs/bin $PATH
+
+# ~/.config/fish/config.fish
+
+function setup_gpg_agent
+    # Unset SSH_AGENT_PID to prevent conflicts
+    if set -q SSH_AGENT_PID
+        unset SSH_AGENT_PID
+    end
+
+    # Set SSH_AUTH_SOCK to use the gpg-agent socket
+    if test (count $gnupg_SSH_AUTH_SOCK_by) -eq 0 -o $gnupg_SSH_AUTH_SOCK_by != $fish_pid
+        set -gx SSH_AUTH_SOCK (gpgconf --list-dirs agent-ssh-socket)
+    end
+
+    # Set GPG_TTY for gpg-agent to connect to the terminal
+    set -gx GPG_TTY (tty)
+
+    # Tell gpg-agent about the new tty
+    gpg-connect-agent updatestartuptty /bye >/dev/null
+end
+
+setup_gpg_agent
+
+
+#+end_SRC
+** home dir
+#+name: config.fish-config-dir
+#+BEGIN_SRC conf :noweb yes :tangle ~/.config/fish/config.fish :mkdirp yes
+<<config.fish>>
+#+END_SRC
+
 
 * zsh
 ** zshrc
