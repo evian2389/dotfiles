@@ -1355,7 +1355,7 @@ config
 ** google drive sync
 #+NAME: mcron-gd-notes.guile
 #+auto_tangle: nil
-#+BEGIN_SRC scheme :tangle ~/.config/cron/gd-notes.guile :mkdirp yes
+#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/config/cron/gd-notes.guile :mkdirp yes
 (job '(next-minute (range 0 60 30))
      "rclone sync /data/orka/notes/ gd-notes:notes")
 ;;(job '(next-minute (range 0 60 30))
@@ -1371,6 +1371,116 @@ config
   #+BEGIN_SRC conf :noweb yes :tangle ~/.config/cron/gd-notes.guile :mkdirp yes
   <<mcron-gd-notes.guile>>
   #+END_SRC
+
+* systemd timer
+** note syn c- systemd service
+*** enable systemd files
+  #+name: note sync systemd enable scripts
+#+BEGIN_SRC sh
+systemctl --user enable rclone-notes-sync.service
+systemctl --user enable rclone-notes-sync.timer
+systemctl --user enable data-orka-vbee0.mount
+systemctl --user enable data-orka-vbee0.automount
+systemctl --user daemon-reload
+systemctl --user start rclone-notes-sync.timer
+systemctl --user start data-orka-vbee0.automount
+#+END_SRC
+
+*** systemd mount service file
+#+NAME: data-orka-vbee0.mount
+#+auto_tangle: nil
+#+BEGIN_SRC sh :tangle /data/orka/dotfiles/config/systemd/user/data-orka-vbee0.mount :mkdirp yes
+[Unit]
+Description=Notes Mount Service
+#Requires=network.target
+After=network.target
+
+[Mount]
+What=worker@jongho3.lee-notes.vbee.lge.com:/home/worker/
+Where=/data/orka/vbee0/
+Type=fuse.sshfs
+Options=port=38735,reconnect,defaults,_netdev,IdentityFile=/home/user/.ssh/id_ed25519,uid=1000,gid=1000
+
+[Install]
+WantedBy=remote-fs.target
+
+
+#+END_SRC
+**** home dir
+  #+name: data-orka-vbee0.mount-config-dir
+#+BEGIN_SRC sh :noweb yes :tangle ~/.config/systemd/user/data-orka-vbee0.mount :mkdirp yes
+  <<data-orka-vbee0.mount>>
+#+END_SRC
+
+*** systemd automount service file
+#+NAME: data-orka-vbee0.automount
+#+auto_tangle: nil
+#+BEGIN_SRC sh :tangle /data/orka/dotfiles/config/systemd/user/data-orka-vbee0.automount :mkdirp yes
+[Unit]
+Description=Notes autoMount Service
+
+[Automount]
+Where=/data/orka/vbee0/
+TimeoutIdleSec=600
+
+[Install]
+WantedBy=remote-fs.target
+
+
+#+END_SRC
+**** home dir
+  #+name: data-orka-vbee0.automount-config-dir
+#+BEGIN_SRC sh :noweb yes :tangle ~/.config/systemd/user/data-orka-vbee0.automount :mkdirp yes
+  <<data-orka-vbee0.automount>>
+#+END_SRC
+
+
+
+*** systemd service file
+#+NAME: rclone-notes-sync.service
+#+auto_tangle: nil
+#+BEGIN_SRC sh :tangle /data/orka/dotfiles/config/systemd/user/rclone-notes-sync.service :mkdirp yes
+[Unit]
+Description=Rclone Notes Sync Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/rclone sync /data/orka/notes notesOnVbee:/home/worker/.share/notes
+# --config=/home/youruser/.config/rclone/rclone.conf  --log-file=/home/youruser/rclone-sync.log -v
+#Restart=on-failure
+#User=orka    # this is user unit file. Trying to modify user or group is not allowed.
+#Group=orka   # this is user unit file. Trying to modify user or group is not allowed.
+
+[Install]
+WantedBy=default.target
+
+#+END_SRC
+**** home dir
+  #+name: gd-notes.guile-config-dir
+#+BEGIN_SRC sh :noweb yes :tangle ~/.config/systemd/user/rclone-notes-sync.service :mkdirp yes
+  <<rclone-notes-sync.service>>
+#+END_SRC
+
+*** systemd timer file
+#+NAME: rclone-notes-sync.timer
+#+auto_tangle: nil
+#+BEGIN_SRC sh :tangle /data/orka/dotfiles/config/systemd/user/rclone-notes-sync.timer :mkdirp yes
+[Unit]
+Description=Run Rclone notes Sync Periodically
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=10min
+Unit=rclone-notes-sync.service
+
+[Install]
+WantedBy=timers.target
+#+END_SRC
+**** home dir
+  #+name: gd-notes.guile-config-dir
+#+BEGIN_SRC sh :noweb yes :tangle ~/.config/systemd/user/rclone-notes-sync.timer :mkdirp yes
+  <<rclone-notes-sync.timer>>
+#+END_SRC
 
 * ghostty
 ** config
@@ -1961,7 +2071,7 @@ language-servers = [ "steel-language-server" ]
   //   - true (default)
   //   - false
   //
-  // mouse_mode false
+  mouse_mode false
 
   // Toggle having pane frames around the panes
   // Options:
@@ -2195,6 +2305,8 @@ source /usr/share/cachyos-fish-config/cachyos-config.fish
 set PATH ~/.cargo/bin ~/.config/emacs/bin $PATH
 
 # ~/.config/fish/config.fish
+
+alias em "emacs -nw"
 
 function setup_gpg_agent
     # Unset SSH_AGENT_PID to prevent conflicts

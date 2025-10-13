@@ -10,6 +10,8 @@ set PATH ~/.cargo/bin ~/.config/emacs/bin $PATH
 
 # ~/.config/fish/config.fish
 
+alias em "emacs -nw"
+
 function setup_gpg_agent
     # Unset SSH_AGENT_PID to prevent conflicts
     if set -q SSH_AGENT_PID
