@@ -559,8 +559,8 @@ config
   (meow-leader-define-key '("T" . org-roam-dailies-goto-date))
 )
 
-(define-key org-mode-map (kbd "M-p") 'org-previous-block)
-(define-key org-mode-map (kbd "M-n") 'org-next-block)
+(define-key org-mode-map (kbd "(") 'org-previous-block)
+(define-key org-mode-map (kbd ")") 'org-next-block)
 
 
 #+END_SRC
@@ -1514,6 +1514,13 @@ keybind = cmd+;>r=reload_config
 keybind = cmd+;>x=close_surface
 
 keybind = cmd+;>n=new_window
+
+# windows
+  # Unbind the default toggle_fullscreen action from Ctrl+Enter.
+keybind = ctrl+enter=unbind
+
+  # Bind Shift+Alt+Enter to maximize/unmaximize the window.
+keybind = cmd+enter=toggle_fullscreen
 
 # tabs
 keybind = cmd+;>c=new_tab

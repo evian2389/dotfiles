@@ -400,8 +400,8 @@
   (meow-leader-define-key '("T" . org-roam-dailies-goto-date))
 )
 
-(define-key org-mode-map (kbd "M-p") 'org-previous-block)
-(define-key org-mode-map (kbd "M-n") 'org-next-block)
+(define-key org-mode-map (kbd "(") 'org-previous-block)
+(define-key org-mode-map (kbd ")") 'org-next-block)
 
 (with-eval-after-load 'org
   (setq org-use-speed-commands t)

@@ -26,6 +26,13 @@ keybind = cmd+;>x=close_surface
 
 keybind = cmd+;>n=new_window
 
+# windows
+  # Unbind the default toggle_fullscreen action from Ctrl+Enter.
+keybind = ctrl+enter=unbind
+
+  # Bind Shift+Alt+Enter to maximize/unmaximize the window.
+keybind = cmd+enter=toggle_fullscreen
+
 # tabs
 keybind = cmd+;>c=new_tab
 keybind = cmd+;>shift+l=next_tab
