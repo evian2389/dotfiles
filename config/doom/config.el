@@ -255,7 +255,13 @@
   (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
   (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
   :init
-  (vertico-mode))
+  (vertico-mode 1)
+  ;; Configure Orderless as the primary completion style
+  (setq completion-styles '(orderless basic))
+  (setq orderless-matching-styles '(orderless-literal orderless-regexp))
+  ;; Enable Consult commands (optional, but highly recommended)
+  ;;(global-set-key (kbd "C-x C-f") 'consult-find-file)
+  )
 
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
@@ -320,7 +326,39 @@
    ;; Enable lsp-ui-signature-mode globally
    (add-hook 'lsp-mode-hook 'lsp-ui-signature-mode)
    ;; Enable lsp-ui-flycheck-mode globally
-   ;;(add-hook 'lsp-mode-hook 'lsp-ui-flycheck-mode)
+   (add-hook 'lsp-mode-hook 'lsp-ui-flycheck-mode)
+
+(use-package! corfu
+  :init
+  (global-corfu-mode 1)
+:custom
+  (corfu-auto t)
+  (corfu-delay 0.2)
+  (:map corfu-map
+        ;("C-n" . corfu-next)          ; Bind Shift+n to move down
+        ;("C-p" . corfu-previous)      ; Bind Shift+p to move up
+        ("S-<tab>" . corfu-previous)  ; Keep Shift+tab for previous
+        ("<tab>" . corfu-next))      ; Keep tab for next
+  )
+
+(use-package! cape
+  :after corfu
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-to-list 'completion-at-point-functions #'cape-line)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  :config
+  ;; Example: Merge LSP and snippet completion sources
+  ;;(add-hook 'completion-at-point-functions #'cape-super-capf)
+  )
+
+;; Configure specific completion styles for file paths
+(after! corfu
+  (setq completion-category-overrides '((file (styles partial-completion))))
+  ;; Use orderless as your primary style, with basic as a fallback.
+  (setq completion-styles '(orderless basic)))
 
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."
