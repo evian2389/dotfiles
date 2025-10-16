@@ -439,23 +439,113 @@ npm install -g emacs-lsp-proxy
     :documentation '(lsp-proxy-describe-thing-at-point :async t)))
 
 #+END_SRC
+
 ***** lsp-ui mode
 #+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
-(add-hook 'lsp-mode-hook 'lsp-ui-doc-mode)
 
+(meow-leader-define-key '("g" . lsp-find-references))
+(meow-leader-define-key '("d" . lsp-find-definition))
+(meow-leader-define-key '("q" . lsp-find-declaration))
+
+(with-eval-after-load 'meow
+  (meow-normal-define-key '("M-;" . lsp-find-references))
+  (meow-normal-define-key '("M-'" . lsp-find-definition))
+  (meow-normal-define-key '("M-\\" . lsp-find-declaration))
+  (meow-normal-define-key '("M-[" . lsp-find-type-definition))
+  (meow-normal-define-key '("M-]" . lsp-find-implementations))
+)
+
+
+#+END_SRC
+***** lsp-mode
+You need to execute *treesit-auto-install-all*
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+
+;; treesit-auto configuration
+(use-package treesit-auto
+  :ensure t
+  :custom
+  (treesit-auto-langs '(python rust cpp))
+  ;; Pin a known working version for the C++ grammar to avoid mismatches
+  ;; (treesit-language-source-alist
+  ;;  `((cpp . ,(treesit-auto--gh-uri "tree-sitter/tree-sitter-cpp" "v0.22.0"))
+  ;;    (rust . ,(treesit-auto--gh-uri "tree-sitter/tree-sitter-rust"))
+  ;;    (python . ,(treesit-auto--gh-uri "tree-sitter/tree-sitter-python"))))
+  ;; Populates auto-mode-alist with the treesit modes *before* any files are opened.
+  (treesit-auto-add-to-auto-mode-alist t)
+  ;; Increase the font-lock level for more detailed highlighting
+  ;;(treesit-font-lock-level 4)
+  :config
+  (treesit-auto-add-to-auto-mode-alist t)
+  (global-treesit-auto-mode))
+
+;; lsp-mode configuration
+(use-package lsp-mode
+  :after treesit-auto
+  :commands lsp
+  :ensure t
+  :init
+  ;; Crucial: Ensure semantic highlighting is off so Tree-sitter can work
+  ;;(setq lsp-enable-semantic-highlighting nil)
+
+  :hook
+  (treesit-auto-mode . lsp-deferred)
+  ;; Fallback hooks for non-treesitter modes (e.g., if treesit-auto fails)
+  ((c-mode c++-mode) . lsp-deferred)
+  (lsp-ui-doc-mode . lsp-deferred)
+
+  :config
+  ;; Additional lsp-mode settings
+  )
+
+;; lsp-ui configuration (No changes needed)
 (use-package lsp-ui
   :after lsp-mode
+  :commands lsp-ui-mode
+  :hook
+  (lsp-mode . lsp-ui-mode)
+
   :config
+  (setq lsp-ui-sideline-enable t)
+  (setq lsp-ui-doc-enable t)
   (setq lsp-ui-peek-enable t)
-  ;; Enable lsp-ui-doc-mode globally
-
-  ;; Disable automatic display on cursor hover if preferred
   (setq lsp-ui-doc-show-on-cursor nil)
-
   (define-key lsp-ui-mode-map (kbd "M-,") #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-references)
-  )      ;; Enable lsp-ui-peek
+  (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-references))
+
+
 #+END_SRC
+
+***** c++
+****** config
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+    ;; (use-package lsp-mode
+    ;;   :commands lsp
+    ;;   :hook ((c-mode c++-mode) . lsp-deferred)
+    ;;   :config
+    ;;   (setq lsp-prefer-flymake nil) ; or t, depending on preference
+    ;;   ;; Add other clangd-specific settings here if needed
+    ;;   )
+#+END_SRC
+*****
+***** rust
+config
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+    (use-package rustic
+      :mode "\\.rs\\'"
+      :hook (rustic-mode . lsp-deferred)
+      :config
+      ;; Add rustic/rust-analyzer specific settings here
+      (setq rustic-format-on-save t) ; Example: enable formatting on save
+      )
+#+END_SRC
+
+
+
 ***** auto completion
 #+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
    (require 'company)
@@ -534,34 +624,6 @@ npm install -g emacs-lsp-proxy
       orig-result)))
 (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 #+END_SRC
-***** c++
-****** config
-#+NAME: config.el
-#+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
-    (use-package lsp-mode
-      :commands lsp
-      :hook ((c-mode c++-mode) . lsp-deferred)
-      :config
-      (setq lsp-prefer-flymake nil) ; or t, depending on preference
-      ;; Add other clangd-specific settings here if needed
-      )
-#+END_SRC
-*****
-***** rust
-config
-#+NAME: config.el
-#+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
-    (use-package rustic
-      :mode "\\.rs\\'"
-      :hook (rustic-mode . lsp-deferred)
-      :config
-      ;; Add rustic/rust-analyzer specific settings here
-      (setq rustic-format-on-save t) ; Example: enable formatting on save
-      )
-#+END_SRC
-
 **** org mode
 ***** basic settings
 #+NAME: config.el
@@ -1212,6 +1274,7 @@ config
        ;;tty               ; improve the terminal Emacs experience
 
        :lang
+       treesit-auto
        lsp-ui
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP
@@ -1381,6 +1444,7 @@ config
                 :files ("*.el")))
 
 (package! rustic)
+(package! treesit-auto)
 
 (package! blamer)
 #+END_SRC
@@ -1684,12 +1748,17 @@ right = ["selections", "primary-selection-length", "position", "position-percent
 #p = "paste_clipboard_before"
 #C-f = [":new", ":insert-output lf-pick", "split_selection_on_newline", "goto_file", "goto_last_modification", "goto_last_modified_file", ":buffer-close!", ":theme nord", ":theme default"]
 "A-8" = [
-  "move_prev_long_word_start",
-  "move_next_long_word_end",
+  "move_prev_word_start",
+  "move_next_word_end",
   "search_selection",
 ]
 C-j = ["insert_mode", "insert_newline", "normal_mode"]
 C-y = ":sh zellij run -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh"
+
+# C-b = ":new<space>:insert-output build.sh"
+"C-b" = [":hsplit-new", ":insert-output build.sh"]
+[keys.normal.space]
+B = [":hsplit-new", ":insert-output ./build.sh"]
 
 [keys.normal.space.","]
 b = ":sh helix-wezterm.sh blame"
@@ -1762,10 +1831,20 @@ auto-format = true
 [language-server.steel-language-server]
 command = "steel-language-server"
 
-[[language]]
-name = "scheme"
-language-servers = [ "steel-language-server" ]
+#[[language]]
+#name = "scheme"
+#language-servers = [ "steel-language-server" ]
 
+
+################C++######
+################
+[[language]]
+name = "cpp"
+language-servers = [ "clangd" ]
+
+[language-server.clangd]
+command = "clangd"
+args = ["--compile-commands-dir=build"]
 
 #+END_SRC
 *** home dir
@@ -1787,7 +1866,7 @@ language-servers = [ "steel-language-server" ]
   keybinds clear-defaults=true {
       locked {
           bind "Ctrl g" { SwitchToMode "normal"; }
-          bind "Ctrl a" { SwitchToMode "tmux"; }
+          bind "Alt a" { SwitchToMode "tmux"; }
       }
       pane {
           bind "left" { MoveFocus "left"; }

@@ -120,6 +120,7 @@
        ;;tty               ; improve the terminal Emacs experience
 
        :lang
+       treesit-auto
        lsp-ui
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP

@@ -70,5 +70,6 @@
                 :files ("*.el")))
 
 (package! rustic)
+(package! treesit-auto)
 
 (package! blamer)

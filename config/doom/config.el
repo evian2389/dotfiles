@@ -305,20 +305,85 @@
     :type-definition '(lsp-proxy-find-type-definition :async t)
     :documentation '(lsp-proxy-describe-thing-at-point :async t)))
 
-(add-hook 'lsp-mode-hook 'lsp-ui-doc-mode)
+(meow-leader-define-key '("g" . lsp-find-references))
+(meow-leader-define-key '("d" . lsp-find-definition))
+(meow-leader-define-key '("q" . lsp-find-declaration))
 
+(with-eval-after-load 'meow
+  (meow-normal-define-key '("M-;" . lsp-find-references))
+  (meow-normal-define-key '("M-'" . lsp-find-definition))
+  (meow-normal-define-key '("M-\\" . lsp-find-declaration))
+  (meow-normal-define-key '("M-[" . lsp-find-type-definition))
+  (meow-normal-define-key '("M-]" . lsp-find-implementations))
+)
+
+;; treesit-auto configuration
+(use-package treesit-auto
+  :ensure t
+  :custom
+  (treesit-auto-langs '(python rust cpp))
+  ;; Pin a known working version for the C++ grammar to avoid mismatches
+  ;; (treesit-language-source-alist
+  ;;  `((cpp . ,(treesit-auto--gh-uri "tree-sitter/tree-sitter-cpp" "v0.22.0"))
+  ;;    (rust . ,(treesit-auto--gh-uri "tree-sitter/tree-sitter-rust"))
+  ;;    (python . ,(treesit-auto--gh-uri "tree-sitter/tree-sitter-python"))))
+  ;; Populates auto-mode-alist with the treesit modes *before* any files are opened.
+  (treesit-auto-add-to-auto-mode-alist t)
+  ;; Increase the font-lock level for more detailed highlighting
+  ;;(treesit-font-lock-level 4)
+  :config
+  (treesit-auto-add-to-auto-mode-alist t)
+  (global-treesit-auto-mode))
+
+;; lsp-mode configuration
+(use-package lsp-mode
+  :after treesit-auto
+  :commands lsp
+  :ensure t
+  :init
+  ;; Crucial: Ensure semantic highlighting is off so Tree-sitter can work
+  ;;(setq lsp-enable-semantic-highlighting nil)
+
+  :hook
+  (treesit-auto-mode . lsp-deferred)
+  ;; Fallback hooks for non-treesitter modes (e.g., if treesit-auto fails)
+  ((c-mode c++-mode) . lsp-deferred)
+  (lsp-ui-doc-mode . lsp-deferred)
+  
+  :config
+  ;; Additional lsp-mode settings
+  )
+
+;; lsp-ui configuration (No changes needed)
 (use-package lsp-ui
   :after lsp-mode
+  :commands lsp-ui-mode
+  :hook
+  (lsp-mode . lsp-ui-mode)
+
   :config
+  (setq lsp-ui-sideline-enable t)
+  (setq lsp-ui-doc-enable t)
   (setq lsp-ui-peek-enable t)
-  ;; Enable lsp-ui-doc-mode globally
-
-  ;; Disable automatic display on cursor hover if preferred
   (setq lsp-ui-doc-show-on-cursor nil)
-
   (define-key lsp-ui-mode-map (kbd "M-,") #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-references)
-  )      ;; Enable lsp-ui-peek
+  (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-references))
+
+    ;; (use-package lsp-mode
+    ;;   :commands lsp
+    ;;   :hook ((c-mode c++-mode) . lsp-deferred)
+    ;;   :config
+    ;;   (setq lsp-prefer-flymake nil) ; or t, depending on preference
+    ;;   ;; Add other clangd-specific settings here if needed
+    ;;   )
+
+    (use-package rustic
+      :mode "\\.rs\\'"
+      :hook (rustic-mode . lsp-deferred)
+      :config
+      ;; Add rustic/rust-analyzer specific settings here
+      (setq rustic-format-on-save t) ; Example: enable formatting on save
+      )
 
    (require 'company)
    (global-company-mode t)
@@ -390,22 +455,6 @@
           (cons "emacs-lsp-booster" orig-result))
       orig-result)))
 (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-
-    (use-package lsp-mode
-      :commands lsp
-      :hook ((c-mode c++-mode) . lsp-deferred)
-      :config
-      (setq lsp-prefer-flymake nil) ; or t, depending on preference
-      ;; Add other clangd-specific settings here if needed
-      )
-
-    (use-package rustic
-      :mode "\\.rs\\'"
-      :hook (rustic-mode . lsp-deferred)
-      :config
-      ;; Add rustic/rust-analyzer specific settings here
-      (setq rustic-format-on-save t) ; Example: enable formatting on save
-      )
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
