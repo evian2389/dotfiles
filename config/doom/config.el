@@ -340,6 +340,9 @@
   :after treesit-auto
   :commands lsp
   :ensure t
+  :custom
+  (lsp-inlay-hint-enable t)
+
   :init
   ;; Crucial: Ensure semantic highlighting is off so Tree-sitter can work
   ;;(setq lsp-enable-semantic-highlighting nil)
@@ -349,7 +352,8 @@
   ;; Fallback hooks for non-treesitter modes (e.g., if treesit-auto fails)
   ((c-mode c++-mode) . lsp-deferred)
   (lsp-ui-doc-mode . lsp-deferred)
-  
+  ;;(lsp-inlay-hints-mode . lsp-deferred)
+
   :config
   ;; Additional lsp-mode settings
   )
