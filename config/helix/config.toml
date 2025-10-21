@@ -1,100 +1,100 @@
-#theme = "ayu_dark"
-#theme = "onedark"
-#theme = "catppuccin_mocha"
-theme = "vintage"
-
-
-[editor]
-line-number = "relative"
-scroll-lines = 1
-cursorline = true
-cursorcolumn = true
-auto-save = false
-completion-trigger-len = 1
-true-color = true
-color-modes = true
-auto-pairs = true
-
-
-#rulers = [120]
-idle-timeout = 50
-#mouse = false
-# Show currently open buffers, only when more than one exists.
-bufferline = "multiple"
-# Number of lines of padding around the edge of the screen when scrolling
-scrolloff = 10
-
-[editor.cursor-shape]
-insert = "bar"
-normal = "block"
-select = "underline"
-
-[editor.file-picker]
-hidden = false
-parents = true
-#git-ignore = false
-
-[editor.indent-guides]
-character = "▏"
-render = true
-
-# https://docs.helix-editor.com/master/configuration.html#editorsoft-wrap-section
-[editor.soft-wrap]
-enable = true
-# wrap-at-text-width = true
-wrap-indicator = "↩ "
-
-### https://docs.helix-editor.com/master/configuration.html#editorwhitespace-section
-[editor.whitespace.render]
-space = "all"
-tab = "all"
-newline = "none"
-
-[editor.whitespace.characters]
-space = " "
-nbsp = "⍽"    # Non Breaking SPace
-tab = "→"
-newline = "⏎"
-tabpad = "·"  # Tabs will look like "→···" (depending on tab width)
-###
-
-[editor.lsp]
-display-messages = true
-display-inlay-hints = true
-
-[editor.statusline]
-left = ["mode", "spinner", "file-name", "file-type", "total-line-numbers", "file-encoding"]
-center = []
-right = ["selections", "primary-selection-length", "position", "position-percentage", "spacer", "diagnostics", "workspace-diagnostics", "version-control"]
-
-[keys.normal]
-# Use system clipboard
-#y = "yank_main_selection_to_clipboard"
-#p = "paste_clipboard_before"
-#C-f = [":new", ":insert-output lf-pick", "split_selection_on_newline", "goto_file", "goto_last_modification", "goto_last_modified_file", ":buffer-close!", ":theme nord", ":theme default"]
-"A-8" = [
-  "move_prev_word_start",
-  "move_next_word_end",
-  "search_selection",
-]
-C-j = ["insert_mode", "insert_newline", "normal_mode"]
-C-y = ":sh zellij run -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh"
-
-# C-b = ":new<space>:insert-output build.sh"
-"C-b" = [":hsplit-new", ":insert-output build.sh"]
-[keys.normal.space]
-B = [":hsplit-new", ":insert-output ./build.sh"]
-
-[keys.normal.space.","]
-b = ":sh helix-wezterm.sh blame"
-c = ":sh helix-wezterm.sh check"
-e = ":sh helix-wezterm.sh explorer"
-f = ":sh helix-wezterm.sh fzf"
-g = ":sh helix-wezterm.sh lazygit"
-o = ":sh helix-wezterm.sh open"
-r = ":sh helix-wezterm.sh run"
-t = ":sh helix-wezterm.sh test"
-
-[keys.insert]
-j = { k = "normal_mode" } # Maps `jk` to exit insert mode
-#l = { b = "λ" } # Maps `jk` to exit insert mode
+  #theme = "ayu_dark"
+  #theme = "onedark"
+  #theme = "catppuccin_mocha"
+  theme = "vintage"
+  
+  
+  [editor]
+  line-number = "relative"
+  scroll-lines = 1
+  cursorline = true
+  cursorcolumn = true
+  auto-save = false
+  completion-trigger-len = 1
+  true-color = true
+  color-modes = true
+  auto-pairs = true
+  
+  
+  #rulers = [120]
+  idle-timeout = 50
+  #mouse = false
+  # Show currently open buffers, only when more than one exists.
+  bufferline = "multiple"
+  # Number of lines of padding around the edge of the screen when scrolling
+  scrolloff = 10
+  
+  [editor.cursor-shape]
+  insert = "bar"
+  normal = "block"
+  select = "underline"
+  
+  [editor.file-picker]
+  hidden = false
+  parents = true
+  #git-ignore = false
+  
+  [editor.indent-guides]
+  character = "▏"
+  render = true
+  
+  # https://docs.helix-editor.com/master/configuration.html#editorsoft-wrap-section
+  [editor.soft-wrap]
+  enable = true
+  # wrap-at-text-width = true
+  wrap-indicator = "↩ "
+  
+  ### https://docs.helix-editor.com/master/configuration.html#editorwhitespace-section
+  [editor.whitespace.render]
+  space = "all"
+  tab = "all"
+  newline = "none"
+  
+  [editor.whitespace.characters]
+  space = " "
+  nbsp = "⍽"    # Non Breaking SPace
+  tab = "→"
+  newline = "⏎"
+  tabpad = "·"  # Tabs will look like "→···" (depending on tab width)
+  ###
+  
+  [editor.lsp]
+  display-messages = true
+  display-inlay-hints = true
+  
+  [editor.statusline]
+  left = ["mode", "spinner", "file-name", "file-type", "total-line-numbers", "file-encoding"]
+  center = []
+  right = ["selections", "primary-selection-length", "position", "position-percentage", "spacer", "diagnostics", "workspace-diagnostics", "version-control"]
+  
+  [keys.normal]
+  # Use system clipboard
+  #y = "yank_main_selection_to_clipboard"
+  #p = "paste_clipboard_before"
+  #C-f = [":new", ":insert-output lf-pick", "split_selection_on_newline", "goto_file", "goto_last_modification", "goto_last_modified_file", ":buffer-close!", ":theme nord", ":theme default"]
+  "A-8" = [
+    "move_prev_word_start",
+    "move_next_word_end",
+    "search_selection",
+  ]
+  C-j = ["insert_mode", "insert_newline", "normal_mode"]
+  C-y = ":sh zellij run -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh"
+  
+  # C-b = ":new<space>:insert-output build.sh"
+  "C-b" = [":hsplit-new", ":insert-output build.sh"]
+  [keys.normal.space]
+  B = [":hsplit-new", ":insert-output ./build.sh"]
+  
+  [keys.normal.space.","]
+  b = ":sh helix-wezterm.sh blame"
+  c = ":sh helix-wezterm.sh check"
+  e = ":sh helix-wezterm.sh explorer"
+  f = ":sh helix-wezterm.sh fzf"
+  g = ":sh helix-wezterm.sh lazygit"
+  o = ":sh helix-wezterm.sh open"
+  r = ":sh helix-wezterm.sh run"
+  t = ":sh helix-wezterm.sh test"
+  
+  [keys.insert]
+  j = { k = "normal_mode" } # Maps `jk` to exit insert mode
+  #l = { b = "λ" } # Maps `jk` to exit insert mode

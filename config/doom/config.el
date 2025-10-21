@@ -149,6 +149,8 @@
       :desc "Comment line" ";" #'comment-line)
 (map! :leader
       :desc "consult bookmark" "B" #'consult-bookmark)
+(map! :leader
+      :desc "consult bookmark" "b" #'consult-buffer)
 
 
 ;;##consult-repgrep - search
@@ -243,7 +245,10 @@
   (meow-leader-define-key '("y" . meow-clipboard-save))
   (meow-leader-define-key '("p" . meow-clipboard-yank))
   (meow-leader-define-key '("B" . consult-bookmark))
-  )
+  (meow-leader-define-key '("b" . consult-buffer))
+  (setq meow-two-char-escape-sequence "jk")
+  (setq meow-two-char-escape-delay 0.2) ;; Adjust as needed
+)
 
 (global-set-key (kbd "M-n") 'ace-window)
 
@@ -491,8 +496,8 @@
   (meow-leader-define-key '("T" . org-roam-dailies-goto-date))
 )
 
-(define-key org-mode-map (kbd "(") 'org-previous-block)
-(define-key org-mode-map (kbd ")") 'org-next-block)
+(define-key org-mode-map (kbd "M-k") 'org-previous-block)
+(define-key org-mode-map (kbd "M-j") 'org-next-block)
 
 (with-eval-after-load 'org
   (setq org-use-speed-commands t)
@@ -857,7 +862,7 @@
 
   (use-package org-brain :ensure t
     :init
-    (setq org-brain-path "/data/orka/notes/brain")
+    (setq org-brain-path "~/notes/brain")
     ;; For Evil users
     (with-eval-after-load 'evil
       (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
