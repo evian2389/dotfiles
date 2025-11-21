@@ -115,6 +115,7 @@
 (setq auto-save-list-file-prefix "~/.config/emacs")
 
 (setq display-line-numbers-type `relative)
+(setq-default truncate-lines t)
 ;;set ui-helpers
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers 'relative)
@@ -234,6 +235,33 @@
 
   (define-key geiser-mode-map (kbd "C-c M-j") 'orka-geiser-connect))
 
+  (setq meow-two-char-escape-sequence "jk")
+  (setq meow-two-char-escape-delay 0.3)
+
+  (defun meow--two-char-exit-insert-state (s)
+    (when (meow-insert-mode-p)
+      (let ((modified (buffer-modified-p)))
+        (insert (elt s 0))
+        (let* ((second-char (elt s 1))
+               (event
+                (if defining-kbd-macro
+                    (read-event nil nil)
+                  (read-event nil nil meow-two-char-escape-delay))))
+          (when event
+            (if (and (characterp event) (= event second-char))
+                (progn
+                  (backward-delete-char 1)
+                  (set-buffer-modified-p modified)
+                  (meow--execute-kbd-macro "<escape>"))
+              (push event unread-command-events)))))))
+
+  (defun meow-two-char-exit-insert-state ()
+    (interactive)
+    (meow--two-char-exit-insert-state meow-two-char-escape-sequence))
+
+  (define-key meow-insert-state-keymap (substring meow-two-char-escape-sequence 0 1)
+    #'meow-two-char-exit-insert-state)
+
 (with-eval-after-load 'meow
   (meow-normal-define-key '("C-j" . meow-page-down))
   (meow-normal-define-key '("C-k" . meow-page-up))
@@ -242,12 +270,12 @@
   (meow-normal-define-key '("M-f" . find-grep-dired))
   (meow-normal-define-key '("M-o" . browse-url-at-point))
   (meow-normal-define-key '("C-o" . pop-global-mark))
+  (meow-normal-define-key '("<" . beginning-of-buffer))
+  (meow-normal-define-key '(">" . end-of-buffer))
   (meow-leader-define-key '("y" . meow-clipboard-save))
   (meow-leader-define-key '("p" . meow-clipboard-yank))
   (meow-leader-define-key '("B" . consult-bookmark))
   (meow-leader-define-key '("b" . consult-buffer))
-  (setq meow-two-char-escape-sequence "jk")
-  (setq meow-two-char-escape-delay 0.2) ;; Adjust as needed
 )
 
 (global-set-key (kbd "M-n") 'ace-window)
@@ -309,6 +337,13 @@
     :implementations '(lsp-proxy-find-implementations :async t)
     :type-definition '(lsp-proxy-find-type-definition :async t)
     :documentation '(lsp-proxy-describe-thing-at-point :async t)))
+  :costom
+  (setq lsp-clients-clangd-args
+          '("-j=4" ;; Example: Use 4 jobs for background indexing
+            "--background-index"
+            "--clang-tidy" ;; Enable Clang-Tidy checks
+            "--completion-style=detailed"
+            "-log=error"))
 
 (meow-leader-define-key '("g" . lsp-find-references))
 (meow-leader-define-key '("d" . lsp-find-definition))
@@ -340,6 +375,10 @@
   (treesit-auto-add-to-auto-mode-alist t)
   (global-treesit-auto-mode))
 
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
 ;; lsp-mode configuration
 (use-package lsp-mode
   :after treesit-auto
@@ -356,12 +395,14 @@
   (treesit-auto-mode . lsp-deferred)
   ;; Fallback hooks for non-treesitter modes (e.g., if treesit-auto fails)
   ((c-mode c++-mode) . lsp-deferred)
-  (lsp-ui-doc-mode . lsp-deferred)
+  ;;(lsp-ui-doc-mode . lsp-deferred)
   ;;(lsp-inlay-hints-mode . lsp-deferred)
 
   :config
   ;; Additional lsp-mode settings
+  (setq lsp-diagnostics-provider :flycheck)
   )
+
 
 ;; lsp-ui configuration (No changes needed)
 (use-package lsp-ui
@@ -374,7 +415,8 @@
   (setq lsp-ui-sideline-enable t)
   (setq lsp-ui-doc-enable t)
   (setq lsp-ui-peek-enable t)
-  (setq lsp-ui-doc-show-on-cursor nil)
+  (setq lsp-ui-doc-show-on-cursor t)
+  (setq lsp-ui-doc-show-with-diagnostics t)
   (define-key lsp-ui-mode-map (kbd "M-,") #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-references))
 
@@ -386,21 +428,19 @@
     ;;   ;; Add other clangd-specific settings here if needed
     ;;   )
 
-    (use-package rustic
-      :mode "\\.rs\\'"
-      :hook (rustic-mode . lsp-deferred)
-      :config
-      ;; Add rustic/rust-analyzer specific settings here
-      (setq rustic-format-on-save t) ; Example: enable formatting on save
-      )
+    ;; (use-package rustic
+    ;;   :mode "\\.rs\\'"
+    ;;   :hook (rustic-mode . lsp-deferred)
+    ;;   :config
+    ;;   ;; Add rustic/rust-analyzer specific settings here
+    ;;   (setq rustic-format-on-save t) ; Example: enable formatting on save
+    ;;   )
 
    (require 'company)
    (global-company-mode t)
-   (add-hook 'lsp-mode-hook 'company-mode)
+   ;;(add-hook 'lsp-mode-hook 'company-mode)
    ;; Enable lsp-ui-signature-mode globally
-   (add-hook 'lsp-mode-hook 'lsp-ui-signature-mode)
-   ;; Enable lsp-ui-flycheck-mode globally
-   (add-hook 'lsp-mode-hook 'lsp-ui-flycheck-mode)
+   ;;(add-hook 'lsp-mode-hook 'lsp-ui-signature-mode)
 
 (use-package! corfu
   :init

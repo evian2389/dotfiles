@@ -14,6 +14,7 @@
   true-color = true
   color-modes = true
   auto-pairs = true
+  end-of-line-diagnostics= "disable"
   
   
   #rulers = [120]
@@ -58,9 +59,25 @@
   tabpad = "·"  # Tabs will look like "→···" (depending on tab width)
   ###
   
+  [editor.inline-diagnostics]
+  # Minimum severity to show a diagnostic on the primary cursor's line.
+  # Set to "disable" to not show any diagnostics inline on the cursor line.
+  cursor-line = "hint" # or "warning", "info", "hint", "disable"
+  
+  # Minimum severity to show a diagnostic on other lines.
+  # Set to "disable" to not show any diagnostics inline on other lines.
+  other-lines = "disable" # or "warning", "info", "hint", "error"
+  
   [editor.lsp]
   display-messages = true
-  display-inlay-hints = true
+  display-inlay-hints = false
+  
+  [keys.normal.space."i"]
+  m = ":toggle lsp.display-messages"
+  i = ":toggle lsp.display-inlay-hints"
+  c = ":toggle inline-diagnostics.cursor-line hint disable" # Toggle cursor-line diagnostics
+  o = ":toggle inline-diagnostics.other-lines warning disable" # Toggle other-lines diagnostics
+  l = ":toggle end-of-line-diagnostics hint disable" # Toggle other-lines diagnostics
   
   [editor.statusline]
   left = ["mode", "spinner", "file-name", "file-type", "total-line-numbers", "file-encoding"]
@@ -97,4 +114,4 @@
   
   [keys.insert]
   j = { k = "normal_mode" } # Maps `jk` to exit insert mode
-  #l = { b = "λ" } # Maps `jk` to exit insert mode
+  k = { j = ":insert-output printf 'λ'" } # Maps `ld` t oinput lambda

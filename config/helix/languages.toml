@@ -50,6 +50,7 @@
   #[[language]]
   #name = "scheme"
   #language-servers = [ "steel-language-server" ]
+  indent = { tab-width = 2, unit = "  " }
   
   
   ################C++######
@@ -57,6 +58,7 @@
   [[language]]
   name = "cpp"
   language-servers = [ "clangd" ]
+  indent = { tab-width = 2, unit = "  " }
   
   [language-server.clangd]
   command = "clangd"
@@ -72,6 +74,7 @@
   formatter = { command = "rustfmt" }
   auto-format = true
   roots = [ "Cargo.toml", "Cargo.lock" ]
+  indent = { tab-width = 2, unit = "  " }
   
   [language-server.rust-analyzer]
   command = "rust-analyzer"
