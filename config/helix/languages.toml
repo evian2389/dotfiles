@@ -34,13 +34,6 @@
   ## Configuration for languages ##
   #################################
   
-  ## Every file type we intend to chat in needs to have lsp-ai enabled
-  [[language]]
-  name = "markdown"
-  #language-servers = ["lsp-ai"]
-  language-servers = ["lsp-ai", "markdown-oxide"]
-  formatter = { command = "dprint", args = ["fmt", "--stdin", "md"]}
-  auto-format = true
   
   #########################
   
@@ -50,7 +43,8 @@
   #[[language]]
   #name = "scheme"
   #language-servers = [ "steel-language-server" ]
-  indent = { tab-width = 2, unit = "  " }
+  #formatter = { command = "dprint", args = ["fmt", "$file_path"] }
+  #indent = { tab-width = 2, unit = "  " }
   
   
   ################C++######
@@ -59,6 +53,7 @@
   name = "cpp"
   language-servers = [ "clangd" ]
   indent = { tab-width = 2, unit = "  " }
+  formatter = { command = "dprint", args = ["fmt", "$file_path"] }
   
   [language-server.clangd]
   command = "clangd"
@@ -78,3 +73,15 @@
   
   [language-server.rust-analyzer]
   command = "rust-analyzer"
+  
+  [language-server.iwe]
+  command = "iwes"
+  
+  ## Every file type we intend to chat in needs to have lsp-ai enabled
+  [[language]]
+  name = "markdown"
+  #language-servers = ["lsp-ai"]
+  #language-servers = ["lsp-ai", "iwe"]
+  language-servers = ["iwe"]
+  formatter = { command = "dprint", args = ["fmt", "--stdin", "md"]}
+  auto-format = true

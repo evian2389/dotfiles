@@ -70,7 +70,7 @@
   
   [editor.lsp]
   display-messages = true
-  display-inlay-hints = false
+  display-inlay-hints = true
   
   [keys.normal.space."i"]
   m = ":toggle lsp.display-messages"

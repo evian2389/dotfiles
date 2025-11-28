@@ -516,6 +516,14 @@
 (require 'org-indent)
 
 (setq org-log-reschedule 'time)
+(setq org-log-done 'time)
+
+;; Follow the links
+(setq org-return-follows-link  t)
+
+;; Associate all org files with org mode
+;; (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+
 
   (custom-set-variables
    '(org-agenda-custom-commands
@@ -544,7 +552,7 @@
   (setq org-enforce-todo-dependencies t)
 
   (setq org-lowest-priority ?F)  ;; Gives us priorities A through F
-  (setq org-default-priority ?E) ;; If an item has no priority, it is considered [#E].
+  (setq org-default-priority ?C) ;; If an item has no priority, it is considered [#C].
 
   (setq org-priority-faces
         '((65 . "#BF616A")
@@ -556,18 +564,20 @@
 
   (setq org-todo-keywords
         '((sequence
-           "TODO(t)" "START(s)" "HOLD(h)" "WAIT(w)" "IDEA(i)" ; Needs further action
+           "TODO(t)" "PLANNING(p)" "IN-PROGRESS(s)" "VERIFYING(v)" "BLOCKED(b)" "IDEA(i)" "[ ]"; Needs further action
            "|"
-           "DONE(d)" "DELIGATED(e)")))                           ; Needs no action currently
+           "DONE(d)" "DELIGATED(e)" "WONT-DO(n)")))                           ; Needs no action currently
 
   (setq org-todo-keyword-faces
         '(("TODO"      :inherit (org-todo region) :foreground "#A3BE8C" :weight bold)
-          ("START"      :inherit (org-todo region) :foreground "#88C0D0" :weight bold)
-          ("HOLD"      :inherit (org-todo region) :foreground "#8FBCBB" :weight bold)
-          ("WAIT"     :inherit (org-todo region) :foreground "#81A1C1" :weight bold)
+          ("PLANNING"      :inherit (org-todo region) :foreground "#98B080" :weight bold)
+          ("IN-PROGRESS"      :inherit (org-todo region) :foreground "#88C0D0" :weight bold)
+          ("VERIFYING"      :inherit (org-todo region) :foreground "#8AD0D0" :weight bold)
+          ("BLOCKED"      :inherit (org-todo region) :foreground "#B8BCBB" :weight bold)
           ("IDEA"      :inherit (org-todo region) :foreground "#EBCB8B" :weight bold)
           ("DONE"      :inherit (org-todo region) :foreground "#30343d" :weight bold)
           ("DELIGATED" :inherit (org-todo region) :foreground "#20242d" :weight bold)
+          ("WONT-DO" :inherit (org-todo region) :foreground "#10141d" :weight bold)
           ))
 
   ;; (custom-theme-set-faces!
@@ -586,12 +596,12 @@
   (set-face-attribute 'org-document-title nil :font my/variable-width-font :weight 'bold :height 1.8)
 
   ;; Resize Org headings
-  (dolist (face '((org-level-1 . 1.6)
-                  (org-level-2 . 1.5)
-                  (org-level-3 . 1.4)
-                  (org-level-4 . 1.3)
-                  (org-level-5 . 1.2)
-                  (org-level-6 . 1.1)
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.05)
+                  (org-level-3 . 1.0)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.0)
+                  (org-level-6 . 1.0)
                   (org-level-7 . 1.0)
                   (org-level-8 . 1.0)))
     (set-face-attribute (car face) nil :font my/variable-width-font :weight 'medium :height (cdr face)))
@@ -629,6 +639,41 @@
   (setq visual-fill-column-width 110
         visual-fill-column-center-text t)
 
+(setq org-capture-templates
+      '(("g" "General To-Do"
+         entry (file+headline "todo.org" "Inbox")
+         "* TODO [#B] %? [/] \n:Created: %T\n"
+         :empty-lines 0
+         :unnarrowed t)
+        ("m" "Meeting"
+         entry (file+datetree "meetings/meetings.org")
+         "* %? :meeting:%^g \n:Created: %T\n** Attendees\n*** \n** Notes\n** Action Items\n*** TODO [#B]  [/]\n"
+         :tree-type week
+         :clock-in t
+         :clock-resume t
+         :empty-lines 0)
+      ))
+
+;; Tags
+(setq org-tag-alist '(
+                      ;; Project types
+                      (:startgroup . nil)
+                      ("@GEN-PROJ" . nil)
+                      ("@CCRC" . nil)
+                      ("@CCIC27" . nil)
+                      (:endgroup . nil)
+
+                      ;; Meeting tags
+                      ("HR" . ?h)
+                      ("general" . ?l)
+                      ("meeting" . ?m)
+                      ("misc" . ?z)
+                      ("planning" . ?p)
+
+                      ;; Work Log Tags
+                      ("accomplishment" . ?a)
+                      ))
+
 (use-package org-roam
   :ensure t
   :init
@@ -646,7 +691,8 @@
       (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
 (setq org-roam-capture-templates
-      '(("e" "etc" plain "%?"
+      '(
+        ("e" "etc" plain "%?"
          :if-new (file+head "main/${slug}.org"
                             "#+filetags: :etc:\n#+date: %U\n#+title: ${title}\n")
          :immediate-finish t
@@ -727,7 +773,8 @@
     ;; Stop centering the document
     (visual-fill-column-mode 0)
     (visual-line-mode 0)
-    (setq display-line-numbers-type `relative)
+
+    (setq display-line-numbers-type `relative'relative)
     ;;set ui-helpers
     (global-display-line-numbers-mode 1)
     (setq display-line-numbers 'relative)
@@ -874,9 +921,9 @@
   (defun my/org-mode-start ()
     ;; Tweak font sizes
     (variable-pitch-mode)
-    ;;(org-superstar-mode)
+    (org-superstar-mode)
     (my/prettify-symbols-setup)
-    ;;(svg-tag-mode)
+    (svg-tag-mode)
     ;; (set-face-attribute org-level-1 nil :foreground "yellow")
     ;; (set-face-attribute org-level-2 nil :foreground "blue")
     ;; (set-face-attribute org-level-3 nil :foreground "blue")
@@ -887,7 +934,7 @@
 
   (defun my/org-agenda-mode-start ()
     (my/prettify-symbols-setup)
-    ;;(org-super-agenda-mode)
+    (org-super-agenda-mode)
     )
 
 
@@ -928,6 +975,17 @@
     :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
     :defer t
     :hook (org-src-mode . org-auto-tangle-mode))
+
+(use-package! org-jira
+  :config
+  (setq jiralib-url "http://jira.lge.com/")
+  (setq org-jira-api-token (string-trim (shell-command-to-string "pass show jira/org-jira")))
+  (setq org-jira-auth-type 'bearer)
+  ;; (setq jiralib-token
+  ;;    (cons "Authorization"
+  ;;          (concat "Bearer " (auth-source-pick-first-password
+  ;;                             :host "http://jira.lge.com/"))))
+)
 
 )
 

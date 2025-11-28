@@ -53,7 +53,8 @@
 (package! org-auto-tangle)
 (package! harpoon)
 (package! jinx)
-;;(package! org-superstar)
+
+(package! org-superstar)
 (package! ace-window)
 (package! polymode)
 (package! vundo)
@@ -76,3 +77,5 @@
 
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
+
+(package! org-jira)
