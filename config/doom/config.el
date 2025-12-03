@@ -546,6 +546,8 @@
 
 (define-key org-mode-map (kbd "M-k") 'org-previous-block)
 (define-key org-mode-map (kbd "M-j") 'org-next-block)
+(define-key org-mode-map (kbd "S-M-<left>") 'org-promote-subtree)
+(define-key org-mode-map (kbd "S-M-<right>") 'org-demote-subtree)
 
 (with-eval-after-load 'org
   (setq org-use-speed-commands t)
@@ -564,7 +566,7 @@
 
   (setq org-todo-keywords
         '((sequence
-           "TODO(t)" "PLANNING(p)" "IN-PROGRESS(s)" "VERIFYING(v)" "BLOCKED(b)" "IDEA(i)" "[ ]"; Needs further action
+           "TODO(t)" "PLANNING(p)" "IN-PROGRESS(s)" "VERIFYING(v)" "BLOCKED(b)" "IDEA(i)" ; Needs further action
            "|"
            "DONE(d)" "DELIGATED(e)" "WONT-DO(n)")))                           ; Needs no action currently
 

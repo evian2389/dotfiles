@@ -10,7 +10,7 @@
 #+BEGIN_SRC bash
 
 ## install clangd, rust-analyzer
-paru -Sy clangd rust-analyzer
+paru -Sy clangd rust-analyzer ttf-jetbrains-mono-nerd  ttf-iosevka-aile
 
 ## install broot
 cargo install --locked --features clipboard broot
@@ -28,8 +28,7 @@ broot --install
 cargo install emacs-lsp-booster
 
 ## install clangd, rust-analyzer
-paru -Sy clangd rust-analyzer
-
+paru -Sy ttf-jetbrains-mono-nerd  ttf-iosevka-aile
 
 #+END_SRC
 
@@ -40,7 +39,7 @@ paru -Sy clangd rust-analyzer
 **** setting doom
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
@@ -113,7 +112,7 @@ paru -Sy clangd rust-analyzer
 **** Theme and Fonts
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
 ;;; Theme and Fonts ----------------------------------------
 (set-frame-parameter nil 'alpha-background 95) ; For current frame
@@ -162,13 +161,14 @@ paru -Sy clangd rust-analyzer
 **** editor settings
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 
 (setq auto-save-list-file-prefix "~/.config/emacs")
 
 (setq display-line-numbers-type `relative)
+(setq-default truncate-lines t)
 ;;set ui-helpers
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers 'relative)
@@ -203,6 +203,8 @@ paru -Sy clangd rust-analyzer
       :desc "Comment line" ";" #'comment-line)
 (map! :leader
       :desc "consult bookmark" "B" #'consult-bookmark)
+(map! :leader
+      :desc "consult bookmark" "b" #'consult-buffer)
 
 
 ;;##consult-repgrep - search
@@ -224,7 +226,7 @@ paru -Sy clangd rust-analyzer
 ***** vundo : visualize undo tree
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 ;;##vundo
 (use-package vundo
   :commands (vundo)
@@ -263,7 +265,7 @@ paru -Sy clangd rust-analyzer
 ***** jinx : dictionary
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 (use-package jinx
 ;  :hook (org-mode . jinx-mode)
   :bind (("M-$" . jinx-correct)
@@ -274,7 +276,7 @@ paru -Sy clangd rust-analyzer
 ***** harpoon : quickly open file
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 ;; You can use this hydra menu that have all the commands
 ;; (map! :n "s-SPC" 'harpoon-quick-menu-hydra)
 ;; (map! :n "s-s" 'harpoon-add-file)
@@ -299,7 +301,7 @@ paru -Sy clangd rust-analyzer
 ***** geiser-mode : lisp in emacs
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 (with-eval-after-load 'geiser-mode
   (setq geiser-mode-auto-p nil)
   (defun orka-geiser-connect ()
@@ -315,7 +317,33 @@ paru -Sy clangd rust-analyzer
 ***** key bindings
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
+  (setq meow-two-char-escape-sequence "jk")
+  (setq meow-two-char-escape-delay 0.3)
+
+  (defun meow--two-char-exit-insert-state (s)
+    (when (meow-insert-mode-p)
+      (let ((modified (buffer-modified-p)))
+        (insert (elt s 0))
+        (let* ((second-char (elt s 1))
+               (event
+                (if defining-kbd-macro
+                    (read-event nil nil)
+                  (read-event nil nil meow-two-char-escape-delay))))
+          (when event
+            (if (and (characterp event) (= event second-char))
+                (progn
+                  (backward-delete-char 1)
+                  (set-buffer-modified-p modified)
+                  (meow--execute-kbd-macro "<escape>"))
+              (push event unread-command-events)))))))
+
+  (defun meow-two-char-exit-insert-state ()
+    (interactive)
+    (meow--two-char-exit-insert-state meow-two-char-escape-sequence))
+
+  (define-key meow-insert-state-keymap (substring meow-two-char-escape-sequence 0 1)
+    #'meow-two-char-exit-insert-state)
 
 (with-eval-after-load 'meow
   (meow-normal-define-key '("C-j" . meow-page-down))
@@ -325,23 +353,25 @@ paru -Sy clangd rust-analyzer
   (meow-normal-define-key '("M-f" . find-grep-dired))
   (meow-normal-define-key '("M-o" . browse-url-at-point))
   (meow-normal-define-key '("C-o" . pop-global-mark))
+  (meow-normal-define-key '("<" . beginning-of-buffer))
+  (meow-normal-define-key '(">" . end-of-buffer))
   (meow-leader-define-key '("y" . meow-clipboard-save))
   (meow-leader-define-key '("p" . meow-clipboard-yank))
   (meow-leader-define-key '("B" . consult-bookmark))
-  )
-
+  (meow-leader-define-key '("b" . consult-buffer))
+)
 #+END_SRC
 
 **** window navigation
 #+NAME:        config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 (global-set-key (kbd "M-n") 'ace-window)
 #+END_SRC
 **** vertico
 #+NAME:        config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 ;; Enable Vertico.
 (use-package vertico
   :custom
@@ -420,6 +450,18 @@ paru -Sy clangd rust-analyzer
   :config
   (global-blamer-mode 1))
 #+END_SRC
+**** llm
+  #+BEGIN_SRC conf :noweb yes :tangle ~/.config/doom/config.el :mkdirp yes
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+#+END_SRC
+
 
 **** TODO: lsp settings
 ***** pre-install
@@ -428,7 +470,7 @@ npm install -g emacs-lsp-proxy
 #+END_EXAMPLE
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 (use-package! lsp-proxy
   :config
   (set-lookup-handlers! 'lsp-proxy-mode
@@ -437,11 +479,18 @@ npm install -g emacs-lsp-proxy
     :implementations '(lsp-proxy-find-implementations :async t)
     :type-definition '(lsp-proxy-find-type-definition :async t)
     :documentation '(lsp-proxy-describe-thing-at-point :async t)))
+  :costom
+  (setq lsp-clients-clangd-args
+          '("-j=4" ;; Example: Use 4 jobs for background indexing
+            "--background-index"
+            "--clang-tidy" ;; Enable Clang-Tidy checks
+            "--completion-style=detailed"
+            "-log=error"))
 
 #+END_SRC
 
 ***** lsp-ui mode
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
 (meow-leader-define-key '("g" . lsp-find-references))
 (meow-leader-define-key '("d" . lsp-find-definition))
@@ -459,7 +508,7 @@ npm install -g emacs-lsp-proxy
 #+END_SRC
 ***** lsp-mode
 You need to execute *treesit-auto-install-all*
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
 ;; treesit-auto configuration
 (use-package treesit-auto
@@ -479,6 +528,10 @@ You need to execute *treesit-auto-install-all*
   (treesit-auto-add-to-auto-mode-alist t)
   (global-treesit-auto-mode))
 
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
 ;; lsp-mode configuration
 (use-package lsp-mode
   :after treesit-auto
@@ -495,12 +548,14 @@ You need to execute *treesit-auto-install-all*
   (treesit-auto-mode . lsp-deferred)
   ;; Fallback hooks for non-treesitter modes (e.g., if treesit-auto fails)
   ((c-mode c++-mode) . lsp-deferred)
-  (lsp-ui-doc-mode . lsp-deferred)
+  ;;(lsp-ui-doc-mode . lsp-deferred)
   ;;(lsp-inlay-hints-mode . lsp-deferred)
 
   :config
   ;; Additional lsp-mode settings
+  (setq lsp-diagnostics-provider :flycheck)
   )
+
 
 ;; lsp-ui configuration (No changes needed)
 (use-package lsp-ui
@@ -513,7 +568,8 @@ You need to execute *treesit-auto-install-all*
   (setq lsp-ui-sideline-enable t)
   (setq lsp-ui-doc-enable t)
   (setq lsp-ui-peek-enable t)
-  (setq lsp-ui-doc-show-on-cursor nil)
+  (setq lsp-ui-doc-show-on-cursor t)
+  (setq lsp-ui-doc-show-with-diagnostics t)
   (define-key lsp-ui-mode-map (kbd "M-,") #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-references))
 
@@ -524,7 +580,7 @@ You need to execute *treesit-auto-install-all*
 ****** config
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
     ;; (use-package lsp-mode
     ;;   :commands lsp
     ;;   :hook ((c-mode c++-mode) . lsp-deferred)
@@ -538,27 +594,25 @@ You need to execute *treesit-auto-install-all*
 config
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
-    (use-package rustic
-      :mode "\\.rs\\'"
-      :hook (rustic-mode . lsp-deferred)
-      :config
-      ;; Add rustic/rust-analyzer specific settings here
-      (setq rustic-format-on-save t) ; Example: enable formatting on save
-      )
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
+    ;; (use-package rustic
+    ;;   :mode "\\.rs\\'"
+    ;;   :hook (rustic-mode . lsp-deferred)
+    ;;   :config
+    ;;   ;; Add rustic/rust-analyzer specific settings here
+    ;;   (setq rustic-format-on-save t) ; Example: enable formatting on save
+    ;;   )
 #+END_SRC
 
 
 
 ***** auto completion
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
    (require 'company)
    (global-company-mode t)
-   (add-hook 'lsp-mode-hook 'company-mode)
+   ;;(add-hook 'lsp-mode-hook 'company-mode)
    ;; Enable lsp-ui-signature-mode globally
-   (add-hook 'lsp-mode-hook 'lsp-ui-signature-mode)
-   ;; Enable lsp-ui-flycheck-mode globally
-   (add-hook 'lsp-mode-hook 'lsp-ui-flycheck-mode)
+   ;;(add-hook 'lsp-mode-hook 'lsp-ui-signature-mode)
 
 (use-package! corfu
   :init
@@ -596,7 +650,7 @@ config
 
 ***** lsp-booster
 ****** config init
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."
   (or
@@ -632,7 +686,7 @@ config
 ***** basic settings
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/notes/"
@@ -644,6 +698,14 @@ config
 (require 'org-indent)
 
 (setq org-log-reschedule 'time)
+(setq org-log-done 'time)
+
+;; Follow the links
+(setq org-return-follows-link  t)
+
+;; Associate all org files with org mode
+;; (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+
 
   (custom-set-variables
    '(org-agenda-custom-commands
@@ -664,15 +726,17 @@ config
   (meow-leader-define-key '("T" . org-roam-dailies-goto-date))
 )
 
-(define-key org-mode-map (kbd "(") 'org-previous-block)
-(define-key org-mode-map (kbd ")") 'org-next-block)
+(define-key org-mode-map (kbd "M-k") 'org-previous-block)
+(define-key org-mode-map (kbd "M-j") 'org-next-block)
+(define-key org-mode-map (kbd "S-M-<left>") 'org-promote-subtree)
+(define-key org-mode-map (kbd "S-M-<right>") 'org-demote-subtree)
 
 
 #+END_SRC
 ***** after org load - start
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 (with-eval-after-load 'org
   (setq org-use-speed-commands t)
   (setq org-enforce-todo-dependencies t)
@@ -681,9 +745,9 @@ config
 ***** org - todo
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
   (setq org-lowest-priority ?F)  ;; Gives us priorities A through F
-  (setq org-default-priority ?E) ;; If an item has no priority, it is considered [#E].
+  (setq org-default-priority ?C) ;; If an item has no priority, it is considered [#C].
 
   (setq org-priority-faces
         '((65 . "#BF616A")
@@ -695,18 +759,20 @@ config
 
   (setq org-todo-keywords
         '((sequence
-           "TODO(t)" "START(s)" "HOLD(h)" "WAIT(w)" "IDEA(i)" ; Needs further action
+           "TODO(t)" "PLANNING(p)" "IN-PROGRESS(s)" "VERIFYING(v)" "BLOCKED(b)" "IDEA(i)" ; Needs further action
            "|"
-           "DONE(d)" "DELIGATED(e)")))                           ; Needs no action currently
+           "DONE(d)" "DELIGATED(e)" "WONT-DO(n)")))                           ; Needs no action currently
 
   (setq org-todo-keyword-faces
         '(("TODO"      :inherit (org-todo region) :foreground "#A3BE8C" :weight bold)
-          ("START"      :inherit (org-todo region) :foreground "#88C0D0" :weight bold)
-          ("HOLD"      :inherit (org-todo region) :foreground "#8FBCBB" :weight bold)
-          ("WAIT"     :inherit (org-todo region) :foreground "#81A1C1" :weight bold)
+          ("PLANNING"      :inherit (org-todo region) :foreground "#98B080" :weight bold)
+          ("IN-PROGRESS"      :inherit (org-todo region) :foreground "#88C0D0" :weight bold)
+          ("VERIFYING"      :inherit (org-todo region) :foreground "#8AD0D0" :weight bold)
+          ("BLOCKED"      :inherit (org-todo region) :foreground "#B8BCBB" :weight bold)
           ("IDEA"      :inherit (org-todo region) :foreground "#EBCB8B" :weight bold)
           ("DONE"      :inherit (org-todo region) :foreground "#30343d" :weight bold)
           ("DELIGATED" :inherit (org-todo region) :foreground "#20242d" :weight bold)
+          ("WONT-DO" :inherit (org-todo region) :foreground "#10141d" :weight bold)
           ))
 
 
@@ -715,7 +781,7 @@ config
 ***** org visual - theme & fonts
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
   ;; (custom-theme-set-faces!
   ;;   'doom-one
     ;; '(org-level-8 :inherit outline-3 :height 1.0)
@@ -732,12 +798,12 @@ config
   (set-face-attribute 'org-document-title nil :font my/variable-width-font :weight 'bold :height 1.8)
 
   ;; Resize Org headings
-  (dolist (face '((org-level-1 . 1.6)
-                  (org-level-2 . 1.5)
-                  (org-level-3 . 1.4)
-                  (org-level-4 . 1.3)
-                  (org-level-5 . 1.2)
-                  (org-level-6 . 1.1)
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.05)
+                  (org-level-3 . 1.0)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.0)
+                  (org-level-6 . 1.0)
                   (org-level-7 . 1.0)
                   (org-level-8 . 1.0)))
     (set-face-attribute (car face) nil :font my/variable-width-font :weight 'medium :height (cdr face)))
@@ -778,11 +844,51 @@ config
 
 
 #+END_SRC
+***** org common - tags, captures
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
+(setq org-capture-templates
+      '(("g" "General To-Do"
+         entry (file+headline "todo.org" "Inbox")
+         "* TODO [#B] %? [/] \n:Created: %T\n"
+         :empty-lines 0
+         :unnarrowed t)
+        ("m" "Meeting"
+         entry (file+datetree "meetings/meetings.org")
+         "* %? :meeting:%^g \n:Created: %T\n** Attendees\n*** \n** Notes\n** Action Items\n*** TODO [#B]  [/]\n"
+         :tree-type week
+         :clock-in t
+         :clock-resume t
+         :empty-lines 0)
+      ))
+
+;; Tags
+(setq org-tag-alist '(
+                      ;; Project types
+                      (:startgroup . nil)
+                      ("@GEN-PROJ" . nil)
+                      ("@CCRC" . nil)
+                      ("@CCIC27" . nil)
+                      (:endgroup . nil)
+
+                      ;; Meeting tags
+                      ("HR" . ?h)
+                      ("general" . ?l)
+                      ("meeting" . ?m)
+                      ("misc" . ?z)
+                      ("planning" . ?p)
+
+                      ;; Work Log Tags
+                      ("accomplishment" . ?a)
+                      ))
+
+#+END_SRC
 
 ***** org roam
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 (use-package org-roam
   :ensure t
   :init
@@ -800,7 +906,8 @@ config
       (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
 (setq org-roam-capture-templates
-      '(("e" "etc" plain "%?"
+      '(
+        ("e" "etc" plain "%?"
          :if-new (file+head "main/${slug}.org"
                             "#+filetags: :etc:\n#+date: %U\n#+title: ${title}\n")
          :immediate-finish t
@@ -834,7 +941,7 @@ config
 ***** org present
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
 ;;; Org Present --------------------------------------------
 
@@ -887,7 +994,8 @@ config
     ;; Stop centering the document
     (visual-fill-column-mode 0)
     (visual-line-mode 0)
-    (setq display-line-numbers-type `relative)
+
+    (setq display-line-numbers-type `relative'relative)
     ;;set ui-helpers
     (global-display-line-numbers-mode 1)
     (setq display-line-numbers 'relative)
@@ -899,7 +1007,7 @@ config
 ***** org pretty-symbols
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
   (defun my/prettify-symbols-setup ()
     "Beautify keywords"
@@ -962,7 +1070,7 @@ config
 ***** org svg-tag-mode
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 (use-package svg-tag-mode
   :after org
     :config
@@ -1046,14 +1154,14 @@ config
 ***** hook & call
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
   (defun my/org-mode-start ()
     ;; Tweak font sizes
     (variable-pitch-mode)
-    ;;(org-superstar-mode)
+    (org-superstar-mode)
     (my/prettify-symbols-setup)
-    ;;(svg-tag-mode)
+    (svg-tag-mode)
     ;; (set-face-attribute org-level-1 nil :foreground "yellow")
     ;; (set-face-attribute org-level-2 nil :foreground "blue")
     ;; (set-face-attribute org-level-3 nil :foreground "blue")
@@ -1064,7 +1172,7 @@ config
 
   (defun my/org-agenda-mode-start ()
     (my/prettify-symbols-setup)
-    ;;(org-super-agenda-mode)
+    (org-super-agenda-mode)
     )
 
 
@@ -1084,11 +1192,11 @@ config
 ***** org brain
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
   (use-package org-brain :ensure t
     :init
-    (setq org-brain-path "/data/orka/notes/brain")
+    (setq org-brain-path "~/notes/brain")
     ;; For Evil users
     (with-eval-after-load 'evil
       (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
@@ -1114,7 +1222,7 @@ config
 ***** org babel
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
   (use-package org-auto-tangle
     :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
@@ -1123,20 +1231,40 @@ config
 
 #+END_SRC
 
+***** org-jira
+#+NAME: config.el
+#+auto_tangle: nil
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
+
+(use-package! org-jira
+  :config
+  (setq jiralib-url "http://jira.lge.com/")
+  (setq org-jira-api-token (string-trim (shell-command-to-string "pass show jira/org-jira")))
+  (setq org-jira-auth-type 'bearer)
+  ;; (setq jiralib-token
+  ;;    (cons "Authorization"
+  ;;          (concat "Bearer " (auth-source-pick-first-password
+  ;;                             :host "http://jira.lge.com/"))))
+)
+#+END_SRC
+
+
 ***** after org load - end
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
 
 
 
 )
 #+END_SRC
 
+
+
 **** TODO: needs to organize
 #+NAME: config.el
 #+auto_tangle: nil
-#+BEGIN_SRC emacs-lisp :tangle /data/orka/dotfiles/config/doom/config.el :mkdirp yes
+#+BEGIN_SRC emacs-lisp :tangle ~/dotfiles/config/doom/config.el :mkdirp yes
                                         ;       (with-eval-after-load 'geiser-mode
                                         ;        (setq geiser-mode-auto-p nil)
                                         ;       (defun orka-geiser-connect ()
@@ -1155,7 +1283,7 @@ config
 ** init.el
 #+NAME: emacs-init.el
 #+auto_tangle: nil
-#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/config/doom/init.el :mkdirp yes
+#+BEGIN_SRC scheme :tangle ~/dotfiles/config/doom/init.el :mkdirp yes
 ;;; init.el -*- lexical-binding: t; -*-
 
 ;; This file controls what Doom modules are enabled and what order they load
@@ -1179,7 +1307,7 @@ config
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       company           ; the ultimate code completion backend
+       (company +childframe) ; the ultimate code completion backend
        (corfu +orderless)  ; complete with cap(f), cape and a flying feather!
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
@@ -1194,7 +1322,7 @@ config
        ;;doom-quit         ; DOOM quit-message prompts when you quit Emacs
        ;;(emoji +unicode)  ; 🙂
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
-       ;;indent-guides     ; highlighted indent columns
+       indent-guides     ; highlighted indent columns
        ligatures         ; ligatures and symbols to make your code pretty again
        minimap           ; show a map of the code on the side
        modeline          ; snazzy, Atom-inspired modeline, plus API
@@ -1334,6 +1462,7 @@ config
        ;;rst               ; ReST in peace
        ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
        (rust +lsp)       ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       rustic
        ;;scala             ; java, but good
        (scheme +guile)   ; a fully conniving family of lisps
        sh                ; she sells {ba,z,fi}sh shells on the C xor
@@ -1375,7 +1504,7 @@ config
 ** packages.el
 #+NAME: emacs-packages.el
 #+auto_tangle: nil
-#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/config/doom/packages.el :mkdirp yes
+#+BEGIN_SRC scheme :tangle ~/dotfiles/config/doom/packages.el :mkdirp yes
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
 
@@ -1431,7 +1560,8 @@ config
 (package! org-auto-tangle)
 (package! harpoon)
 (package! jinx)
-;;(package! org-superstar)
+
+(package! org-superstar)
 (package! ace-window)
 (package! polymode)
 (package! vundo)
@@ -1451,6 +1581,11 @@ config
 (package! treesit-auto)
 
 (package! blamer)
+
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
+
+(package! org-jira)
 #+END_SRC
 *** home dir
   #+name: emacs-packages.el-config-dir
@@ -1462,12 +1597,12 @@ config
 ** google drive sync
 #+NAME: mcron-gd-notes.guile
 #+auto_tangle: nil
-#+BEGIN_SRC scheme :tangle /data/orka/dotfiles/config/cron/gd-notes.guile :mkdirp yes
+#+BEGIN_SRC scheme :tangle ~/dotfiles/config/cron/gd-notes.guile :mkdirp yes
 (job '(next-minute (range 0 60 30))
-     "rclone sync /data/orka/notes/ gd-notes:notes")
+     "rclone sync ~/notes/ gd-notes:notes")
 ;;(job '(next-minute (range 0 60 30))
       ;; (lambda ()
-      ;;   (system* "rclone sync /data/orka/notes/ gd-notes:notes")
+      ;;   (system* "rclone sync ~/notes/ gd-notes:notes")
       ;;   )
       ;; "sync-gd-notes")
 
@@ -1496,7 +1631,7 @@ systemctl --user start data-orka-vbee0.automount
 *** systemd mount service file
 #+NAME: data-orka-vbee0.mount
 #+auto_tangle: nil
-#+BEGIN_SRC sh :tangle /data/orka/dotfiles/config/systemd/user/data-orka-vbee0.mount :mkdirp yes
+#+BEGIN_SRC sh :tangle ~/dotfiles/config/systemd/user/data-orka-vbee0.mount :mkdirp yes
 [Unit]
 Description=Notes Mount Service
 Requires=network.target
@@ -1504,7 +1639,7 @@ After=network.target
 
 [Mount]
 What=worker@jongho3.lee-notes.vbee.lge.com:/home/worker/
-Where=/data/orka/vbee0/
+Where=~/vbee0/
 Type=fuse.sshfs
 Options=port=38735,reconnect,defaults,_netdev,IdentityFile=/home/user/.ssh/id_ed25519,uid=1000,gid=1000
 
@@ -1522,12 +1657,12 @@ WantedBy=default.target
 *** systemd automount service file
 #+NAME: data-orka-vbee0.automount
 #+auto_tangle: nil
-#+BEGIN_SRC sh :tangle /data/orka/dotfiles/config/systemd/user/data-orka-vbee0.automount :mkdirp yes
+#+BEGIN_SRC sh :tangle ~/dotfiles/config/systemd/user/data-orka-vbee0.automount :mkdirp yes
 [Unit]
 Description=Notes autoMount Service
 
 [Automount]
-Where=/data/orka/vbee0/
+Where=~/vbee0/
 TimeoutIdleSec=600
 
 [Install]
@@ -1546,13 +1681,13 @@ WantedBy=remote-fs.target
 *** systemd service file
 #+NAME: rclone-notes-sync.service
 #+auto_tangle: nil
-#+BEGIN_SRC sh :tangle /data/orka/dotfiles/config/systemd/user/rclone-notes-sync.service :mkdirp yes
+#+BEGIN_SRC sh :tangle ~/dotfiles/config/systemd/user/rclone-notes-sync.service :mkdirp yes
 [Unit]
 Description=Rclone Notes Sync Service
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/rclone sync /data/orka/notes notesOnVbee:/home/worker/.share/notes
+ExecStart=/usr/bin/rclone sync ~/notes notesOnVbee:/home/worker/.share/notes
 # --config=/home/youruser/.config/rclone/rclone.conf  --log-file=/home/youruser/rclone-sync.log -v
 #Restart=on-failure
 #User=orka    # this is user unit file. Trying to modify user or group is not allowed.
@@ -1571,7 +1706,7 @@ WantedBy=default.target
 *** systemd timer file
 #+NAME: rclone-notes-sync.timer
 #+auto_tangle: nil
-#+BEGIN_SRC sh :tangle /data/orka/dotfiles/config/systemd/user/rclone-notes-sync.timer :mkdirp yes
+#+BEGIN_SRC sh :tangle ~/dotfiles/config/systemd/user/rclone-notes-sync.timer :mkdirp yes
 [Unit]
 Description=Run Rclone notes Sync Periodically
 
@@ -1593,7 +1728,7 @@ WantedBy=timers.target
 ** config
 #+NAME: ghostty-config
 #+auto_tangle: nil
-#+BEGIN_SRC config :tangle /data/orka/dotfiles/config/ghostty/config :mkdirp yes
+#+BEGIN_SRC config :tangle ~/dotfiles/config/ghostty/config :mkdirp yes
 font-family = JetBrains Mono
 #font-family = D2Coding
 #font-family = BerkeleyMono Nerd Font
@@ -1675,7 +1810,7 @@ copy-on-select = clipboard
 ** config
 #+NAME: helix-config.toml
 #+auto_tangle: nil
-#+BEGIN_SRC toml :tangle /data/orka/dotfiles/config/helix/config.toml :mkdirp yes
+#+BEGIN_SRC toml :tangle ~/dotfiles/config/helix/config.toml :mkdirp yes
 
 #theme = "ayu_dark"
 #theme = "onedark"
@@ -1693,6 +1828,7 @@ completion-trigger-len = 1
 true-color = true
 color-modes = true
 auto-pairs = true
+end-of-line-diagnostics= "disable"
 
 
 #rulers = [120]
@@ -1737,9 +1873,25 @@ newline = "⏎"
 tabpad = "·"  # Tabs will look like "→···" (depending on tab width)
 ###
 
+[editor.inline-diagnostics]
+# Minimum severity to show a diagnostic on the primary cursor's line.
+# Set to "disable" to not show any diagnostics inline on the cursor line.
+cursor-line = "hint" # or "warning", "info", "hint", "disable"
+
+# Minimum severity to show a diagnostic on other lines.
+# Set to "disable" to not show any diagnostics inline on other lines.
+other-lines = "disable" # or "warning", "info", "hint", "error"
+
 [editor.lsp]
 display-messages = true
 display-inlay-hints = true
+
+[keys.normal.space."i"]
+m = ":toggle lsp.display-messages"
+i = ":toggle lsp.display-inlay-hints"
+c = ":toggle inline-diagnostics.cursor-line hint disable" # Toggle cursor-line diagnostics
+o = ":toggle inline-diagnostics.other-lines warning disable" # Toggle other-lines diagnostics
+l = ":toggle end-of-line-diagnostics hint disable" # Toggle other-lines diagnostics
 
 [editor.statusline]
 left = ["mode", "spinner", "file-name", "file-type", "total-line-numbers", "file-encoding"]
@@ -1776,7 +1928,7 @@ t = ":sh helix-wezterm.sh test"
 
 [keys.insert]
 j = { k = "normal_mode" } # Maps `jk` to exit insert mode
-#l = { b = "λ" } # Maps `jk` to exit insert mode
+k = { j = ":insert-output printf 'λ'" } # Maps `ld` t oinput lambda
 
 
 
@@ -1785,7 +1937,7 @@ j = { k = "normal_mode" } # Maps `jk` to exit insert mode
 #+END_SRC
 #+NAME: helix-languages.toml
 #+auto_tangle: nil
-#+BEGIN_SRC config :tangle /data/orka/dotfiles/config/helix/languages.toml :mkdirp yes
+#+BEGIN_SRC config :tangle ~/dotfiles/config/helix/languages.toml :mkdirp yes
 ################################
 ### Configuration for lsp-ai ###
 ################################
@@ -1822,13 +1974,6 @@ system = "You are a code assistant chatbot. The user will ask you for assistance
 ## Configuration for languages ##
 #################################
 
-## Every file type we intend to chat in needs to have lsp-ai enabled
-[[language]]
-name = "markdown"
-#language-servers = ["lsp-ai"]
-language-servers = ["lsp-ai", "markdown-oxide"]
-formatter = { command = "dprint", args = ["fmt", "--stdin", "md"]}
-auto-format = true
 
 #########################
 
@@ -1838,6 +1983,8 @@ command = "steel-language-server"
 #[[language]]
 #name = "scheme"
 #language-servers = [ "steel-language-server" ]
+#formatter = { command = "dprint", args = ["fmt", "$file_path"] }
+#indent = { tab-width = 2, unit = "  " }
 
 
 ################C++######
@@ -1845,10 +1992,40 @@ command = "steel-language-server"
 [[language]]
 name = "cpp"
 language-servers = [ "clangd" ]
+indent = { tab-width = 2, unit = "  " }
+formatter = { command = "dprint", args = ["fmt", "$file_path"] }
 
 [language-server.clangd]
 command = "clangd"
 args = ["--compile-commands-dir=build"]
+
+
+######## rust #########
+
+[[language]]
+name = "rust"
+# Make sure your rust-analyzer path is correct, or just use the binary name if it's in your PATH
+language-servers = ["rust-analyzer"]
+formatter = { command = "rustfmt" }
+auto-format = true
+roots = [ "Cargo.toml", "Cargo.lock" ]
+indent = { tab-width = 2, unit = "  " }
+
+[language-server.rust-analyzer]
+command = "rust-analyzer"
+
+[language-server.iwe]
+command = "iwes"
+
+## Every file type we intend to chat in needs to have lsp-ai enabled
+[[language]]
+name = "markdown"
+#language-servers = ["lsp-ai"]
+#language-servers = ["lsp-ai", "iwe"]
+language-servers = ["iwe"]
+formatter = { command = "dprint", args = ["fmt", "--stdin", "md"]}
+auto-format = true
+
 
 #+END_SRC
 *** home dir
@@ -1866,7 +2043,7 @@ args = ["--compile-commands-dir=build"]
 ** key
 #+NAME: zellij-config.kdl
 #+auto_tangle: nil
-#+BEGIN_SRC config :tangle /data/orka/dotfiles/config/zellij/config.kdl :mkdirp yes
+#+BEGIN_SRC config :tangle ~/dotfiles/config/zellij/config.kdl :mkdirp yes
   keybinds clear-defaults=true {
       locked {
           bind "Ctrl g" { SwitchToMode "normal"; }
@@ -2108,6 +2285,7 @@ args = ["--compile-commands-dir=build"]
           bind "j" { MoveFocus "down"; SwitchToMode "locked"; }
           bind "k" { MoveFocus "up"; SwitchToMode "locked"; }
           bind "l" { MoveFocus "right"; SwitchToMode "locked"; }
+          bind "tab" { ToggleTab; SwitchToMode "locked"; }
           bind "n" { GoToNextTab; SwitchToMode "locked"; }
           bind "o" { FocusNextPane;  SwitchToMode "locked"; }
           bind "p" { GoToPreviousTab; SwitchToMode "locked"; }
@@ -2175,7 +2353,7 @@ args = ["--compile-commands-dir=build"]
   // The name of the default layout to load on startup
   // Default: "default"
   //
-  default_layout "compact"
+  default_layout "default"
 
   // The folder in which Zellij will look for layouts
   // (Requires restart)
@@ -2416,7 +2594,7 @@ args = ["--compile-commands-dir=build"]
 ** config
 #+NAME: config.fish
 #+auto_tangle: nil
-#+BEGIN_SRC config :tangle /data/orka/dotfiles/config/fish/config.fish :mkdirp yes
+#+BEGIN_SRC config :tangle ~/dotfiles/config/fish/config.fish :mkdirp yes
 source /usr/share/cachyos-fish-config/cachyos-config.fish
 
 # overwrite greeting
@@ -2425,7 +2603,9 @@ source /usr/share/cachyos-fish-config/cachyos-config.fish
 #    # smth smth
 #end
 
-set PATH ~/.cargo/bin ~/.config/emacs/bin $PATH
+set PATH ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/ ~/.cargo/bin ~/.config/emacs/bin $PATH
+
+#set HELIX_RUNTIME ~/.config/helix/runtime/
 
 # ~/.config/fish/config.fish
 
@@ -2464,7 +2644,7 @@ setup_gpg_agent
 ** zshrc
 #+NAME: zsh-.zshrc
 #+auto_tangle: nil
-#+BEGIN_SRC zsh :tangle /data/orka/dotfiles/config/zsh/.zshrc :mkdirp yes
+#+BEGIN_SRC zsh :tangle ~/dotfiles/config/zsh/.zshrc :mkdirp yes
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
