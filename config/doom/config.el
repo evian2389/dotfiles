@@ -120,6 +120,9 @@
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers 'relative)
 (setq display-line-numbers-width 'auto)
+(setq display-line-numbers-width 4)
+(setq display-line-numbers-grow-only t)
+(setq display-line-numbers-width-start t)
 
 ;; Set the cursor color
                                         ;(setq-default cursor-type 'bar) ;; or '(bar . 2) for a thicker bar
@@ -511,7 +514,6 @@
       org-roam-directory "~/notes/resources/")
 
 (add-hook 'org-mode-hook #'hl-todo-mode)
-(setq display-line-numbers-width 'auto)
 
 (require 'org-indent)
 
@@ -778,9 +780,7 @@
 
     (setq display-line-numbers-type `relative'relative)
     ;;set ui-helpers
-    (global-display-line-numbers-mode 1)
     (setq display-line-numbers 'relative)
-    (setq display-line-numbers-width 'auto)
     )
 
   (defun my/prettify-symbols-setup ()
@@ -949,6 +949,11 @@
   (add-hook 'org-present-mode-quit-hook 'my/org-present-end)
   (add-hook 'org-present-after-navigate-functions 'my/org-present-prepare-slide)
 
+  ;; Allows you to edit entries directly from org-brain-visualize
+ ;;( use-package polymode
+ ;; :defer t)
+
+
   (use-package org-brain :ensure t
     :init
     (setq org-brain-path "~/notes/brain")
@@ -966,12 +971,10 @@
     (setq org-brain-visualize-default-choices 'all)
     (setq org-brain-title-max-length 12)
     (setq org-brain-include-file-entries nil
-          org-brain-file-entries-use-title nil))
+          org-brain-file-entries-use-title nil)
+     ;;(add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode)
 
-  ;; Allows you to edit entries directly from org-brain-visualize
-  ;; (use-package polymode
-  ;;   :config
-  ;;   (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
+)
 
   (use-package org-auto-tangle
     :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory

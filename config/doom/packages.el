@@ -56,7 +56,8 @@
 
 (package! org-superstar)
 (package! ace-window)
-(package! polymode)
+;;(package! polymode)
+;;(package! poly-org)
 (package! vundo)
 (package! visual-fill-column)
 
@@ -75,7 +76,10 @@
 
 (package! blamer)
 
+(package! org-jira)
+(package! aider)
+(package! ein)
+(package! org-gcal)
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
-
-(package! org-jira)
+(package! copilot-chat)

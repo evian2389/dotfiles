@@ -6,7 +6,7 @@ source /usr/share/cachyos-fish-config/cachyos-config.fish
 #    # smth smth
 #end
 
-set PATH ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/ ~/.cargo/bin ~/.config/emacs/bin $PATH
+set PATH ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/ ~/.cargo/bin ~/.config/emacs/bin/ ~/go/bin/ $PATH
 
 #set HELIX_RUNTIME ~/.config/helix/runtime/
 

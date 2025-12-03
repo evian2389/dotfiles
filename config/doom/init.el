@@ -112,8 +112,12 @@
        ;;tmux              ; an API for interacting with tmux
        tree-sitter       ; syntax and parsing, sitting in a tree...
        upload            ; map local to remote projects via ssh/ftp
-       polymode
+       ;;polymode
+       ;;poly-org
        vundo             ; visualize undo tree
+       org-gcal     ;; google calendar sync
+       copilot   ;;github copilot
+       copilot-chat
 
        :os
        (:if (featurep :system 'macos) macos)  ; improve compatibility with macOS
@@ -144,7 +148,7 @@
        ;;fsharp            ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
-       ;;(go +lsp)         ; the hipster dialect
+       (go +lsp)         ; the hipster dialect
        ;;(graphql +lsp)    ; Give queries a REST
        (haskell +lsp)    ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
