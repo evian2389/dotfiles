@@ -48,16 +48,18 @@
   ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
   ;; (unpin! t)
   (package! org-present)
-  (package! org-brain :recipe (:build (:not compile)))
+  (package! org-brain :recipe (:build (:not compile)))   ;;rm /home/jongho3/.config/emacs/.local/straight/build-30.2/org-brain/org-brain.elc
   (package! org-roam-ui)
   (package! org-auto-tangle)
   (package! harpoon)
   (package! jinx)
+  (package! affe)
+  (package! org-wild-notifier)
   
   (package! org-superstar)
   (package! ace-window)
-  ;;(package! polymode)
-  ;;(package! poly-org)
+  (package! polymode)
+  (package! poly-org)
   (package! vundo)
   (package! visual-fill-column)
   

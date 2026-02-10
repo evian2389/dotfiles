@@ -46,11 +46,11 @@
          (popup +defaults)   ; tame sudden yet inevitable temporary windows
          ;;smooth-scroll     ; So smooth you won't believe it's not butter
          ;;tabs              ; a tab bar for Emacs
-         ;;treemacs          ; a project drawer, like neotree but cooler
+         (treemacs +lsp)          ; a project drawer, like neotree but cooler
          ;;unicode           ; extended unicode support for various languages
          (vc-gutter +pretty) ; vcs diff in the fringe
          vi-tilde-fringe   ; fringe tildes to mark beyond EOB
-         ;;window-select     ; visually switch windows
+         window-select     ; visually switch windows
          workspaces        ; tab emulation, persistence & separate workspaces
          ;;zen               ; distraction-free coding or writing
          ace-window          ; move focus among windows..
@@ -118,6 +118,7 @@
          org-gcal     ;; google calendar sync
          copilot   ;;github copilot
          copilot-chat
+         affe       ;; fuzzy file finder
   
          :os
          (:if (featurep :system 'macos) macos)  ; improve compatibility with macOS
@@ -137,7 +138,7 @@
          ;;data              ; config/data formats
          ;;(dart +flutter)   ; paint ui and not much else
          ;;dhall
-         elixir            ; erlang done right
+         (elixir +lsp)            ; erlang done right
          ;;elm               ; care for a cup of TEA?
          emacs-lisp        ; drown in parentheses
          erlang            ; an elegant language for a more civilized age
@@ -167,12 +168,12 @@
          ;;nim               ; python + lisp at the speed of c
          ;;nix               ; I hereby declare "nix geht mehr!"
          ocaml             ; an objective camel
-         (org +roam2 +babel +roam-ui +pretty +super-agenda +ql +present +brain +auto-tangle)              ; organize your plain life in plain text
+         (org +agenda +roam2 +babel +roam-ui +pretty +super-agenda +ql +present +brain +auto-tangle +superstar +roam-ui +cal +wild-notifier)              ; organize your plain life in plain text
          ;;php               ; perl's insecure younger brother
          plantuml          ; diagrams for confusing people more
          ;;graphviz          ; diagrams for confusing yourself even more
          ;;purescript        ; javascript, but functional
-         python            ; beautiful is better than ugly
+         (python +lsp)            ; beautiful is better than ugly
          ;;qt                ; the 'cutest' gui framework ever
          ;;racket            ; a DSL for DSLs
          ;;raku              ; the artist formerly known as perl6
@@ -190,7 +191,7 @@
          ;;terra             ; Earth and Moon in alignment for performance.
          ;;web               ; the tubes
          ;;yaml              ; JSON, but readable
-         zig               ; C, but simpler
+         (zig + lsp)               ; C, but simpler
          lsp-proxy
          eglot
   

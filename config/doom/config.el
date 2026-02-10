@@ -21,7 +21,7 @@
                     :height 140
                     :italic t)))
   :config
-  (global-blamer-mode 1))
+  (global-blamer-mode 0))
 
 ;; accept completion from copilot and fallback to company
 (use-package! copilot
@@ -125,7 +125,6 @@
   ;;
   ;;
   
-  
   ;(setq doom-theme 'doom-one)
   (setq doom-theme 'doom-gruvbox)
   (setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 15))
@@ -172,8 +171,10 @@
   (set-face-attribute 'fixed-pitch nil :font my/fixed-width-font :weight 'light :height 110)
   (set-face-attribute 'variable-pitch nil :font my/variable-width-font :weight 'light :height 1.1)
   ;;(set-face-attribute 'hangul nil :font my/hangul-font :weight 'light :height 120)
-  (set-fontset-font t 'hangul (font-spec :family my/hangul-font :height 120)) ;
-  
+  ;;(set-fontset-font t 'hangul (font-spec :family my/hangul-font :height 120)) ;
+  (set-fontset-font t 'hangul (font-spec :family my/hangul-font :height 120)) ; 반영: 자간겹침 현상?
+  (setq face-font-rescale-alist '((my/hangul-font . 1.20)
+                                  ("NanumGothicCoding" . 1.1)))
   
   ;; This determines the style of line numbers in effect. If set to `nil', line
   ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -190,11 +191,17 @@
   (setq display-line-numbers-grow-only t)
   (setq display-line-numbers-width-start t)
   
+  ;;(setq select-enable-clipboard t) ;; Enable clipboard integration
+  (setq select-enable-primary t) ;; Enable clipboard integration
+  ;; (setq select-active-regions t)  ;; Highlight selections
+  
+  
   ;; Set the cursor color
                                           ;(setq-default cursor-type 'bar) ;; or '(bar . 2) for a thicker bar
   (set-cursor-color "coral") ;; Replace "red" with your desired color
   
   (setq default-input-method "korean-hangul")
+  (global-set-key (kbd "S-SPC") 'toggle-input-method) ; Shift+Space를 한영 전환 키로 설정
   (add-hook 'post-command-hook
             (lambda ()
               (set-cursor-color
@@ -221,6 +228,12 @@
         :desc "consult bookmark" "B" #'consult-bookmark)
   (map! :leader
         :desc "consult bookmark" "b" #'consult-buffer)
+  (map! :leader
+        :desc "FuZzily find File in home"
+        "f z h" (cmd!! #'affe-find "~/"))
+  (map! :leader
+        :desc "FuZzily find file in this Dir"
+        "f z f" (cmd!! #'affe-find))
   
   
   ;;##consult-repgrep - search
@@ -345,12 +358,19 @@
     (meow-normal-define-key '("<" . beginning-of-buffer))
     (meow-normal-define-key '(">" . end-of-buffer))
     (meow-normal-define-key '("M-n" . ace-window))
+    (meow-normal-define-key '("N" . +treemacs/toggle))
     (meow-leader-define-key '("y" . meow-clipboard-save))
     (meow-leader-define-key '("p" . meow-clipboard-yank))
     (meow-leader-define-key '("B" . consult-bookmark))
     (meow-leader-define-key '("b" . consult-buffer))
   )
   (global-set-key (kbd "M-n") 'ace-window)
+  (map! :map treemacs-mode-map "N" #'+treemacs/toggle) ; Bind 'q' to toggle/close treemacs when focused
+  
+  (after! ace-window
+    ;; Remove treemacs-mode from the ignore list so ace-window can see it
+    (setq aw-ignored-buffers (delq 'treemacs-mode aw-ignored-buffers)))
+  ;; (map! "M-m" #'treemacs-select-window)
   
   ;; (defun my-eat-mode-hook ()
   ;;   "Add local keybinding for ace-window in eat buffers."
@@ -427,7 +447,7 @@
                       :height 140
                       :italic t)))
     :config
-    (global-blamer-mode 1))
+    (global-blamer-mode 0))
   ;; accept completion from copilot and fallback to company
   (use-package! copilot
     :hook (prog-mode . copilot-mode)
@@ -540,7 +560,19 @@
     :config
     ;; Additional lsp-mode settings
     (setq lsp-diagnostics-provider :flycheck)
-    )
+  
+    
+    (defun my/consult-lsp-symbols-at-point ()
+      "Search for LSP symbols with the symbol at point as initial input."
+      (interactive)
+      (consult-lsp-symbols (thing-at-point 'symbol)))
+  
+    ;; Optional: Bind the new command to a key
+    (global-set-key (kbd "C-.") '+vertico/search-symbol-at-point)
+    (meow-normal-define-key '("C-." . +vertico/search-symbol-at-point))
+  
+    (setq consult-lsp-symbols-command (lambda () (thing-at-point 'symbol)))
+  )
   
   
   ;; lsp-ui configuration (No changes needed)
@@ -647,12 +679,30 @@
   (setq org-directory "~/notes/"
         org-roam-directory "~/notes/resources/")
   
+  (setq org-agenda-files 
+        (seq-filter (lambda (file) 
+                      ;; Exclude files in the "archive" or "private" directory
+                      (not (string-match-p "/2024/\\|/2025/" file)))
+                    (directory-files-recursively "~/notes" "\\.org$")))
+  
   (add-hook 'org-mode-hook #'hl-todo-mode)
   
   (require 'org-indent)
   
   (setq org-log-reschedule 'time)
   (setq org-log-done 'time)
+  
+  (setq alert-default-style 'libnotify)
+  (use-package org-wild-notifier
+    :after org
+    :config
+    (setq org-wild-notifier-alert-time '(10 30)
+          org-wild-notifier-keyword-whitelist nil
+          alert-fade-time 50
+          org-wild-notifier--alert-severity 'high
+          org-wild-notifier-keyword-blacklist '("personal" "PERSONAL"))
+  
+    (org-wild-notifier-mode t))
   
   ;; Follow the links
   (setq org-return-follows-link  t)
@@ -917,9 +967,15 @@
       (visual-fill-column-mode 0)
       (visual-line-mode 0)
   
-      (setq display-line-numbers-type `relative'relative)
-      ;;set ui-helpers
+      ;;set -helpers
+      (setq-default truncate-lines t)
+      (global-display-line-numbers-mode 1)
       (setq display-line-numbers 'relative)
+      (setq display-line-numbers-width 'auto)
+      (setq display-line-numbers-width 4)
+      (setq display-line-numbers-grow-only t)
+      (setq display-line-numbers-width-start t)
+      (setq display-line-numbers-type 'relative)
       )
   
   
@@ -1148,4 +1204,3 @@
                                           ;       (geiser-connect 'guile "localhost" "37146"))
   
                                           ;    (define-key geiser-mode-map (kbd "C-c M-j") 'orka-geiser-connect))
-
