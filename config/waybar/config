@@ -1,0 +1,254 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 4,
+    "modules-left": ["niri/workspaces", "niri/window"],
+    "modules-center": ["clock", "mpris"],
+    "modules-right": [
+        "cpu", 
+        "memory", 
+        "network", 
+        "bluetooth",
+        "pulseaudio", 
+        "pulseaudio#microphone",
+        "backlight",
+        "power-profiles-daemon",
+        "battery", 
+        "custom/fcitx5",
+        "custom/wlsunset",
+        "tray", 
+        "privacy",
+        "custom/notification",
+        "custom/lock",
+        "custom/suspend",
+        "custom/power"
+    ],
+
+    "niri/workspaces": {
+        "format": "{index}: {icon}",
+        "format-icons": {
+            "default": "󰄰",
+            "focused": "󰮯",
+            "active": "󰄯",
+            "urgent": "󰀦"
+        },
+        "on-click": "activate"
+    },
+
+    "niri/window": {
+        "format": "{title}",
+        "max-length": 50,
+        "separate-outputs": true
+    },
+
+    "clock": {
+        "format": "󰃭 {:%Y-%m-%d %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "calendar": {
+            "mode": "year",
+            "mode-mon-col": 3,
+            "on-scroll": 1,
+            "format": {
+                "months": "<span color='#ffead3'><b>{}</b></span>",
+                "days": "<span color='#ecc6d9'><b>{}</b></span>",
+                "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+                "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+                "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+            }
+        }
+    },
+
+    "mpris": {
+        "format": "{player_icon} {title} - {artist}",
+        "format-paused": "{status_icon} <i>{title} - {artist}</i>",
+        "player-icons": {
+            "default": "󰐎",
+            "mpv": "󰐎",
+            "spotify": "",
+            "chrome": ""
+        },
+        "status-icons": {
+            "paused": "󰏤"
+        },
+        "max-length": 30
+    },
+
+    "cpu": {
+        "interval": 5,
+        "format": "󰻠 {usage}%",
+        "states": {
+            "warning": 70,
+            "critical": 90
+        },
+        "on-click": "ghostty -e btop",
+        "on-click-right": "ghostty -e btop"
+    },
+
+    "memory": {
+        "interval": 5,
+        "format": "󰍛 {percentage}%",
+        "states": {
+            "warning": 70,
+            "critical": 90
+        },
+        "on-click": "ghostty -e btop",
+        "on-click-right": "ghostty -e btop"
+    },
+
+    "network": {
+        "interval": 2,
+        "format-wifi": " {essid} ({signalStrength}%) 󰇚 {bandwidthDownBytes} 󰕒 {bandwidthUpBytes}",
+        "format-ethernet": "󰀂 {ifname} 󰇚 {bandwidthDownBytes} 󰕒 {bandwidthUpBytes}",
+        "format-linked": "󰀂 {ifname} (No IP)",
+        "format-disconnected": "󰖪 Disconnected",
+        "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+        "on-click": "nmcli radio wifi toggle",
+        "on-click-right": "nm-connection-editor"
+    },
+
+    "bluetooth": {
+        "format": "󰂯 {status}",
+        "format-connected": "󰂱 {device_alias}",
+        "format-connected-battery": "󰂱 {device_alias} {device_battery_percentage}%",
+        "tooltip-format": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
+        "on-click": "rfkill toggle bluetooth",
+        "on-click-right": "blueman-manager"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟 Muted",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "󰋎",
+            "headset": "󰋎",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+        "on-click-right": "flatpak run com.saivert.pwvucontrol"
+    },
+
+    "pulseaudio#microphone": {
+        "format": "{format_source}",
+        "format-source": "󰍬 {volume}%",
+        "format-source-muted": "󰍭 Muted",
+        "on-click": "flatpak run com.saivert.pwvucontrol",
+        "on-click-right": "qpwgraph",
+        "tooltip": false
+    },
+
+    "backlight": {
+        "format": "{icon} {percent}%",
+        "format-icons": ["󰃚", "󰃛", "󰃜", "󰃝", "󰃞", "󰃟", "󰃠"],
+        "on-scroll-up": "brightnessctl set +5%",
+        "on-scroll-down": "brightnessctl set 5%-",
+        "smooth-scrolling-threshold": 1
+    },
+
+    "power-profiles-daemon": {
+        "format": "{icon}",
+        "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
+        "tooltip": true,
+        "format-icons": {
+            "default": "",
+            "performance": "",
+            "balanced": "",
+            "power-saver": ""
+        }
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󱐋 {icon} {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-alt": "{icon} {time}",
+        "format-icons": ["", "", "", "", ""]
+    },
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
+    },
+
+    "privacy": {
+        "icon-size": 14,
+        "transition-duration": 250,
+        "modules": [
+            {
+                "type": "screenshare",
+                "tooltip": false
+            },
+            {
+                "type": "audio-in",
+                "tooltip": false
+            }
+        ]
+    },
+
+    "custom/notification": {
+        "tooltip": false,
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "<span foreground='red'><sup></sup></span>",
+            "none": "",
+            "dnd-notification": "<span foreground='red'><sup></sup></span>",
+            "dnd-none": "",
+            "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+            "inhibited-none": "",
+            "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+            "dnd-inhibited-none": ""
+        },
+        "return-type": "json",
+        "exec-if": "which swaync-client",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -d -sw",
+        "on-click-right": "swaync-client -t -sw",
+        "escape": true
+    },
+
+    "custom/fcitx5": {
+        "interval": 1,
+        "exec": "fcitx5-remote | grep -q '2' && echo '한' || echo 'En'",
+        "format": "󰘳 {}",
+        "on-click": "fcitx5-remote -t",
+        "on-click-right": "fcitx5-config-qt",
+        "tooltip": false
+    },
+
+    "custom/wlsunset": {
+        "format": "{}",
+        "interval": 1,
+        "exec": "pgrep -x wlsunset > /dev/null && echo '󰖔' || echo '󰖛'",
+        "on-click": "pgrep -x wlsunset && pkill wlsunset || wlsunset",
+        "tooltip-format": "Toggle wlsunset (night light)"
+    },
+
+    "custom/lock": {
+        "format": "󰌾",
+        "on-click": "hyprlock",
+        "tooltip": false
+    },
+
+    "custom/suspend": {
+        "format": "󰤄",
+        "on-click": "loginctl suspend",
+        "tooltip": false
+    },
+
+    "custom/power": {
+        "format": "⏻ ",
+        "tooltip": false,
+        "on-click": "hyprlock",
+        "on-click-right": "wlogout"
+    }
+}

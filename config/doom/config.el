@@ -201,7 +201,7 @@
   (set-cursor-color "coral") ;; Replace "red" with your desired color
   
   (setq default-input-method "korean-hangul")
-  (global-set-key (kbd "S-SPC") 'toggle-input-method) ; Shift+Space를 한영 전환 키로 설정
+  (global-set-key (kbd "C-SPC") 'toggle-input-method) ; Ctrl+Space를 한영 전환 키로 설정
   (add-hook 'post-command-hook
             (lambda ()
               (set-cursor-color
@@ -234,9 +234,23 @@
   (map! :leader
         :desc "FuZzily find file in this Dir"
         "f z f" (cmd!! #'affe-find))
+   ;; go translate
   
+  ;; (use-package gt
+  ;;           (setq gt-langs '(en kr))
+  ;;   (setq gt-default-translator
+  ;;         (gt-translator
+  ;;          :taker   (gt-taker :text 'buffer :pick 'paragraph)  ; config the Taker
+  ;;          :engines (list  (gt-google-engine)) ; specify the Engines
+  ;;          :render  (gt-buffer-render)))
+  ;;         )
+  
+  ;; This configuration means:
+  ;; Initialize the default translator, let it translate between en and fr via Google Translate,
+  ;; and the result will be displayed in the Echo Area.
   
   ;;##consult-repgrep - search
+  
   ;; You can use this hydra menu that have all the commands
   ;; (map! :n "s-SPC" 'harpoon-quick-menu-hydra)
   ;; (map! :n "s-s" 'harpoon-add-file)
@@ -354,17 +368,17 @@
       (condition-case nil
           (cond
            ;; 1. 현재 커서 아래가 여는 괄호일 때
-           ((looking-at "\\s\(") 
+           ((looking-at "\\s\(")
             (forward-list 1) (backward-char 1))
-           
+  
            ;; 2. 현재 커서 아래가 닫는 괄호일 때
-           ((looking-at "\\s\)") 
+           ((looking-at "\\s\)")
             (forward-char 1) (backward-list 1))
-           
+  
            ;; 3. 커서 바로 왼쪽이 닫는 괄호일 때 (중요!)
            ((and (char-before) (string-match "\\s\)" (char-to-string (char-before))))
             (backward-list 1))
-           
+  
            ;; 4. 커서 바로 왼쪽이 여는 괄호일 때
            ((and (char-before) (string-match "\\s\(" (char-to-string (char-before))))
             (backward-char 1) (forward-list 1) (backward-char 1))
@@ -599,7 +613,7 @@
     ;; Additional lsp-mode settings
     (setq lsp-diagnostics-provider :flycheck)
   
-    
+  
     (defun my/consult-lsp-symbols-at-point ()
       "Search for LSP symbols with the symbol at point as initial input."
       (interactive)
@@ -717,8 +731,8 @@
   (setq org-directory "~/notes/"
         org-roam-directory "~/notes/resources/")
   
-  (setq org-agenda-files 
-        (seq-filter (lambda (file) 
+  (setq org-agenda-files
+        (seq-filter (lambda (file)
                       ;; Exclude files in the "archive" or "private" directory
                       (not (string-match-p "/2024/\\|/2025/" file)))
                     (directory-files-recursively "~/notes" "\\.org$")))

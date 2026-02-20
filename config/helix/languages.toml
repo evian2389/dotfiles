@@ -82,6 +82,6 @@
   name = "markdown"
   #language-servers = ["lsp-ai"]
   #language-servers = ["lsp-ai", "iwe"]
-  language-servers = ["iwe"]
+  language-servers = ["marksman", "markdown-oxide", "iwe"]
   formatter = { command = "dprint", args = ["fmt", "--stdin", "md"]}
   auto-format = true

@@ -1,7 +1,8 @@
   #theme = "ayu_dark"
   #theme = "onedark"
   #theme = "catppuccin_mocha"
-  theme = "vintage"
+  #theme = "vintage"
+  theme = "gruvbox_material_dark_hard"
   
   
   [editor]
@@ -85,6 +86,7 @@
   right = ["selections", "primary-selection-length", "position", "position-percentage", "spacer", "diagnostics", "workspace-diagnostics", "version-control"]
   
   [keys.normal]
+  "D" = "kill_to_line_end"
   # Use system clipboard
   #y = "yank_main_selection_to_clipboard"
   #p = "paste_clipboard_before"
