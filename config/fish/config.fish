@@ -10,6 +10,9 @@ set PATH ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/ ~/.cargo/bin 
 
 #set HELIX_RUNTIME ~/.config/helix/runtime/
 
+set EDITOR helix
+set VISUAL emacs
+
 # ~/.config/fish/config.fish
 
 alias em "emacs -nw"

@@ -172,8 +172,8 @@
   (set-face-attribute 'variable-pitch nil :font my/variable-width-font :weight 'light :height 1.1)
   ;;(set-face-attribute 'hangul nil :font my/hangul-font :weight 'light :height 120)
   ;;(set-fontset-font t 'hangul (font-spec :family my/hangul-font :height 120)) ;
-  (set-fontset-font t 'hangul (font-spec :family my/hangul-font :height 120)) ; 반영: 자간겹침 현상?
-  (setq face-font-rescale-alist '((my/hangul-font . 1.20)
+  (set-fontset-font t 'hangul (font-spec :family my/hangul-font)) ; 반영: 자간겹침 현상?
+  (setq face-font-rescale-alist '(("D2CodingLigature Nerd Font" . 1.15)
                                   ("NanumGothicCoding" . 1.1)))
   
   ;; This determines the style of line numbers in effect. If set to `nil', line
@@ -250,7 +250,7 @@
     (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
   
   (setopt text-mode-ispell-word-completion nil)
-  
+  (which-function-mode 1)
   ;;##vundo
   (use-package vundo
     :commands (vundo)
@@ -347,6 +347,40 @@
     (define-key meow-insert-state-keymap (substring meow-two-char-escape-sequence 0 1)
       #'meow-two-char-exit-insert-state)
   
+  (defun my/meow-jump-to-pair ()
+    "괄호의 앞이나 뒤, 어디서든 짝으로 점프합니다."
+    (interactive)
+    (let ((pos (point)))
+      (condition-case nil
+          (cond
+           ;; 1. 현재 커서 아래가 여는 괄호일 때
+           ((looking-at "\\s\(") 
+            (forward-list 1) (backward-char 1))
+           
+           ;; 2. 현재 커서 아래가 닫는 괄호일 때
+           ((looking-at "\\s\)") 
+            (forward-char 1) (backward-list 1))
+           
+           ;; 3. 커서 바로 왼쪽이 닫는 괄호일 때 (중요!)
+           ((and (char-before) (string-match "\\s\)" (char-to-string (char-before))))
+            (backward-list 1))
+           
+           ;; 4. 커서 바로 왼쪽이 여는 괄호일 때
+           ((and (char-before) (string-match "\\s\(" (char-to-string (char-before))))
+            (backward-char 1) (forward-list 1) (backward-char 1))
+  
+           ;; 5. 줄에서 괄호 탐색
+           (t
+            (save-excursion
+              (if (re-search-forward "[([{\"\]})]" (line-end-position) t)
+                  (setq pos (match-beginning 0))
+                (setq pos nil)))
+            (if pos
+                (progn (goto-char pos) (my/meow-jump-to-pair))
+              (message "No pair found on this line"))))
+        (error (message "No matching pair found")))))
+  
+  
   (with-eval-after-load 'meow
     (meow-normal-define-key '("C-j" . meow-page-down))
     (meow-normal-define-key '("C-k" . meow-page-up))
@@ -359,12 +393,16 @@
     (meow-normal-define-key '(">" . end-of-buffer))
     (meow-normal-define-key '("M-n" . ace-window))
     (meow-normal-define-key '("N" . +treemacs/toggle))
+    (meow-normal-define-key '("%" . my/meow-jump-to-pair))
     (meow-leader-define-key '("y" . meow-clipboard-save))
     (meow-leader-define-key '("p" . meow-clipboard-yank))
     (meow-leader-define-key '("B" . consult-bookmark))
     (meow-leader-define-key '("b" . consult-buffer))
   )
   (global-set-key (kbd "M-n") 'ace-window)
+  (map! :map grep-mode-map
+        ;; :n "o" #'compile-goto-error  ; 일반 모드에서 바로 이동
+        :"M-n" #'ace-window)  ; ace-window 호출 예시
   (map! :map treemacs-mode-map "N" #'+treemacs/toggle) ; Bind 'q' to toggle/close treemacs when focused
   
   (after! ace-window
@@ -509,7 +547,7 @@
   (with-eval-after-load 'meow
     (meow-normal-define-key '("M-;" . lsp-find-references))
     (meow-normal-define-key '("M-'" . lsp-find-definition))
-    (meow-normal-define-key '("M-\\" . lsp-find-declaration))
+    (meow-normal-define-key '("M-\\" . rgrep))
     (meow-normal-define-key '("M-[" . lsp-find-type-definition))
     (meow-normal-define-key '("M-]" . lsp-find-implementations))
   )
