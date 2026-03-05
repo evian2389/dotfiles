@@ -1,0 +1,16 @@
+layout {
+    gaps 8
+    focus-ring {
+        width 2
+        color "#7aa2f7"
+    }
+    border {
+        width 1
+        color "#33467c"
+    }
+}
+
+window-rule {
+    geometry-corner-radius 8
+    clip-to-geometry true
+}

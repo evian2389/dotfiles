@@ -1,0 +1,16 @@
+.notification {
+  background: rgba(30, 30, 30, 0.9);
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  color: white;
+}
+
+.notification-content {
+  margin-top: 5px;
+}
+
+.notification-title {
+  font-weight: bold;
+}
