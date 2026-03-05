@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Helix
+Comment=Modal terminal text editor
+Exec=ghostty -e hx %u
+Icon=helix
+Type=Application
+Terminal=false
+Categories=TextEditor;Development;Utility;
+MimeType=text/plain;application/x-shellscript;text/x-python;text/x-rust;text/x-go;text/x-c;text/x-cpp;
+Keywords=text;editor;terminal;modal;
+Process Group PGID: 11822

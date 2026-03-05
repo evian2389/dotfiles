@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=vsclient
+Exec=env QT_QPA_PLATFORM=xcb /opt/VD-i/bin/vsclient %u
+Icon=vsclient
+StartupNotify=false
+MimeType=x-scheme-handler/vdivsclient;
