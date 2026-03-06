@@ -121,7 +121,7 @@ binds {
     Mod+V hotkey-overlay-title="Audio Mixer: wiremix" { spawn "pwvucontrol"; }
     Mod+Ctrl+V hotkey-overlay-title="Audio Mixer: pavucontrol" { spawn "pwvucontrol"; }
     Mod+Ctrl+L hotkey-overlay-title="Lock Screen" { spawn "hyprlock"; }
-    Mod+P hotkey-overlay-title="Lock Screen" { spawn "hyprlock"; }
+    Mod+I hotkey-overlay-title="Lock Screen" { spawn "hyprlock"; }
     //Mod+M { spawn "mpv $(wl-paste)"; }
     Mod+M { spawn "sh" "-c" "mpv $(wl-paste)"; }
     
@@ -193,6 +193,10 @@ binds {
     Mod+Shift+9 { move-column-to-workspace 9; }
 
     Mod+Tab hotkey-overlay-title="Previous Workspace" { focus-workspace-previous; }
+
+    // Screenshots with Satty
+    Print hotkey-overlay-title="Screenshot (Edit)" { spawn "sh" "-c" "grim - | satty -f -"; }
+    Mod+P hotkey-overlay-title="Screenshot Area (Edit)" { spawn "sh" "-c" "grim -g \"$(slurp)\" - | satty -f -"; }
 }
 
 // --- Window Rules ---
