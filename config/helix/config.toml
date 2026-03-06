@@ -97,8 +97,9 @@
     "search_selection",
   ]
   C-j = ["insert_mode", "insert_newline", "normal_mode"]
-  C-y = ":sh zellij run -f -x 10%% -y 10%% --width 80%% --height 80%% -- bash ~/.config/helix/yazi-picker.sh"
-C-e = ":sh zellij run -f -x 10%% -y 10%% --width 80%% --height 80%% -- bash ~/.config/helix/broot-picker.sh"
+  A-y = ":sh zellij run -f -x 10%% -y 10%% --width 80%% --height 80%% -- bash ~/.config/helix/yazi-picker.sh"
+  A-e = ":sh zellij run -f -x 10%% -y 10%% --width 80%% --height 80%% -- bash ~/.config/helix/broot-picker.sh"
+  A-t = ["save_selection", "select_all", ":pipe sed 's/[[:space:]]*$//'", "jump_backward"]
   
   # C-b = ":new<space>:insert-output build.sh"
   "C-b" = [":hsplit-new", ":insert-output build.sh"]
@@ -115,6 +116,6 @@ C-e = ":sh zellij run -f -x 10%% -y 10%% --width 80%% --height 80%% -- bash ~/.c
   r = ":sh helix-wezterm.sh run"
   t = ":sh helix-wezterm.sh test"
   
-  [keys.insert]
-  j = { k = "normal_mode" } # Maps `jk` to exit insert mode
-  k = { j = ":insert-output printf 'λ'" } # Maps `ld` t oinput lambda
+  # [keys.insert]
+  # j = { k = "normal_mode" } # Maps `jk` to exit insert mode
+  # k = { j = ":insert-output printf 'λ'" } # Maps `ld` t oinput lambda
