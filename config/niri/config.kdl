@@ -124,6 +124,7 @@ binds {
     Mod+I hotkey-overlay-title="Lock Screen" { spawn "hyprlock"; }
     //Mod+M { spawn "mpv $(wl-paste)"; }
     Mod+M { spawn "sh" "-c" "mpv $(wl-paste)"; }
+    Mod+Y hotkey-overlay-title="File Manager: Yazi" { spawn "ghostty" "-e" "yazi"; }
     
     // Standard Niri Controls
     Mod+Q hotkey-overlay-title="Close Window" { close-window; }
@@ -138,10 +139,10 @@ binds {
     Mod+Right hotkey-overlay-title="Focus Monitor Right" { focus-monitor-right; }
     Mod+Up    hotkey-overlay-title="Focus Monitor Up"    { focus-monitor-up; }
     Mod+Down  hotkey-overlay-title="Focus Monitor Down"  { focus-monitor-down; }
-    Mod+H     hotkey-overlay-title="Focus Left"  { focus-column-left; }
+    Mod+H     hotkey-overlay-title="Focus Left"  { focus-column-or-monitor-left; }
     Mod+J     hotkey-overlay-title="Focus Workspace Down" { focus-window-or-workspace-down; }
     Mod+K     hotkey-overlay-title="Focus Workspace Up"   { focus-window-or-workspace-up; }
-    Mod+L     hotkey-overlay-title="Focus Right" { focus-column-right; }
+    Mod+L     hotkey-overlay-title="Focus Right" { focus-column-or-monitor-right; }
     
     // Overview / Workspace navigation
     Mod+O hotkey-overlay-title="Toggle Overview" { toggle-overview; }
