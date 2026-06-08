@@ -17,3 +17,28 @@ desc = "Delete a bookmark"
 on   = [ "b" ]
 run  = "plugin bunny"
 desc = "Bunny bookmark menu"
+
+[[mgr.prepend_keymap]]
+on   = [ "g", "t" ]
+run  = 'shell "ghostty --working-directory=$PWD &" --orphan'
+desc = "open terminal here"
+
+[[mgr.prepend_keymap]]
+on   = [ "u", "m" ]
+run  = 'shell "udiskie-umount $0" --confirm'
+desc = "Unmount selected device"
+
+[[mgr.prepend_keymap]]
+on = [ "t", "y" ]
+run = "plugin smart-tab"
+desc = "Create a tab and enter the hovered directory"
+
+[[mgr.prepend_keymap]]
+on   = [ "t", "t" ]
+run  = 'shell "if [ -d \"$1\" ]; then TARGET=\"$1\"; else TARGET=\"$(dirname \"$1\")\"; fi; zellij action new-tab --cwd \"$TARGET\"" --orphan'
+desc = "Open parent directory of hovered item in Zellij tab"
+
+# [[mgr.prepend_keymap]]
+# on   = [ "t", "t" ]
+# run  = 'shell "zellij action new-tab --cwd \"$1\"" --confirm'
+# desc = "Open hovered directory in a new Zellij tab"

@@ -8,3 +8,13 @@ prepend_rules = [
   { mime = "text/*", use = "edit" },
 ]
 
+[plugin]
+append_previewers = [
+    { url = "*", run = "file-extra-metadata" }
+]
+append_spotters = [
+    { url = "*", run = "file-extra-metadata" }
+]
+
+[mgr]
+linemode = "size" # Options: "none", "size", "mtime", "btime", "permissions", "owner"

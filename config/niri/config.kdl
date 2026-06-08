@@ -1,5 +1,7 @@
 // Niri configuration file (KDL)
 
+prefer-no-csd
+
 // --- Startup Services ---
 spawn-sh-at-startup "dbus-update-activation-environment --all"
 spawn-sh-at-startup "gnome-keyring-daemon --start --components=secrets"
@@ -12,13 +14,13 @@ spawn-at-startup "swww-daemon"
 spawn-sh-at-startup "swww img ~/.config/niri/wallpaper.jpg"
 spawn-sh-at-startup "~/.nix-profile/bin/hyprlax ~/.config/niri/wallpaper.jpg"
 spawn-at-startup "swaync"
+spawn-at-startup "niriusd"
 
 // --- General Settings ---
 hotkey-overlay {
     skip-at-startup
 }
 
-prefer-no-csd
 screenshot-path "~/Pictures/Screenshots/%Y-%m-%d %H-%M-%S.png"
 
 overview {
@@ -51,7 +53,7 @@ layer-rule {
 
 // --- Layout & Visuals ---
 layout {
-    gaps 12
+    gaps 2
     center-focused-column "never"
     
     preset-column-widths {
@@ -64,7 +66,7 @@ layout {
     
     focus-ring {
         width 2
-        active-color "#7aa2f7"
+        active-color "#87a2f7"
         inactive-color "#414868"
     }
 
@@ -115,6 +117,9 @@ animations {
 binds {
     // Shortcuts Panel
     Mod+Shift+Slash { show-hotkey-overlay; }
+    // Mod + Grave (숫자 1 왼쪽의 ` 키)로 Alacritty 스크래치패드 토글
+    // Mod+T { spawn "nirius" "scratchpad-show"; }
+    // Mod+GRAVE { spawn "nirius" "scratchpad-toggle"; }
 
     // Launcher: Fuzzel (Guix home)
     Mod+D hotkey-overlay-title="App Launcher: Fuzzel" { spawn "fuzzel"; }
@@ -133,16 +138,20 @@ binds {
     Mod+Ctrl+Return hotkey-overlay-title="Open Terminal: Ghostty" { spawn "alacritty"; }
     Mod+Shift+E hotkey-overlay-title="Logout Menu" { spawn "wlogout"; }
     Mod+Ctrl+Shift+E hotkey-overlay-title="Quit Niri" { quit; }
+    Mod+W { toggle-window-floating; }
+    Mod+N { switch-focus-between-floating-and-tiling; }
+    // Mod+M { move-window-to-scratchpad; }
+    // Mod+N { toggle-scratchpad-window; }
     
     // Navigation
     Mod+Left  hotkey-overlay-title="Focus Monitor Left"  { focus-monitor-left; }
     Mod+Right hotkey-overlay-title="Focus Monitor Right" { focus-monitor-right; }
     Mod+Up    hotkey-overlay-title="Focus Monitor Up"    { focus-monitor-up; }
     Mod+Down  hotkey-overlay-title="Focus Monitor Down"  { focus-monitor-down; }
-    Mod+H     hotkey-overlay-title="Focus Left"  { focus-column-or-monitor-left; }
+    Mod+H     hotkey-overlay-title="Focus Left"  { focus-column-left; }
     Mod+J     hotkey-overlay-title="Focus Workspace Down" { focus-window-or-workspace-down; }
     Mod+K     hotkey-overlay-title="Focus Workspace Up"   { focus-window-or-workspace-up; }
-    Mod+L     hotkey-overlay-title="Focus Right" { focus-column-or-monitor-right; }
+    Mod+L     hotkey-overlay-title="Focus Right" { focus-column-right; }
     
     // Overview / Workspace navigation
     Mod+O hotkey-overlay-title="Toggle Overview" { toggle-overview; }
@@ -212,6 +221,13 @@ window-rule {
     match app-id=r#"google-chrome"#
     match app-id=r#"code"#
     open-maximized true
+}
+
+window-rule {
+    match app-id="^scratchpad$"
+    open-floating true
+    default-column-width { proportion 0.7;}
+    default-window-height { proportion 1.0;}
 }
 
 // File dialogs - Open/Save/Select

@@ -23,7 +23,7 @@
   export EDITOR=helix
   export VISUAL=helix
   
-  PATH=~/.local/bin:~/.cargo/bin:$PATH:~/.npm-packages/bin:~/.config/emacs/bin/
+  PATH=~/.local/bin:~/.cargo/bin:$PATH:~/.npm-packages/bin:~/.config/emacs/bin/:$(go env GOPATH)/bin
   
   source /home/orka/.config/broot/launcher/bash/br
   
@@ -40,14 +40,25 @@
   # export ZELLIJ=zellij
   # export ZELLIJ_SESSION_NAME=main
   
-  if [[ -z "$ZELLIJ" ]]; then
-      if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
-          zellij attach -c
-      else
-          zellij
-      fi
+  # if [[ -z "$ZELLIJ" ]]; then
+  #     if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
+  #         zellij attach -c
+  #     else
+  #         zellij
+  #     fi
   
-      if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
-          exit
-      fi
-  fi
+  #     if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
+  #         exit
+  #     fi
+  # fi
+
+# Added by NemoClaw installer
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# NemoClaw PATH setup
+export PATH="/home/jongho3/.local/bin:$PATH"
+# end NemoClaw PATH setup
+
+source /home/jongho3/.config/broot/launcher/bash/br
+
+export PATH="/home/jongho3/dotfiles/.local/bin:$PATH" # pi-agent-rust installer PATH

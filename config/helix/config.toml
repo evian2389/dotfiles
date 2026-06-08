@@ -16,8 +16,6 @@
   color-modes = true
   auto-pairs = true
   end-of-line-diagnostics= "disable"
-  
-  
   #rulers = [120]
   idle-timeout = 50
   #mouse = false
@@ -25,6 +23,11 @@
   bufferline = "multiple"
   # Number of lines of padding around the edge of the screen when scrolling
   scrolloff = 10
+  
+  # [editor.sticky-context]
+  # enable = true
+  # follow-cursor = true
+  # max-lines = 4
   
   [editor.cursor-shape]
   insert = "bar"
@@ -82,6 +85,7 @@
   
   [editor.statusline]
   left = ["mode", "spinner", "file-name", "file-type", "total-line-numbers", "file-encoding"]
+  # center = ["syntax-tree-path"]
   center = []
   right = ["selections", "primary-selection-length", "position", "position-percentage", "spacer", "diagnostics", "workspace-diagnostics", "version-control"]
   
@@ -107,7 +111,7 @@
   B = [":hsplit-new", ":insert-output ./build.sh"]
   
   [keys.normal.space.","]
-  b = ":sh helix-wezterm.sh blame"
+  b = ":sh bash ~/.config/helix/git-blame-toggle.sh %{filename}"
   c = ":sh helix-wezterm.sh check"
   e = ":sh helix-wezterm.sh explorer"
   f = ":sh helix-wezterm.sh fzf"

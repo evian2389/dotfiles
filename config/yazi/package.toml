@@ -8,5 +8,10 @@ use = "stelcodes/bunny"
 rev = "6ee99bc"
 hash = "417de633d0008580b386bd3358eea56f"
 
+[[plugin.deps]]
+use = "boydaihungst/file-extra-metadata"
+rev = "044274c"
+hash = "14006064a6a53a1770fbdcefb97a8347"
+
 [flavor]
 deps = []
