@@ -15,6 +15,7 @@ spawn-sh-at-startup "swww img ~/.config/niri/wallpaper.jpg"
 spawn-sh-at-startup "~/.nix-profile/bin/hyprlax ~/.config/niri/wallpaper.jpg"
 spawn-at-startup "swaync"
 spawn-at-startup "niriusd"
+spawn-at-startup "kdeconnect-indicator"
 
 // --- General Settings ---
 hotkey-overlay {
