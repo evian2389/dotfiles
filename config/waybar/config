@@ -17,6 +17,7 @@
         "battery", 
         "custom/fcitx5",
         "custom/wlsunset",
+        "custom/kdeconnect",
         "tray", 
         "privacy",
         "custom/notification",
@@ -231,6 +232,13 @@
         "exec": "pgrep -x wlsunset > /dev/null && echo '󰖔' || echo '󰖛'",
         "on-click": "pgrep -x wlsunset && pkill wlsunset || wlsunset",
         "tooltip-format": "Toggle wlsunset (night light)"
+    },
+
+    "custom/kdeconnect": {
+        "format": "󰄜",
+        "on-click": "kdeconnect-app",
+        "tooltip": true,
+        "tooltip-format": "KDE Connect"
     },
 
     "custom/lock": {
