@@ -114,6 +114,8 @@ animations {
     }
 }
 
+workspace "stash" { }
+
 // --- Keybindings ---
 binds {
     // Shortcuts Panel
@@ -188,30 +190,51 @@ binds {
     Mod+3 { focus-workspace 3; }
     Mod+4 { focus-workspace 4; }
     Mod+5 { focus-workspace 5; }
-    Mod+6 { focus-workspace 6; }
-    Mod+7 { focus-workspace 7; }
-    Mod+8 { focus-workspace 8; }
-    Mod+9 { focus-workspace 9; }
 
     Mod+Shift+1 { move-column-to-workspace 1; }
     Mod+Shift+2 { move-column-to-workspace 2; }
     Mod+Shift+3 { move-column-to-workspace 3; }
     Mod+Shift+4 { move-column-to-workspace 4; }
     Mod+Shift+5 { move-column-to-workspace 5; }
-    Mod+Shift+6 { move-column-to-workspace 6; }
-    Mod+Shift+7 { move-column-to-workspace 7; }
-    Mod+Shift+8 { move-column-to-workspace 8; }
-    Mod+Shift+9 { move-column-to-workspace 9; }
 
     Mod+Tab hotkey-overlay-title="Previous Workspace" { focus-workspace-previous; }
 
     // Screenshots with Satty
     Print hotkey-overlay-title="Screenshot (Edit)" { spawn "sh" "-c" "grim - | satty -f -"; }
     Mod+P hotkey-overlay-title="Screenshot Area (Edit)" { spawn "sh" "-c" "grim -g \"$(slurp)\" - | satty -f -"; }
+    Mod+Shift+P hotkey-overlay-title="Screenshot Area (5s Delay)" { spawn "sh" "-c" "sleep 5; grim -g \"$(slurp)\" - | satty -f -"; }
+
+    // Window focus
+    Mod+B { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "google-chrome" "google-chrome-stable"; }
+    Mod+S { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "vsclient" "vsclient"; }
+    Mod+G { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "com.mitchellh.ghostty" "ghostty"; }
+
+    Mod+T { spawn "niri-scratchpad" "target" "--spawn" "ghostty --title=scratchpad-term" "title" "scratchpad-term"; }
+    // Mod+S { spawn "$HOME/.config/niri/niri-run-or-raise.sh" "vsclient" "vsclient"; }
+    //
+    // 기존 설정을 "show" 명령어로 명확히 하고, 호출 시마다 위치와 크기를 다시 잡도록 유도합니다.
+    "Mod+Escape" {
+        spawn "niri-scratch-pad" "show" "1" "--as-float"
+    }
 }
 
 // --- Window Rules ---
 // Application-specific rules
+//
+
+window-rule {
+    match title="^scratchpad-term$"
+
+    open-floating true
+
+    // Position parameters must be written flatly on a single line
+    //default-floating-position x=0.05 y=0.05 relative-to="top-left"
+
+    // Sizing parameters REQUIRE inner brackets and the "proportion" tag
+    default-column-width { proportion 0.95; }
+    default-window-height { proportion 0.95; }
+}
+
 window-rule {
     match is-active=false
     opacity 1.0
