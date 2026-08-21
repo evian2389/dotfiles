@@ -5,13 +5,13 @@ hash = "92fbb5483657fa7976cdf4e0104e18e0"
 
 [[plugin.deps]]
 use = "stelcodes/bunny"
-rev = "6ee99bc"
-hash = "417de633d0008580b386bd3358eea56f"
+rev = "71b14a3"
+hash = "18a2829738214fe9bca99a2fef19113d"
 
 [[plugin.deps]]
 use = "boydaihungst/file-extra-metadata"
-rev = "044274c"
-hash = "14006064a6a53a1770fbdcefb97a8347"
+rev = "8bb639d"
+hash = "8c5f14c09c981a496afaab5184e4aa08"
 
 [flavor]
 deps = []
