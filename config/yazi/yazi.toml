@@ -2,6 +2,9 @@
 edit = [
   { run = 'hx "$@"', block = true, desc = "Helix" },
 ]
+zed_custom = [
+    { run = 'zeditor "$@"', block = false, desc = "Zed Editor" },
+]
 
 [open]
 prepend_rules = [

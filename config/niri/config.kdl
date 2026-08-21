@@ -208,6 +208,7 @@ binds {
     Mod+B { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "google-chrome" "google-chrome-stable"; }
     Mod+S { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "vsclient" "vsclient"; }
     Mod+G { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "com.mitchellh.ghostty" "ghostty"; }
+    Mod+E { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "emacs" "emacs"; }
 
     Mod+T { spawn "niri-scratchpad" "target" "--spawn" "ghostty --title=scratchpad-term" "title" "scratchpad-term"; }
     // Mod+S { spawn "$HOME/.config/niri/niri-run-or-raise.sh" "vsclient" "vsclient"; }
@@ -284,6 +285,11 @@ window-rule {
 window-rule {
     geometry-corner-radius 8
     clip-to-geometry true
+}
+
+// Always focus newly opened windows (e.g. Zed opened from yazi's gz)
+window-rule {
+    open-focused true
 }
 
 // --- Input ---

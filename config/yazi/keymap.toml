@@ -24,6 +24,11 @@ run  = 'shell "ghostty --working-directory=$PWD &" --orphan'
 desc = "open terminal here"
 
 [[mgr.prepend_keymap]]
+on   = [ "g", "z" ]
+run  = 'shell --orphan -- zeditor %h'
+desc = "Open hovered directory/file in Zed"
+
+[[mgr.prepend_keymap]]
 on   = [ "u", "m" ]
 run  = 'shell "udiskie-umount $0" --confirm'
 desc = "Unmount selected device"
