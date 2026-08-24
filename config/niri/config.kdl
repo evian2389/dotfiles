@@ -207,7 +207,8 @@ binds {
     // Window focus
     Mod+B { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "google-chrome" "google-chrome-stable"; }
     Mod+S { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "vsclient" "vsclient"; }
-    Mod+G { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "com.mitchellh.ghostty" "ghostty"; }
+
+    //Mod+G { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "com.mitchellh.ghostty" "ghostty"; }
     Mod+E { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "emacs" "emacs"; }
 
     Mod+T { spawn "niri-scratchpad" "target" "--spawn" "ghostty --title=scratchpad-term" "title" "scratchpad-term"; }
@@ -217,7 +218,12 @@ binds {
     "Mod+Escape" {
         spawn "niri-scratch-pad" "show" "1" "--as-float"
     }
-}
+    // Press Mod+Ctrl+1 to dynamically pin the current window to Slot 1
+    Mod+Alt+G { spawn "~/.config/niri/niri-dynamic-bind.sh" "set_g"; }
+
+    // Press Mod+1 to instantly jump focus back to that exact window
+    Mod+G      { spawn "~/.config/niri/niri-dynamic-bind.sh" "go_g"; }
+    }
 
 // --- Window Rules ---
 // Application-specific rules
