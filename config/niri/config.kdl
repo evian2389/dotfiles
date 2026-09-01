@@ -205,7 +205,8 @@ binds {
     Mod+Shift+P hotkey-overlay-title="Screenshot Area (5s Delay)" { spawn "sh" "-c" "sleep 5; grim -g \"$(slurp)\" - | satty -f -"; }
 
     // Window focus
-    Mod+B { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "google-chrome" "google-chrome-stable"; }
+    // Mod+B { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "google-chrome" "google-chrome-stable"; }
+    Mod+B hotkey-overlay-title="Open Zen Browser" { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "zen" "/opt/zen-browser-bin/zen-bin"; }
     Mod+S { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "vsclient" "vsclient"; }
 
     //Mod+G { spawn "/home/jongho3/.config/niri/niri_run_or_raise.sh" "com.mitchellh.ghostty" "ghostty"; }
