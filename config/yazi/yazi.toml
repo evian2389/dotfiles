@@ -2,16 +2,23 @@
 edit = [
   { run = 'hx "$@"', block = true, desc = "Helix" },
 ]
+miro_pdf = [
+  { run = 'miro-pdf %s', orphan = true, desc = "Miro PDF" },
+]
 zed_custom = [
     { run = 'zeditor "$@"', block = false, desc = "Zed Editor" },
 ]
 
 [open]
 prepend_rules = [
+  { mime = "application/pdf", use = "miro_pdf" },
   { mime = "text/*", use = "edit" },
 ]
 
 [plugin]
+prepend_previewers = [
+    { mime = "application/pdf", run = "bookokrat-preview" },
+]
 append_previewers = [
     { url = "*", run = "file-extra-metadata" }
 ]

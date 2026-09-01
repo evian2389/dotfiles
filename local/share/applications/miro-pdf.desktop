@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Miro PDF
+GenericName=PDF Viewer
+Comment=Read PDF files in a terminal
+Exec=miro-pdf %F
+Icon=application-pdf
+Terminal=false
+Type=Application
+Categories=Office;Viewer;
+MimeType=application/pdf;
+Keywords=pdf;reader;viewer;
