@@ -1,0 +1,16 @@
+# herdr configuration
+# Managed by dotfiles (stow). Place at ~/.config/herdr/config.toml
+
+[ui]
+agent_panel_sort = "spaces"
+show_agent_labels_on_pane_borders = false
+pane_gaps = false
+pane_outer_borders = false
+hide_tab_bar_when_single_tab = true
+
+[ui.toast]
+delivery = "system"
+
+[keys]
+# Enter prefix mode with Alt+A, instead of the default Ctrl+B.
+prefix = "alt+a"
