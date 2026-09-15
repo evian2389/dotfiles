@@ -78,3 +78,31 @@ shell '
 ' --confirm
 '''
 desc = "Extract selected archives into separate folders using 7z"
+
+[[mgr.prepend_keymap]]
+on = [ "c", "o" ]
+run = '''
+shell --block -- sh -c '
+    if [ "$#" -ne 2 ]; then
+        printf "Mark exactly two files to compare (got %s)\n" "$#" >&2
+        printf "Press any key to continue...\n" >&2
+        read -r _
+        exit 1
+    fi
+
+    type1=$(file --brief --mime-type -- "$1")
+    type2=$(file --brief --mime-type -- "$2")
+
+    case "$type1:$type2" in
+        text/*:text/*)
+            exec ghostty -e nvim -d -- "$1" "$2"
+            ;;
+        *)
+            cmp -- "$1" "$2"
+            printf "\nPress any key to continue...\n" >&2
+            read -r _
+            ;;
+    esac
+' compare "$@"
+'''
+desc = "Compare two marked files"
