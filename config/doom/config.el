@@ -117,12 +117,11 @@
 
 (setq auto-save-list-file-prefix "~/.config/emacs")
 
-(setq display-line-numbers-type `relative)
+(setq display-line-numbers-type 'relative)
 (setq-default truncate-lines t)
 ;;set ui-helpers
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers 'relative)
-(setq display-line-numbers-width 'auto)
 (setq display-line-numbers-width 4)
 (setq display-line-numbers-grow-only t)
 (setq display-line-numbers-width-start t)
@@ -194,10 +193,6 @@
   "Run consult-ripgrep with the last regex from regex-search-ring."
   (interactive)
   (consult-ripgrep nil (car regexp-search-ring)))
-
-(with-eval-after-load 'simple
-  (setq-default display-fill-column-indicator-column 80)
-  (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
 
 (setopt text-mode-ispell-word-completion nil)
 (which-function-mode 1)
@@ -373,9 +368,6 @@
   (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
   :init
   (vertico-mode 1)
-  ;; Configure Orderless as the primary completion style
-  (setq completion-styles '(orderless basic))
-  (setq orderless-matching-styles '(orderless-literal orderless-regexp))
   ;; Enable Consult commands (optional, but highly recommended)
   ;;(global-set-key (kbd "C-x C-f") 'consult-find-file)
   )
@@ -407,11 +399,59 @@
 
 ;; Option 2: Replace `vertico-insert' to enable TAB prefix expansion.
 ;; (keymap-set vertico-map "TAB" #'minibuffer-complete)
-(setq completion-styles '(basic substring partial-completion flex))
 (setq read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t
       completion-ignore-case t)
 (setq completion-in-region-function #'consult-completion-in-region)
+
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-category-defaults nil)
+  (completion-pcm-leading-wildcard t)
+  (orderless-matching-styles '(orderless-literal orderless-regexp)))
+
+(use-package blamer
+  :bind (("s-i" . blamer-show-commit-info))
+  :defer 20
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-min-offset 70)
+  :custom-face
+  (blamer-face ((t :foreground "#7a88cf"
+                    :background nil
+                    :height 140
+                    :italic t)))
+  :config
+  (global-blamer-mode 0))
+
+;; Accept completion from Copilot and fall back to Company.
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)
+              ("C-n" . 'copilot-next-completion)
+              ("C-p" . 'copilot-previous-completion))
+  :config
+  (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+  (add-to-list 'copilot-indentation-alist '(org-mode 2))
+  (add-to-list 'copilot-indentation-alist '(text-mode 2))
+  (add-to-list 'copilot-indentation-alist '(clojure-mode 2))
+  (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
+
+(use-package aider
+  :config
+  (setq aider-args '("--model" "gemini" "--no-auto-accept-architect"))
+  (setenv "GEMINI_API_KEY"
+          (string-trim (shell-command-to-string "pass data/google/gemini_api.key")))
+  (global-set-key (kbd "C-c H") 'aider-transient-menu)
+  (aider-magit-setup-transients)
+  (global-auto-revert-mode 1)
+  (auto-revert-mode 1))
 
 (use-package! lsp-proxy
   :config
@@ -421,13 +461,6 @@
     :implementations '(lsp-proxy-find-implementations :async t)
     :type-definition '(lsp-proxy-find-type-definition :async t)
     :documentation '(lsp-proxy-describe-thing-at-point :async t)))
-  :costom
-  (setq lsp-clients-clangd-args
-          '("-j=4" ;; Example: Use 4 jobs for background indexing
-            "--background-index"
-            "--clang-tidy" ;; Enable Clang-Tidy checks
-            "--completion-style=detailed"
-            "-log=error"))
 
 (meow-leader-define-key '("g" . lsp-find-references))
 (meow-leader-define-key '("d" . lsp-find-definition))
@@ -452,7 +485,6 @@
   ;;    (rust . ,(treesit-auto--gh-uri "tree-sitter/tree-sitter-rust"))
   ;;    (python . ,(treesit-auto--gh-uri "tree-sitter/tree-sitter-python"))))
   ;; Populates auto-mode-alist with the treesit modes *before* any files are opened.
-  (treesit-auto-add-to-auto-mode-alist t)
   ;; Increase the font-lock level for more detailed highlighting
   ;;(treesit-font-lock-level 4)
   :config
@@ -470,6 +502,12 @@
   :ensure t
   :custom
   (lsp-inlay-hint-enable t)
+  (lsp-clients-clangd-args
+   '("-j=4"
+     "--background-index"
+     "--clang-tidy"
+     "--completion-style=detailed"
+     "-log=error"))
 
   :init
   ;; Crucial: Ensure semantic highlighting is off so Tree-sitter can work
@@ -558,17 +596,10 @@
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-to-list 'completion-at-point-functions #'cape-line)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
   :config
   ;; Example: Merge LSP and snippet completion sources
   ;;(add-hook 'completion-at-point-functions #'cape-super-capf)
   )
-
-;; Configure specific completion styles for file paths
-(after! corfu
-  (setq completion-category-overrides '((file (styles partial-completion))))
-  ;; Use orderless as your primary style, with basic as a fallback.
-  (setq completion-styles '(orderless basic)))
 
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."
@@ -790,14 +821,22 @@
                       ("accomplishment" . ?a)
                       ))
 
-(use-package org-roam
-  :ensure t
+(use-package! org-roam
   :init
   (setq org-roam-v2-ack t)
   :custom
   (org-roam-completion-everywhere t)
   :config
   (org-roam-setup))
+
+(use-package! consult-org-roam
+  :after org-roam
+  :config
+  (consult-org-roam-mode 1))
+
+(map! :leader
+      :desc "Search Org-roam"
+      "s r" #'consult-org-roam-search)
 
          ;;; find by titles and tags  :TODO:check if this works..
 
@@ -1071,33 +1110,34 @@
  ;;( use-package polymode
  ;; :defer t)
 
+)
 
-  (use-package org-brain :ensure t
-    :init
-    (setq org-brain-path "~/notes/brain")
-    ;; For Evil users
-    (with-eval-after-load 'evil
-      (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
-    :config
-    (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
-    (setq org-id-track-globally t)
-    (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
-    (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
-    (push '("b" "Brain" plain (function org-brain-goto-end)
-            "* %i%?" :empty-lines 1)
-          org-capture-templates)
-    (setq org-brain-visualize-default-choices 'all)
-    (setq org-brain-title-max-length 12)
-    (setq org-brain-include-file-entries nil
-          org-brain-file-entries-use-title nil)
-     ;;(add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode)
+(use-package! org-brain
+  :init
+  (setq org-brain-path "~/notes/brain")
+  ;; For Evil users
+  (with-eval-after-load 'evil
+    (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
+  :config
+  (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
+  (setq org-id-track-globally t)
+  (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+  (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
+  (push '("b" "Brain" plain (function org-brain-goto-end)
+          "* %i%?" :empty-lines 1)
+        org-capture-templates)
+  (setq org-brain-visualize-default-choices 'all)
+  (setq org-brain-title-max-length 12)
+  (setq org-brain-include-file-entries nil
+        org-brain-file-entries-use-title nil)
+  ;;(add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode)
 
 )
 
-  (use-package org-auto-tangle
-    :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
-    :defer t
-    :hook (org-src-mode . org-auto-tangle-mode))
+(use-package org-auto-tangle
+  :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
+  :defer t
+  :hook (org-src-mode . org-auto-tangle-mode))
 
 (use-package! org-jira
   :config
@@ -1108,8 +1148,6 @@
   ;;    (cons "Authorization"
   ;;          (concat "Bearer " (auth-source-pick-first-password
   ;;                             :host "http://jira.lge.com/"))))
-)
-
 )
 
                                         ;       (with-eval-after-load 'geiser-mode

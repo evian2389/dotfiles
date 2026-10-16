@@ -50,6 +50,7 @@
 (package! org-present)
 (package! org-brain :recipe (:build (:not compile)))   ;;rm /home/jongho3/.config/emacs/.local/straight/build-30.2/org-brain/org-brain.elc
 (package! org-roam-ui)
+(package! consult-org-roam)
 (package! org-auto-tangle)
 (package! harpoon)
 (package! jinx)
