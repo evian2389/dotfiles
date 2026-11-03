@@ -19,6 +19,20 @@ return {
         vim.treesitter.language.add(parser.lang, { path = paths[1] })
       end
     end
+
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "norg",
+      callback = function(event)
+        vim.keymap.set("n", "<CR>", "<Plug>(neorg.esupports.hop.hop-link)", {
+          buffer = event.buf,
+          desc = "[neorg] Jump to Link",
+        })
+        vim.keymap.set("n", "<leader>nl", "<Plug>(neorg.esupports.hop.hop-link)", {
+          buffer = event.buf,
+          desc = "Neorg: Follow link",
+        })
+      end,
+    })
   end,
   opts = {
     load = {
