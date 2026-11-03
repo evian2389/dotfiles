@@ -37,3 +37,9 @@ key = "prefix+shift+f"
 type = "plugin_action"
 command = "herdr-file-viewer.open-file-viewer-tab"
 description = "open file viewer in tab"
+
+[[keys.command]]
+key = "prefix+u"
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle"
+description = "toggle reviewer"

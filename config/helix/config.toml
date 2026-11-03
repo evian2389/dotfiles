@@ -111,7 +111,8 @@
   B = [":hsplit-new", ":insert-output ./build.sh"]
   
   [keys.normal.space.","]
-  b = ":sh bash ~/.config/helix/git-blame-toggle.sh %{filename}"
+  b = ":sh bash ~/.config/helix/git-blame-toggle.sh \"%{file_path_absolute}\""
+  m = ":sh bash ~/.config/helix/markdown-preview-toggle.sh \"%{file_path_absolute}\""
   c = ":sh helix-wezterm.sh check"
   e = ":sh helix-wezterm.sh explorer"
   f = ":sh helix-wezterm.sh fzf"
