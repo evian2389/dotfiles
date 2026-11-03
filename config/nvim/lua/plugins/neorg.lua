@@ -62,6 +62,16 @@ return {
   keys = {
     { "<leader>nn", "<cmd>Neorg workspace neovim<cr>", desc = "Neorg: Open workspace" },
     { "<leader>ni", "<cmd>Neorg index<cr>", desc = "Neorg: Open index" },
+    {
+      "<leader>ns",
+      function()
+        Snacks.picker.grep({
+          cwd = vim.fn.expand("~/notes/neovim"),
+          glob = "*.norg",
+        })
+      end,
+      desc = "Neorg: Search workspace",
+    },
     { "<leader>nt", "<cmd>edit ~/notes/neovim/tasks.norg<cr>", desc = "Neorg: Open tasks" },
     { "<leader>nj", "<cmd>Neorg journal today<cr>", desc = "Neorg: Open today's journal" },
   },
