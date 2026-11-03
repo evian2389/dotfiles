@@ -15,6 +15,7 @@ return {
         true
       )
       if paths[1] then
+        vim.opt.runtimepath:append(vim.fn.fnamemodify(paths[1], ":h:h"))
         vim.treesitter.language.add(parser.lang, { path = paths[1] })
       end
     end
