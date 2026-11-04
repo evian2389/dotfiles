@@ -1,0 +1,7 @@
+[Unit]
+Description=Sync recent unresolved assigned Jira tasks into Taskwarrior
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/bugwarrior pull --quiet
+UMask=0077

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Taskwarrior reminders every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=15s
+Persistent=true
+Unit=taskwarrior-reminder.service
+
+[Install]
+WantedBy=timers.target

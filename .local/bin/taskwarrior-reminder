@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+"""Send desktop reminders for pending Taskwarrior tasks."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any
+
+
+ADVANCE = timedelta(hours=1)
+CATCH_UP_GRACE = timedelta(minutes=15)
+STATE_RETENTION = timedelta(days=1)
+ALL_DAY_HOUR = 9
+STATE_FILE = Path.home() / ".local/state/taskwarrior-reminder/notified.json"
+NOTIFY_SEND = Path("/usr/bin/notify-send")
+
+
+@dataclass(frozen=True)
+class Alert:
+    when: datetime
+    key: str
+    title: str
+    body: str
+
+
+def parse_task_date(value: Any) -> datetime:
+    if not isinstance(value, str):
+        raise ValueError("Taskwarrior exported a non-string reminder date")
+
+    normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        event_time = datetime.fromisoformat(normalized)
+    except ValueError as error:
+        raise ValueError(f"Unrecognized Taskwarrior date: {value!r}") from error
+
+    if event_time.tzinfo is None:
+        event_time = event_time.astimezone()
+    event_time = event_time.astimezone()
+
+    # Taskwarrior exports date-only values as local midnight.
+    if (
+        event_time.hour == 0
+        and event_time.minute == 0
+        and event_time.second == 0
+        and event_time.microsecond == 0
+    ):
+        event_time = event_time.replace(hour=ALL_DAY_HOUR)
+
+    return event_time
+
+
+def fetch_pending_tasks() -> list[dict[str, Any]]:
+    task_command = shutil.which("task")
+    if task_command is None:
+        raise RuntimeError("Taskwarrior executable 'task' was not found")
+
+    result = subprocess.run(
+        [task_command, "status:pending", "export"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        detail = result.stderr.strip()
+        raise RuntimeError(f"Taskwarrior export failed: {detail or result.returncode}")
+
+    tasks = json.loads(result.stdout)
+    if not isinstance(tasks, list):
+        raise ValueError("Taskwarrior export did not return a task list")
+    return tasks
+
+
+def build_alerts(
+    tasks: list[dict[str, Any]], now: datetime
+) -> tuple[list[Alert], set[str]]:
+    alerts: list[Alert] = []
+    live_keys: set[str] = set()
+
+    for task in tasks:
+        if not isinstance(task, dict):
+            raise ValueError("Taskwarrior export contains an invalid task record")
+        task_uuid = task.get("uuid")
+        if not isinstance(task_uuid, str) or not task_uuid:
+            raise ValueError("Taskwarrior export contains a task without a UUID")
+
+        description = task.get("description")
+        if not isinstance(description, str) or not description:
+            description = "(untitled task)"
+        body = " ".join(description.split())
+        if len(body) > 240:
+            body = body[:237] + "..."
+
+        for field, label in (
+            ("due", "Due"),
+            ("scheduled", "Scheduled"),
+            ("reminder", "Reminder"),
+        ):
+            raw_date = task.get(field)
+            if raw_date is None:
+                continue
+
+            event_time = parse_task_date(raw_date)
+            phases = (
+                (("at", event_time, label),)
+                if field == "reminder"
+                else (
+                    ("before", event_time - ADVANCE, f"{label} in 1 hour"),
+                    ("at", event_time, f"{label} now"),
+                )
+            )
+
+            for phase, target, title in phases:
+                key = f"{task_uuid}:{field}:{event_time.isoformat()}:{phase}"
+                if target >= now - STATE_RETENTION:
+                    live_keys.add(key)
+
+                if (
+                    target <= now <= target + CATCH_UP_GRACE
+                    and (phase != "before" or now < event_time)
+                ):
+                    alerts.append(Alert(target, key, title, body))
+
+    alerts.sort(key=lambda alert: (alert.when, alert.key))
+    return alerts, live_keys
+
+
+def load_state() -> dict[str, str]:
+    try:
+        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
+    except json.JSONDecodeError as error:
+        raise RuntimeError(f"Invalid reminder state file: {STATE_FILE}") from error
+
+    if not isinstance(state, dict) or any(
+        not isinstance(key, str) or not isinstance(value, str)
+        for key, value in state.items()
+    ):
+        raise RuntimeError(f"Invalid reminder state file: {STATE_FILE}")
+    return state
+
+
+def save_state(state: dict[str, str]) -> None:
+    STATE_FILE.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    STATE_FILE.parent.chmod(0o700)
+    temporary_file = STATE_FILE.with_name(f".{STATE_FILE.name}.{os.getpid()}.tmp")
+
+    try:
+        with temporary_file.open("w", encoding="utf-8") as file:
+            json.dump(dict(sorted(state.items())), file, separators=(",", ":"))
+            file.write("\n")
+        temporary_file.chmod(0o600)
+        temporary_file.replace(STATE_FILE)
+    finally:
+        try:
+            temporary_file.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="report the number of notifications without sending or recording them",
+    )
+    args = parser.parse_args()
+
+    try:
+        now = datetime.now().astimezone()
+        tasks = fetch_pending_tasks()
+        alerts, live_keys = build_alerts(tasks, now)
+        stored_state = load_state()
+        state = {key: value for key, value in stored_state.items() if key in live_keys}
+        state_changed = state != stored_state
+        pending_alerts = [alert for alert in alerts if alert.key not in state]
+
+        if args.dry_run:
+            print(f"{len(pending_alerts)} notification(s) would be sent.")
+            return 0
+
+        if not NOTIFY_SEND.is_file():
+            raise RuntimeError(f"Notification command not found: {NOTIFY_SEND}")
+
+        for alert in pending_alerts:
+            result = subprocess.run(
+                [
+                    str(NOTIFY_SEND),
+                    "--app-name=Taskwarrior",
+                    "--urgency=normal",
+                    "--expire-time=10000",
+                    alert.title,
+                    alert.body,
+                ],
+                check=False,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(f"notify-send exited with status {result.returncode}")
+
+            state[alert.key] = now.isoformat()
+            save_state(state)
+            state_changed = False
+
+        if state_changed:
+            save_state(state)
+    except (OSError, RuntimeError, ValueError) as error:
+        print(f"taskwarrior-reminder: {error}", file=sys.stderr)
+        return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

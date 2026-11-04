@@ -1,0 +1,293 @@
+#!/usr/bin/env python3
+"""Run Bugwarrior using Jira credentials loaded safely from ~/.env."""
+
+from __future__ import annotations
+
+import json
+import os
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from urllib.parse import urlsplit
+
+
+BUGWARRIOR = Path("/usr/bin/bugwarrior")
+VENV_PYTHON = Path.home() / ".local/share/bugwarrior-venv/bin/python"
+ENV_FILE = Path.home() / ".env"
+TASKRC = Path.home() / ".taskrc"
+ASSIGNEE = "jongho3.lee"
+RUNTIME_SUBDIR = "bugwarrior-jira"
+
+
+def load_jira_environment() -> dict[str, str]:
+    if not ENV_FILE.is_file():
+        raise RuntimeError(f"Missing Jira environment file: {ENV_FILE}")
+    if ENV_FILE.stat().st_mode & 0o077:
+        raise RuntimeError(f"{ENV_FILE} must not be readable by group or others")
+
+    required = {
+        "JIRA_URL",
+        "JIRA_USERNAME",
+        "JIRA_USEREMAIL",
+        "JIRA_PERSONAL_ACCESS_TOKEN",
+        "JIRA_PERSONAL_TOKEN",
+    }
+    values: dict[str, str] = {}
+
+    for line_number, line in enumerate(
+        ENV_FILE.read_text(encoding="utf-8").splitlines(), start=1
+    ):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("export "):
+            stripped = stripped[7:].lstrip()
+
+        name, separator, _ = stripped.partition("=")
+        name = name.strip()
+        if not separator or name not in required:
+            continue
+
+        try:
+            parts = shlex.split(stripped, comments=True, posix=True)
+        except ValueError as error:
+            raise RuntimeError(
+                f"Malformed Jira entry in {ENV_FILE} at line {line_number}"
+            ) from error
+
+        if len(parts) != 1 or "=" not in parts[0]:
+            raise RuntimeError(
+                f"Malformed Jira entry in {ENV_FILE} at line {line_number}"
+            )
+        key, value = parts[0].split("=", 1)
+        values[key] = value
+
+    pat_values = [
+        values[key]
+        for key in ("JIRA_PERSONAL_ACCESS_TOKEN", "JIRA_PERSONAL_TOKEN")
+        if values.get(key)
+    ]
+    if len(set(pat_values)) > 1:
+        raise RuntimeError("Jira PAT variables in ~/.env do not match")
+
+    jira_url = values.get("JIRA_URL", "").rstrip("/")
+    username = values.get("JIRA_USERNAME") or values.get("JIRA_USEREMAIL", "")
+    pat = pat_values[0] if pat_values else ""
+
+    parsed_url = urlsplit(jira_url)
+    if (
+        parsed_url.scheme != "https"
+        or not parsed_url.netloc
+        or parsed_url.username
+        or parsed_url.password
+    ):
+        raise RuntimeError("JIRA_URL must be an HTTPS Jira base URL")
+    if not username:
+        raise RuntimeError("JIRA_USERNAME or JIRA_USEREMAIL is missing from ~/.env")
+    if not pat:
+        raise RuntimeError("Jira personal access token is missing from ~/.env")
+
+    return {"base_uri": jira_url, "username": username, "PAT": pat}
+
+
+def toml_string(value: str) -> str:
+    return json.dumps(value, ensure_ascii=False)
+
+
+def get_taskwarrior_data_location() -> str:
+    task = shutil.which("task")
+    if task is None:
+        raise RuntimeError("Taskwarrior executable 'task' was not found")
+
+    environment = os.environ.copy()
+    environment.pop("TASKDATA", None)
+    environment["TASKRC"] = str(TASKRC)
+    result = subprocess.run(
+        [task, "_show"],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise RuntimeError("Unable to read Taskwarrior configuration")
+
+    for line in result.stdout.splitlines():
+        if line.startswith("data.location="):
+            return str(Path(line.partition("=")[2]).expanduser())
+    raise RuntimeError("Taskwarrior data.location is not configured")
+
+
+def get_runtime_paths() -> tuple[Path, Path]:
+    runtime_value = os.environ.get("XDG_RUNTIME_DIR")
+    if not runtime_value:
+        raise RuntimeError("XDG_RUNTIME_DIR is unavailable; refusing non-RAM storage")
+    runtime_base = Path(runtime_value)
+    if not runtime_base.is_dir():
+        raise RuntimeError("XDG_RUNTIME_DIR is unavailable; refusing non-RAM storage")
+
+    info = runtime_base.stat()
+    if info.st_uid != os.getuid() or info.st_mode & 0o077:
+        raise RuntimeError("XDG_RUNTIME_DIR must be private to the current user")
+
+    findmnt = shutil.which("findmnt")
+    if findmnt is None:
+        raise RuntimeError("findmnt is required to verify RAM-only runtime storage")
+    filesystem = subprocess.run(
+        [findmnt, "-n", "-o", "FSTYPE", "--target", str(runtime_base)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if filesystem.returncode != 0 or filesystem.stdout.strip() != "tmpfs":
+        raise RuntimeError("XDG_RUNTIME_DIR is not backed by tmpfs")
+
+    runtime_dir = runtime_base / RUNTIME_SUBDIR
+    runtime_dir.mkdir(mode=0o700, exist_ok=True)
+    runtime_dir.chmod(0o700)
+    return runtime_dir, runtime_dir / "taskrc"
+
+
+def write_runtime_taskrc(
+    taskrc_path: Path, data_location: str, uda_lines: list[str]
+) -> None:
+    content = "\n".join(
+        [
+            f"data.location={data_location}",
+            "confirmation=no",
+            *uda_lines,
+            "",
+        ]
+    )
+    temporary_path = taskrc_path.with_suffix(".tmp")
+    temporary_path.write_text(content, encoding="utf-8")
+    temporary_path.chmod(0o600)
+    temporary_path.replace(taskrc_path)
+
+
+def cleanup_closed_tasks(task: str, environment: dict[str, str]) -> None:
+    for status, action in (("completed", "delete"), ("deleted", "purge")):
+        count = subprocess.run(
+            [task, "rc.verbose=nothing", "+jira", f"status:{status}", "count"],
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if count.returncode != 0:
+            raise RuntimeError("Unable to count closed Jira tasks in Taskwarrior")
+        try:
+            count_value = int(count.stdout.strip())
+        except ValueError as error:
+            raise RuntimeError("Taskwarrior returned an invalid task count") from error
+        if count_value == 0:
+            continue
+
+        cleanup = subprocess.run(
+            [task, "rc.verbose=nothing", "+jira", f"status:{status}", action],
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if cleanup.returncode != 0:
+            raise RuntimeError("Unable to remove closed Jira tasks from Taskwarrior")
+
+
+def make_config(credentials: dict[str, str], taskrc_path: Path) -> str:
+    query = (
+        f"assignee = '{ASSIGNEE}' AND resolution IS EMPTY "
+        'AND updated >= startOfDay("-3M")'
+    )
+    return "\n".join(
+        (
+            "[general]",
+            'targets = ["jira"]',
+            f"taskrc = {toml_string(str(taskrc_path))}",
+            "",
+            "[jira]",
+            'service = "jira"',
+            f"base_uri = {toml_string(credentials['base_uri'])}",
+            f"username = {toml_string(credentials['username'])}",
+            f"PAT = {toml_string(credentials['PAT'])}",
+            f"query = {toml_string(query)}",
+            'add_tags = ["jira"]',
+            "",
+        )
+    )
+
+
+def main() -> int:
+    arguments = sys.argv[1:]
+    if not arguments or any(
+        argument in {"-h", "--help", "--version"} for argument in arguments
+    ):
+        return subprocess.run([str(BUGWARRIOR), *arguments], check=False).returncode
+
+    if not BUGWARRIOR.is_file():
+        print(f"Bugwarrior executable not found: {BUGWARRIOR}", file=sys.stderr)
+        return 1
+
+    try:
+        credentials = load_jira_environment()
+        runtime_dir, taskrc_path = get_runtime_paths()
+        data_location = get_taskwarrior_data_location()
+        write_runtime_taskrc(taskrc_path, data_location, [])
+        with tempfile.TemporaryDirectory(
+            prefix="bugwarrior-",
+            dir=runtime_dir,
+        ) as directory:
+            config_path = Path(directory) / "bugwarrior.toml"
+            config_text = make_config(credentials, taskrc_path)
+            config_path.write_text(config_text, encoding="utf-8")
+            config_path.chmod(0o600)
+
+            environment = os.environ.copy()
+            environment.pop("TASKDATA", None)
+            environment["TASKRC"] = str(taskrc_path)
+            environment["BUGWARRIORRC"] = str(config_path)
+            python = VENV_PYTHON if VENV_PYTHON.is_file() else Path(sys.executable)
+
+            if arguments[0] == "pull":
+                uda_result = subprocess.run(
+                    [str(python), str(BUGWARRIOR), "uda"],
+                    env=environment,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if uda_result.returncode != 0:
+                    sys.stderr.write(uda_result.stderr)
+                    raise RuntimeError("Unable to load Bugwarrior Jira field definitions")
+                uda_lines = [
+                    line
+                    for line in uda_result.stdout.splitlines()
+                    if line.startswith("uda.")
+                ]
+                write_runtime_taskrc(taskrc_path, data_location, uda_lines)
+
+            result = subprocess.run(
+                [str(python), str(BUGWARRIOR), *arguments],
+                env=environment,
+                check=False,
+            )
+            if result.returncode != 0:
+                return result.returncode
+
+            if arguments[0] == "pull" and "--dry-run" not in arguments:
+                task = shutil.which("task")
+                if task is None:
+                    raise RuntimeError("Taskwarrior executable 'task' was not found")
+                cleanup_closed_tasks(task, environment)
+
+            return 0
+    except (OSError, RuntimeError) as error:
+        print(f"bugwarrior: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

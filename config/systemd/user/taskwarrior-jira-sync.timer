@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh Jira tasks in Taskwarrior
+
+[Timer]
+OnStartupSec=1min
+OnUnitActiveSec=30min
+AccuracySec=30s
+Unit=taskwarrior-jira-sync.service
+
+[Install]
+WantedBy=timers.target
