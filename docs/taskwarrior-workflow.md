@@ -4,7 +4,7 @@
 
 - `c`를 누르고 `jira` context를 선택하면 Jira 작업만 보입니다. 전체 작업으로 돌아가려면 context를 해제하거나 `task context none`을 실행합니다.
 - Jira 작업 하나를 선택한 뒤 `o`를 누르면 Zen Browser 새 탭에서 이슈가 열립니다.
-- `Shift+S`는 Jira 동기화를 systemd에 비동기로 요청합니다. taskwarrior-tui는 바로 돌아오며, 동기화 완료 후 `r`을 눌러 목록을 갱신합니다. 선택한 한 건만이 아니라 설정된 Jira 조회 전체를 갱신합니다.
+- `Shift+S`는 Jira 동기화를 systemd에 비동기로 요청합니다. taskwarrior-tui는 바로 돌아오고, 이후 Taskwarrior 데이터베이스 변경을 감지해 동기화 완료 시 목록을 자동 갱신합니다. 변경 감지는 최대 1분 내 보정되며, 즉시 확인하려면 `r`을 누릅니다. 선택한 한 건만이 아니라 설정된 Jira 조회 전체를 갱신합니다.
 
 ## 데이터 흐름
 
