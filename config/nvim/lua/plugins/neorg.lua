@@ -125,11 +125,11 @@ return {
             end
           end,
           actions = {
-            confirm = function(picker, item)
+            confirm = function(picker, item, action)
               local input = vim.trim(picker.input:get())
               local path_changed = copied_path ~= nil and input ~= copied_path
               if item and not path_changed then
-                return Snacks.picker.actions.jump(picker, item)
+                return Snacks.picker.actions.jump(picker, item, action)
               end
 
               local path, err = resolve_reference_path(input, workspace)
