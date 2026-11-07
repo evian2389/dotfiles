@@ -1,0 +1,20 @@
+# Alacritty: JetBrainsMonoHangul Nerd Font Mono (JetBrains Mono + D2Coding Hangul +
+# Nerd icons in one monospaced family; same font as ghostty).
+[font]
+size = 12
+
+[font.normal]
+family = "JetBrainsMonoHangul Nerd Font Mono"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMonoHangul Nerd Font Mono"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMonoHangul Nerd Font Mono"
+style = "Italic"
+
+[font.bold_italic]
+family = "JetBrainsMonoHangul Nerd Font Mono"
+style = "Bold Italic"
