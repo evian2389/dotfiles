@@ -1,0 +1,12 @@
+# sirup — work PC (Outlook / Microsoft 365 IMAP+SMTP), see docs/mail-outlook.md.
+# Only useful if IT allows IMAP/SMTP AUTH with OAuth2 (XOAUTH2/OAUTHBEARER).
+#
+# [accounts.work]
+# default = true
+# imap.server = "outlook.office365.com"
+# imap.sasl.xoauth2.username = "you@company.com"
+# imap.sasl.xoauth2.token.command = ["pass", "show", "work/outlook-access-token"]
+# smtp.server = "smtp://smtp.office365.com:587"
+# smtp.starttls = true
+# smtp.sasl.xoauth2.username = "you@company.com"
+# smtp.sasl.xoauth2.token.command = ["pass", "show", "work/outlook-access-token"]

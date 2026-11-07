@@ -1,0 +1,19 @@
+# himalaya (v2) — work PC (Arch, corporate network, Outlook/Microsoft 365).
+# Policy: no mail data on the SSD. Reads live; downloads go to /tmp.
+# Secrets never live here (password.command / token.command only).
+# See docs/mail-outlook.md for which of the options below your tenant allows.
+
+downloads-dir = "/tmp/himalaya-downloads"
+
+# --- Option A: IMAP via sirup (needs IMAP + modern auth enabled by IT) --------
+# [accounts.work]
+# default = true
+# email = "you@company.com"
+# imap.server = "unix:///run/user/1000/sirup/work-imap.sock"
+# smtp.server = "unix:///run/user/1000/sirup/work-smtp.sock"
+
+# --- Option B: Microsoft Graph backend (no IMAP needed, needs an OAuth token) --
+# [accounts.work]
+# default = true
+# email = "you@company.com"
+# msgraph.auth.token.command = ["pass", "show", "work/msgraph-access-token"]
